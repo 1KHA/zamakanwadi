@@ -1,10 +1,11 @@
-import { Link } from 'react-router-dom';
+'use client';
+
+import Link from 'next/link';
 import { useTranslation } from 'react-i18next';
 import { Mail, Phone, MapPin } from 'lucide-react';
 
 export default function Footer() {
-  const { t, i18n } = useTranslation();
-  const isRTL = i18n.language === 'ar';
+  const { t } = useTranslation();
 
   const links = [
     { to: '/about', label: t('nav.about') },
@@ -20,7 +21,6 @@ export default function Footer() {
     <footer className="bg-dark text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
-          {/* Brand */}
           <div className="lg:col-span-1">
             <div className="flex items-center gap-2 mb-4">
               <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
@@ -33,13 +33,12 @@ export default function Footer() {
             </p>
           </div>
 
-          {/* Quick Links */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">{isRTL ? 'روابط سريعة' : 'Quick Links'}</h3>
+            <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
             <ul className="space-y-2">
               {links.map((link) => (
                 <li key={link.to}>
-                  <Link to={link.to} className="text-gray-400 hover:text-secondary text-sm transition-colors">
+                  <Link href={link.to} className="text-gray-400 hover:text-secondary text-sm transition-colors">
                     {link.label}
                   </Link>
                 </li>
@@ -47,9 +46,8 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Services */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">{isRTL ? 'خدماتنا' : 'Our Services'}</h3>
+            <h3 className="text-lg font-semibold mb-4">Our Services</h3>
             <ul className="space-y-2">
               <li><span className="text-gray-400 text-sm">Work Offices</span></li>
               <li><span className="text-gray-400 text-sm">Meeting Rooms</span></li>
@@ -59,9 +57,8 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Contact */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">{isRTL ? 'تواصل معنا' : 'Contact Us'}</h3>
+            <h3 className="text-lg font-semibold mb-4">Contact Us</h3>
             <ul className="space-y-3">
               <li className="flex items-center gap-2 text-gray-400 text-sm">
                 <Mail className="w-4 h-4 shrink-0" />
