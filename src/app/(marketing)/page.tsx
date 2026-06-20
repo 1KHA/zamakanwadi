@@ -2,6 +2,8 @@
 import { useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import Link from 'next/link';
+import ContactSection from '@/components/ContactSection';
+import Image from 'next/image';
 import {
   Play,
   ArrowRight,
@@ -228,7 +230,7 @@ export default function LandingPage() {
         <div className="absolute inset-0">
           <div className="absolute inset-0 bg-gradient-to-br from-primary/90 via-primary/70 to-dark/90" />
           <img
-            src="/src/assets/hero.png"
+            src="/images/wmk01.png"
             alt="Zamakan workspace"
             className="w-full h-full object-cover opacity-40"
             loading="eager"
@@ -271,7 +273,7 @@ export default function LandingPage() {
 
               <div className="flex flex-wrap items-center gap-4">
                 <Link
-                  href="/plans"
+                  href="#contact"
                   className="inline-flex items-center justify-center gap-2 px-6 py-3 sm:px-8 sm:py-4 bg-secondary text-dark font-semibold rounded-xl hover:bg-secondary-dark transition-colors shadow-lg shadow-secondary/20"
                 >
                   {isRTL ? 'احجز الآن' : 'Book Now'}
@@ -411,30 +413,42 @@ export default function LandingPage() {
 
           {/* Decorative image row */}
           <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
-            <GradientPlaceholder
-              className="h-48 sm:h-64 rounded-2xl"
-              from="#9D1942"
-              to="#7A1333"
-              label={isRTL ? 'صورة زمكان 01' : 'Zamakan Image 01'}
-            />
-            <GradientPlaceholder
-              className="h-48 sm:h-64 rounded-2xl md:mt-8"
-              from="#F2B704"
-              to="#ffbf19"
-              label={isRTL ? 'صورة زمكان 02' : 'Zamakan Image 02'}
-            />
-            <GradientPlaceholder
-              className="h-48 sm:h-64 rounded-2xl"
-              from="#2B2422"
-              to="#979493"
-              label={isRTL ? 'صورة موقع زمكان' : 'Zamakan Site Image'}
-            />
-            <GradientPlaceholder
-              className="h-48 sm:h-64 rounded-2xl md:mt-8"
-              from="#0d0f25"
-              to="#2B2422"
-              label={isRTL ? 'صورة زمكان 03' : 'Zamakan Image 03'}
-            />
+            <div className="relative h-48 sm:h-64 rounded-2xl overflow-hidden">
+              <Image
+                src="/images/decoimage/3.jpg"
+                alt={isRTL ? 'صورة زمكان 01' : 'Zamakan Image 01'}
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 50vw, 25vw"
+              />
+            </div>
+            <div className="relative h-48 sm:h-64 rounded-2xl overflow-hidden md:mt-8">
+              <Image
+                src="/images/decoimage/6.jpg"
+                alt={isRTL ? 'صورة زمكان 02' : 'Zamakan Image 02'}
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 50vw, 25vw"
+              />
+            </div>
+            <div className="relative h-48 sm:h-64 rounded-2xl overflow-hidden">
+              <Image
+                src="/images/decoimage/7.jpg"
+                alt={isRTL ? 'صورة موقع زمكان' : 'Zamakan Site Image'}
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 50vw, 25vw"
+              />
+            </div>
+            <div className="relative h-48 sm:h-64 rounded-2xl overflow-hidden md:mt-8">
+              <Image
+                src="/images/decoimage/10.jpg"
+                alt={isRTL ? 'صورة زمكان 03' : 'Zamakan Image 03'}
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 50vw, 25vw"
+              />
+            </div>
           </div>
         </div>
       </section>
@@ -447,18 +461,24 @@ export default function LandingPage() {
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
             {/* Images */}
             <div className="relative">
-              <GradientPlaceholder
-                className="w-full h-80 sm:h-96 rounded-3xl shadow-xl"
-                from="#9D1942"
-                to="#2B2422"
-                label={isRTL ? 'مكاتب العمل' : 'Work Offices'}
-              />
-              <GradientPlaceholder
-                className="absolute -bottom-6 -end-6 w-40 h-40 sm:w-48 sm:h-48 rounded-2xl shadow-lg border-4 border-white"
-                from="#F2B704"
-                to="#ffbf19"
-                label={isRTL ? 'تفاصيل' : 'Details'}
-              />
+              <div className="relative w-full h-80 sm:h-96 rounded-3xl shadow-xl overflow-hidden">
+                <Image
+                  src="/images/decoimage/3.jpg"
+                  alt={isRTL ? 'مكاتب العمل' : 'Work Offices'}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                />
+              </div>
+              <div className="absolute -bottom-6 -end-6 w-40 h-40 sm:w-48 sm:h-48 rounded-2xl shadow-lg border-4 border-white overflow-hidden">
+                <Image
+                  src="/images/decoimage/6.jpg"
+                  alt={isRTL ? 'تفاصيل' : 'Details'}
+                  fill
+                  className="object-cover"
+                  sizes="200px"
+                />
+              </div>
             </div>
 
             {/* Text */}
@@ -502,7 +522,7 @@ export default function LandingPage() {
               </ul>
 
               <Link
-                href="/work-offices"
+                href="#contact"
                 className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-white font-medium rounded-xl hover:bg-primary-dark transition-colors"
               >
                 {isRTL ? 'استكشف المكاتب' : 'Explore Offices'}
@@ -564,7 +584,7 @@ export default function LandingPage() {
               </ul>
 
               <Link
-                href="/services"
+                href="#contact"
                 className="inline-flex items-center gap-2 px-6 py-3 bg-secondary text-dark font-medium rounded-xl hover:bg-secondary-dark transition-colors"
               >
                 {isRTL ? 'احجز قاعة' : 'Book a Room'}
@@ -625,7 +645,7 @@ export default function LandingPage() {
 
           <div className="flex flex-wrap items-center justify-center gap-4 pt-4">
             <Link
-              href="/plans"
+              href="#contact"
               className="inline-flex items-center gap-2 px-8 py-4 bg-secondary text-dark font-bold rounded-xl hover:bg-secondary-dark transition-colors shadow-lg shadow-black/10"
             >
               {isRTL ? 'عرض الباقات' : 'View Plans'}
@@ -722,7 +742,7 @@ export default function LandingPage() {
                   </ul>
 
                   <Link
-                    href="/plans"
+                    href="#contact"
                     className={`block w-full text-center py-3 rounded-xl font-semibold transition-colors ${
                       plan.popular
                         ? 'bg-secondary text-dark hover:bg-secondary-dark'
@@ -976,6 +996,8 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
+
+      <ContactSection />
 
       {/* ============================================================= */}
       {/*  VIDEO MODAL                                                     */}
