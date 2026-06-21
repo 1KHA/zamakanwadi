@@ -452,18 +452,24 @@ export default function LandingPage() {
             <div
               className={`relative ${isRTL ? 'lg:order-1' : 'lg:order-2'}`}
             >
-              <GradientPlaceholder
-                className="w-full h-80 sm:h-96 rounded-3xl shadow-xl"
-                from="#0d0f25"
-                to="#2B2422"
-                label={isRTL ? 'قاعات الاجتماعات' : 'Meeting Rooms'}
-              />
-              <GradientPlaceholder
-                className="absolute -bottom-6 -start-6 w-40 h-40 sm:w-48 sm:h-48 rounded-2xl shadow-lg border-4 border-white"
-                from="#ffbf19"
-                to="#F2B704"
-                label={isRTL ? 'تفاصيل' : 'Details'}
-              />
+              <div className="relative w-full h-80 sm:h-96 rounded-3xl shadow-xl overflow-hidden">
+                <Image
+                  src="/images/decoimage/7.jpg"
+                  alt={isRTL ? 'قاعات الاجتماعات' : 'Meeting Rooms'}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                />
+              </div>
+              <div className="absolute -bottom-6 -start-6 w-40 h-40 sm:w-48 sm:h-48 rounded-2xl shadow-lg border-4 border-white overflow-hidden">
+                <Image
+                  src="/images/decoimage/10.jpg"
+                  alt={isRTL ? 'تفاصيل' : 'Details'}
+                  fill
+                  className="object-cover"
+                  sizes="200px"
+                />
+              </div>
             </div>
           </div>
         </div>
