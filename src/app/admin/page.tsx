@@ -47,8 +47,13 @@ export default function AdminPage() {
     setMessagesError('');
 
     fetch('/api/contact-messages')
-      .then((res) => {
-        if (!res.ok) throw new Error('Failed to fetch messages');
+      .then(async (res) => {
+        if (!res.ok) {
+          const data = await res.json().catch(() => ({}));
+          const message = data.details || data.error || `HTTP ${res.status}`;
+          console.error('[admin] Failed to fetch messages:', data);
+          throw new Error(message);
+        }
         return res.json();
       })
       .then((data) => {
