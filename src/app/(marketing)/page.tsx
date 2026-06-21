@@ -976,22 +976,24 @@ export default function LandingPage() {
 
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
             {[
-              { h: 'h-48 sm:h-64', from: '#9D1942', to: '#7A1333' },
-              { h: 'h-48 sm:h-64 md:mt-12', from: '#F2B704', to: '#ffbf19' },
-              { h: 'h-48 sm:h-64', from: '#2B2422', to: '#979493' },
-              { h: 'h-48 sm:h-64 md:mt-12', from: '#0d0f25', to: '#2B2422' },
-              { h: 'h-48 sm:h-64 md:mt-8', from: '#ffbf19', to: '#F2B704' },
-              { h: 'h-48 sm:h-64', from: '#7A1333', to: '#9D1942' },
-              { h: 'h-48 sm:h-64 md:mt-8', from: '#979493', to: '#2B2422' },
-              { h: 'h-48 sm:h-64', from: '#2B2422', to: '#0d0f25' },
+              { h: 'h-48 sm:h-64', src: '/images/disimage/IMG_0219.jpg' },
+              { h: 'h-48 sm:h-64 md:mt-12', src: '/images/disimage/NSPACE%20FULL-10.jpg' },
+              { h: 'h-48 sm:h-64', src: '/images/disimage/IMG_0368.jpg' },
+              { h: 'h-48 sm:h-64 md:mt-12', src: '/images/disimage/%D8%B5%D9%88%D8%B1%D8%A92.jpg' },
+              { h: 'h-48 sm:h-64 md:mt-8', src: '/images/disimage/IMG_7903-HDR.jpg' },
+              { h: 'h-48 sm:h-64', src: '/images/disimage/GNR_1879%20copy.jpg' },
+              { h: 'h-48 sm:h-64 md:mt-8', src: '/images/disimage/space%26cafe-7.jpg' },
+              { h: 'h-48 sm:h-64', src: '/images/disimage/NBL_9534.JPG' },
             ].map((item, idx) => (
-              <GradientPlaceholder
-                key={idx}
-                className={`${item.h} rounded-2xl`}
-                from={item.from}
-                to={item.to}
-                label={`${isRTL ? 'صورة' : 'Image'} ${idx + 1}`}
-              />
+              <div key={idx} className={`relative ${item.h} rounded-2xl overflow-hidden`}>
+                <Image
+                  src={item.src}
+                  alt={`${isRTL ? 'صورة' : 'Image'} ${idx + 1}`}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                />
+              </div>
             ))}
           </div>
         </div>
