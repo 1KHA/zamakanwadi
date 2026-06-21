@@ -58,7 +58,13 @@ export default function ContactSection() {
   };
 
   return (
-    <section id="contact" className="py-20 sm:py-28 lg:py-36 bg-gray-50">
+    <section id="contact" className="relative py-20 sm:py-28 lg:py-36 bg-gray-50 overflow-hidden">
+      {/* Decorative background */}
+      <div aria-hidden="true" className="pointer-events-none absolute top-6 left-6 w-36 h-36 border-[3px] border-primary/10 rounded-2xl rotate-12" />
+      <div aria-hidden="true" className="pointer-events-none absolute top-20 left-20 w-10 h-10 border-2 border-secondary/20 rounded-lg -rotate-6" />
+      <div aria-hidden="true" className="pointer-events-none absolute bottom-6 right-6 w-44 h-44 border-[3px] border-secondary/15 rounded-3xl -rotate-12" />
+      <div aria-hidden="true" className="pointer-events-none absolute bottom-20 right-24 w-14 h-14 border-2 border-primary/10 rounded-xl rotate-6" />
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0" style={{ backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 80px, rgba(157,25,66,0.025) 80px, rgba(157,25,66,0.025) 81px)' }} />
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-dark leading-tight mb-4">

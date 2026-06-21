@@ -302,6 +302,12 @@ export default function LandingPage() {
       {/*  PACKAGES INTRO                                                  */}
       {/* ============================================================= */}
       <section className="relative py-20 sm:py-28 lg:py-36 bg-white overflow-hidden">
+        {/* Decorative background */}
+        <div aria-hidden="true" className="pointer-events-none absolute top-6 right-6 w-36 h-36 border-[3px] border-primary/10 rounded-2xl rotate-12" />
+        <div aria-hidden="true" className="pointer-events-none absolute top-20 right-24 w-14 h-14 border-2 border-secondary/20 rounded-xl rotate-45" />
+        <div aria-hidden="true" className="pointer-events-none absolute bottom-6 left-6 w-44 h-44 border-[3px] border-secondary/10 rounded-3xl -rotate-6" />
+        <div aria-hidden="true" className="pointer-events-none absolute bottom-24 left-20 w-8 h-8 bg-primary/5 rounded-lg rotate-12" />
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0" style={{ backgroundImage: 'repeating-linear-gradient(-45deg, transparent, transparent 80px, rgba(157,25,66,0.025) 80px, rgba(157,25,66,0.025) 81px)' }} />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-4xl mx-auto space-y-6">
             <SectionTitle>
@@ -363,7 +369,13 @@ export default function LandingPage() {
       {/* ============================================================= */}
       {/*  MEETING ROOMS                                                   */}
       {/* ============================================================= */}
-      <section className="py-20 sm:py-28 lg:py-36 bg-white">
+      <section className="relative py-20 sm:py-28 lg:py-36 bg-white overflow-hidden">
+        {/* Decorative background */}
+        <div aria-hidden="true" className="pointer-events-none absolute top-8 left-6 w-28 h-28 border-2 border-secondary/20 rounded-xl rotate-12" />
+        <div aria-hidden="true" className="pointer-events-none absolute top-28 left-16 w-10 h-10 bg-secondary/10 rounded-lg -rotate-6" />
+        <div aria-hidden="true" className="pointer-events-none absolute bottom-6 right-6 w-36 h-36 border-[3px] border-primary/10 rounded-2xl -rotate-12" />
+        <div aria-hidden="true" className="pointer-events-none absolute bottom-24 right-20 w-12 h-12 border-2 border-primary/10 rounded-lg rotate-6" />
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0" style={{ backgroundImage: 'repeating-linear-gradient(60deg, transparent, transparent 100px, rgba(242,183,4,0.035) 100px, rgba(242,183,4,0.035) 101px)' }} />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
             {/* Text — order changes on RTL/LTR via logical flow not needed because grid auto flows; we use order class */}
@@ -444,7 +456,12 @@ export default function LandingPage() {
       {/* ============================================================= */}
       {/*  FEATURES                                                        */}
       {/* ============================================================= */}
-      <section className="py-20 sm:py-28 lg:py-36 bg-white">
+      <section className="relative py-20 sm:py-28 lg:py-36 bg-white overflow-hidden">
+        {/* Decorative background */}
+        <div aria-hidden="true" className="pointer-events-none absolute top-6 left-6 w-44 h-44 border-[3px] border-primary/10 rounded-3xl rotate-12" />
+        <div aria-hidden="true" className="pointer-events-none absolute top-24 left-28 w-10 h-10 border-2 border-secondary/25 rounded-lg rotate-45" />
+        <div aria-hidden="true" className="pointer-events-none absolute bottom-6 right-6 w-44 h-44 border-[3px] border-secondary/15 rounded-3xl -rotate-12" />
+        <div aria-hidden="true" className="pointer-events-none absolute bottom-28 right-28 w-8 h-8 bg-primary/5 rounded-lg rotate-6" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto space-y-4 mb-16">
             <SectionTitle>
@@ -482,7 +499,13 @@ export default function LandingPage() {
       {/* ============================================================= */}
       {/*  DECORATIVE IMAGE GRID                                           */}
       {/* ============================================================= */}
-      <section className="py-20 sm:py-28 lg:py-36 bg-white">
+      <section className="relative py-20 sm:py-28 lg:py-36 bg-white overflow-hidden">
+        {/* Decorative background */}
+        <div aria-hidden="true" className="pointer-events-none absolute top-6 right-6 w-40 h-40 border-[3px] border-secondary/15 rounded-2xl rotate-12" />
+        <div aria-hidden="true" className="pointer-events-none absolute top-24 right-24 w-12 h-12 border-2 border-primary/10 rounded-xl -rotate-6" />
+        <div aria-hidden="true" className="pointer-events-none absolute bottom-6 left-6 w-36 h-36 border-2 border-primary/10 rounded-2xl -rotate-6" />
+        <div aria-hidden="true" className="pointer-events-none absolute bottom-20 left-16 w-10 h-10 bg-secondary/10 rounded-lg rotate-12" />
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0" style={{ backgroundImage: 'repeating-linear-gradient(-30deg, transparent, transparent 60px, rgba(157,25,66,0.025) 60px, rgba(157,25,66,0.025) 61px)' }} />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto space-y-4 mb-16">
             <SectionTitle>
