@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Send, ArrowRight, Phone, User, Briefcase } from 'lucide-react';
+import { Send, Phone, User, Briefcase } from 'lucide-react';
 
 const INQUIRY_OPTIONS = [
   { value: 'whole-office', ar: 'تأجير مكتب كامل', en: 'Rent a whole office' },
@@ -184,7 +184,6 @@ export default function ContactSection() {
                 : isRTL
                   ? 'إرسال الاستفسار'
                   : 'Send Inquiry'}
-              <ArrowRight className={`w-5 h-5 ${isRTL ? 'rotate-180' : ''}`} />
             </button>
           </form>
         </div>
