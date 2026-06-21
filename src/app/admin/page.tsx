@@ -250,7 +250,7 @@ export default function AdminPage() {
                       {messages.map((msg) => (
                         <tr key={msg.id} className="border-b border-gray-50 hover:bg-gray-50">
                           <td className="py-3 px-4 font-medium text-dark">{msg.fullName}</td>
-                          <td className="py-3 px-4 text-gray-custom" dir="ltr">{msg.phone}</td>
+                          <td className="py-3 px-4 text-gray-custom text-end" dir="ltr">{msg.phone}</td>
                           <td className="py-3 px-4 text-gray-custom">{msg.activity}</td>
                           <td className="py-3 px-4 text-gray-custom">
                             {msg.inquiryType === 'whole-office' && (isRTL ? 'تأجير مكتب كامل' : 'Rent a whole office')}
