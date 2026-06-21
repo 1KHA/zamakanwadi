@@ -10,12 +10,11 @@ import {
   Mail,
   MapPin,
   Briefcase,
-  Users,
   Coffee,
   Wifi,
   Monitor,
+  Users,
   Clock,
-  Star,
   Zap,
   Shield,
   Headphones,
@@ -176,13 +175,6 @@ export default function LandingPage() {
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
             {/* Text content */}
             <div className="text-white space-y-6 sm:space-y-8">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-white/20 backdrop-blur-sm">
-                <Star className="w-4 h-4 text-secondary" />
-                <span className="text-sm font-medium">
-                  {isRTL ? 'مساحة عمل مبتكرة' : 'Innovative Workspace'}
-                </span>
-              </div>
-
               <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight">
                 {isRTL ? (
                   <>
@@ -326,13 +318,6 @@ export default function LandingPage() {
       <section className="relative py-20 sm:py-28 lg:py-36 bg-white overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-4xl mx-auto space-y-6">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-secondary/10 border border-secondary/20">
-              <Star className="w-4 h-4 text-secondary-dark" />
-              <span className="text-sm font-semibold text-secondary-dark">
-                {isRTL ? 'خطط مرنة' : 'Flexible Plans'}
-              </span>
-            </div>
-
             <SectionTitle>
               {isRTL
                 ? 'بيئة عمل مصممة لنجاحك'
@@ -399,13 +384,6 @@ export default function LandingPage() {
             <div
               className={`space-y-6 ${isRTL ? 'lg:order-2' : 'lg:order-1'}`}
             >
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-secondary/10 border border-secondary/20">
-                <Users className="w-4 h-4 text-secondary-dark" />
-                <span className="text-sm font-semibold text-secondary-dark">
-                  {isRTL ? 'قاعات الاجتماعات' : 'Meeting Rooms'}
-                </span>
-              </div>
-
               <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-dark leading-tight">
                 {isRTL
                   ? 'قاعات اجتماعات لكل المناسبات'
@@ -483,13 +461,6 @@ export default function LandingPage() {
       <section className="py-20 sm:py-28 lg:py-36 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto space-y-4 mb-16">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#ffbf19]/10 border border-[#ffbf19]/20">
-              <Zap className="w-4 h-4 text-[#d4a103]" />
-              <span className="text-sm font-semibold text-[#d4a103]">
-                {isRTL ? 'لماذا زمكان؟' : 'Why Zamakan?'}
-              </span>
-            </div>
-
             <SectionTitle>
               {isRTL ? 'مميزاتنا' : 'Our Features'}
             </SectionTitle>

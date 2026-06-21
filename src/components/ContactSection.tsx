@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Send, ArrowRight, Phone, User, Briefcase, HelpCircle } from 'lucide-react';
+import { Send, ArrowRight, Phone, User, Briefcase } from 'lucide-react';
 
 const INQUIRY_OPTIONS = [
   { value: 'whole-office', ar: 'تأجير مكتب كامل', en: 'Rent a whole office' },
@@ -61,12 +61,6 @@ export default function ContactSection() {
     <section id="contact" className="py-20 sm:py-28 lg:py-36 bg-gray-50">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-6">
-            <HelpCircle className="w-4 h-4 text-primary" />
-            <span className="text-sm font-semibold text-primary">
-              {isRTL ? 'نحن هنا لمساعدتك' : 'We are here to help'}
-            </span>
-          </div>
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-dark leading-tight mb-4">
             {isRTL ? 'تواصل معنا' : 'Contact Us'}
           </h2>
