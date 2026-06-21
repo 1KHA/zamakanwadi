@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { signIn } from 'next-auth/react';
+import { signIn, getSession } from 'next-auth/react';
 import { Mail, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react';
 
 export default function SignInPage() {
@@ -32,7 +32,12 @@ export default function SignInPage() {
     if (result?.error) {
       setError(isRTL ? 'البريد الإلكتروني أو كلمة المرور غير صحيحة' : 'Invalid email or password');
     } else {
-      router.push('/profile');
+      const session = await getSession();
+      if (session?.user?.role === 'ADMIN') {
+        router.push('/admin');
+      } else {
+        router.push('/');
+      }
       router.refresh();
     }
   };

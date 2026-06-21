@@ -1,13 +1,18 @@
 'use client';
+
 import { useState } from 'react';
-import { signIn } from 'next-auth/react';
+import { useTranslation } from 'react-i18next';
 import { useRouter } from 'next/navigation';
-import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
+import { signIn } from 'next-auth/react';
+import { Mail, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react';
 
 export default function AdminSignInPage() {
+  const { i18n } = useTranslation();
+  const isRTL = i18n.language === 'ar';
   const router = useRouter();
-  const [form, setForm] = useState({ email: '', password: '' });
+
   const [showPassword, setShowPassword] = useState(false);
+  const [form, setForm] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -25,7 +30,7 @@ export default function AdminSignInPage() {
     setLoading(false);
 
     if (result?.error) {
-      setError('البريد الإلكتروني أو كلمة المرور غير صحيحة');
+      setError(isRTL ? 'البريد الإلكتروني أو كلمة المرور غير صحيحة' : 'Invalid email or password');
     } else {
       router.push('/admin');
       router.refresh();
@@ -33,49 +38,57 @@ export default function AdminSignInPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4" dir="rtl">
+    <div className={`min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 ${isRTL ? 'rtl' : 'ltr'}`}>
       <div className="w-full max-w-md">
-        <div className="bg-white rounded-2xl shadow-xl p-8">
+        <div className="bg-white rounded-2xl shadow-xl p-8 sm:p-10">
           <div className="text-center mb-8">
-            <div className="w-14 h-14 bg-primary rounded-xl flex items-center justify-center mx-auto mb-4">
-              <span className="text-white font-bold text-xl">Z</span>
+            <div className="w-16 h-16 bg-primary rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <span className="text-white font-bold text-2xl">Z</span>
             </div>
-            <h1 className="text-2xl font-bold text-dark">تسجيل دخول المشرف</h1>
-            <p className="text-gray-custom mt-1 text-sm">لوحة تحكم زمكان</p>
+            <h1 className="text-2xl font-bold text-dark">
+              {isRTL ? 'تسجيل الدخول للإدارة' : 'Admin Sign In'}
+            </h1>
+            <p className="text-gray-custom mt-2">
+              {isRTL ? 'لوحة تحكم زمكان الإدارية' : 'Zamakan Admin Dashboard'}
+            </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label className="block text-sm font-medium text-dark mb-2">البريد الإلكتروني</label>
+              <label className="block text-sm font-medium text-dark mb-2">
+                {isRTL ? 'البريد الإلكتروني' : 'Email Address'}
+              </label>
               <div className="relative">
-                <Mail className="absolute top-1/2 -translate-y-1/2 right-3 w-5 h-5 text-gray-400" />
+                <Mail className={`absolute top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 ${isRTL ? 'right-3' : 'left-3'}`} />
                 <input
                   type="email"
+                  required
                   value={form.email}
                   onChange={(e) => setForm({ ...form, email: e.target.value })}
-                  required
-                  className="w-full pr-10 pl-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary"
-                  placeholder="admin@zamakan.com"
+                  className={`w-full ${isRTL ? 'pr-10 pl-4' : 'pl-10 pr-4'} py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent`}
+                  placeholder={isRTL ? 'your@email.com' : 'your@email.com'}
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-dark mb-2">كلمة المرور</label>
+              <label className="block text-sm font-medium text-dark mb-2">
+                {isRTL ? 'كلمة المرور' : 'Password'}
+              </label>
               <div className="relative">
-                <Lock className="absolute top-1/2 -translate-y-1/2 right-3 w-5 h-5 text-gray-400" />
+                <Lock className={`absolute top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 ${isRTL ? 'right-3' : 'left-3'}`} />
                 <input
                   type={showPassword ? 'text' : 'password'}
+                  required
                   value={form.password}
                   onChange={(e) => setForm({ ...form, password: e.target.value })}
-                  required
-                  className="w-full pr-10 pl-12 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary"
+                  className={`w-full ${isRTL ? 'pr-10 pl-12' : 'pl-10 pr-12'} py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent`}
                   placeholder="••••••••"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute top-1/2 -translate-y-1/2 left-3 text-gray-400 hover:text-dark"
+                  className={`absolute top-1/2 -translate-y-1/2 ${isRTL ? 'left-3' : 'right-3'} text-gray-400 hover:text-dark`}
                 >
                   {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
@@ -91,9 +104,10 @@ export default function AdminSignInPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 bg-primary text-white font-bold rounded-xl hover:bg-primary-dark transition-colors disabled:opacity-50"
+              className="w-full py-3 bg-primary text-white font-bold rounded-xl hover:bg-primary-dark transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
             >
-              {loading ? 'جاري الدخول...' : 'تسجيل الدخول'}
+              {loading ? (isRTL ? 'جاري الدخول...' : 'Signing in...') : (isRTL ? 'تسجيل الدخول' : 'Sign In')}
+              <ArrowRight className={`w-5 h-5 ${isRTL ? 'rotate-180' : ''}`} />
             </button>
           </form>
         </div>
