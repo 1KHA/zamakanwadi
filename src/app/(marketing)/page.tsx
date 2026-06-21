@@ -177,7 +177,7 @@ export default function LandingPage() {
                   <>
                     زمكان
                     <br />
-                    <span className="text-secondary">مساحتك</span> للإبداع
+                    <span className="text-secondary">مجتمعك</span> الريادي
                   </>
                 ) : (
                   <>
@@ -189,11 +189,11 @@ export default function LandingPage() {
                 )}
               </h1>
 
-              <p className="text-base sm:text-lg lg:text-xl text-white/80 max-w-lg leading-relaxed">
+              {/* <p className="text-base sm:text-lg lg:text-xl text-white/80 max-w-lg leading-relaxed">
                 {isRTL
                   ? 'اكتشف بيئة عمل مصممة لتلهمك وتدعم نموك المهني مع أفضل المرافق والخدمات.'
                   : 'Discover a work environment designed to inspire you and support your professional growth with the best facilities and services.'}
-              </p>
+              </p> */}
 
               <div className="flex flex-wrap items-center gap-4">
                 <Link
@@ -312,13 +312,13 @@ export default function LandingPage() {
           <div className="text-center max-w-4xl mx-auto space-y-6">
             <SectionTitle>
               {isRTL
-                ? 'بيئة عمل مصممة لنجاحك'
+                ? 'بيئة عمل ملهمة'
                 : 'A Work Environment Designed for Your Success'}
             </SectionTitle>
 
             <SectionSubtitle className="mx-auto">
               {isRTL
-                ? 'استمتع بمكاتب عمل عصرية مجهزة بأحدث التقنيات، إنترنت فائق السرعة، وأماكن مريحة تساعدك على التركيز وتحقيق أهدافك بكفاءة.'
+                ? 'رسالتنا تكمن في خلق بيئة محفزة للإبداع والإبتكار لإثراء تجربة ريادي الأعمال وربطهم بالمجتمع الريادي.'
                 : 'Enjoy modern offices equipped with the latest technology, high-speed internet, and comfortable spaces that help you focus and achieve your goals efficiently.'}
             </SectionSubtitle>
           </div>

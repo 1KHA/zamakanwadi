@@ -2,6 +2,7 @@
 
 import { useTranslation } from 'react-i18next';
 import { Mail, Phone, MapPin } from 'lucide-react';
+import Logo from '@/components/Logo';
 
 export default function Footer() {
   const { t, i18n } = useTranslation();
@@ -12,11 +13,8 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
           <div>
-            <div className="flex items-center gap-2 mb-4">
-              <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-lg">Z</span>
-              </div>
-              <span className="text-xl font-bold">Zamakan</span>
+            <div className="mb-4">
+              <Logo width={140} height={63} />
             </div>
             <p className="text-gray-400 text-sm leading-relaxed max-w-sm">
               {isRTL

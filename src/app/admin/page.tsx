@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import Logo from '@/components/Logo';
 import {
   LayoutDashboard, Users, Folder, ShoppingCart, Settings, MessageSquare,
   TrendingUp, TrendingDown, DollarSign, BarChart3,
@@ -156,11 +157,8 @@ export default function AdminPage() {
         {/* Sidebar */}
         <aside className="w-64 bg-dark text-white min-h-screen sticky top-0">
           <div className="p-6">
-            <div className="flex items-center gap-2 mb-8">
-              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">Z</span>
-              </div>
-              <span className="font-bold">Zamakan Admin</span>
+            <div className="mb-8">
+              <Logo width={140} height={63} />
             </div>
             <nav className="space-y-1">
               {sidebarItems.map((item) => (

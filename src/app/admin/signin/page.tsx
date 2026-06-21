@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { useRouter } from 'next/navigation';
 import { signIn } from 'next-auth/react';
 import { Mail, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react';
+import Logo from '@/components/Logo';
 
 export default function AdminSignInPage() {
   const { i18n } = useTranslation();
@@ -42,8 +43,8 @@ export default function AdminSignInPage() {
       <div className="w-full max-w-md">
         <div className="bg-white rounded-2xl shadow-xl p-8 sm:p-10">
           <div className="text-center mb-8">
-            <div className="w-16 h-16 bg-primary rounded-2xl flex items-center justify-center mx-auto mb-4">
-              <span className="text-white font-bold text-2xl">Z</span>
+            <div className="flex justify-center mb-4">
+              <Logo width={160} height={72} />
             </div>
             <h1 className="text-2xl font-bold text-dark">
               {isRTL ? 'تسجيل الدخول للإدارة' : 'Admin Sign In'}
