@@ -7,6 +7,34 @@ import {
   ChevronRight, Bell, Search
 } from 'lucide-react';
 
+function getWeekStart(date: Date) {
+  const d = new Date(date);
+  const day = d.getDay();
+  const diff = d.getDate() - day;
+  const start = new Date(d.setDate(diff));
+  start.setHours(0, 0, 0, 0);
+  return start;
+}
+
+function formatWeekLabel(
+  start: Date,
+  isCurrent: boolean,
+  isRTL: boolean,
+  count: number
+) {
+  const dateStr = start.toLocaleDateString(isRTL ? 'ar-SA' : 'en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+  });
+  if (isCurrent) {
+    return isRTL ? `هذا الأسبوع (${count})` : `This week (${count})`;
+  }
+  return isRTL
+    ? `أسبوع ${dateStr} (${count})`
+    : `Week of ${dateStr} (${count})`;
+}
+
 export default function AdminPage() {
   const { i18n } = useTranslation();
   const isRTL = i18n.language === 'ar';
@@ -70,6 +98,44 @@ export default function AdminPage() {
       cancelled = true;
     };
   }, [activeTab]);
+
+  const currentWeekStart = getWeekStart(new Date());
+  const currentWeekKey = currentWeekStart.toISOString();
+
+  const [openWeeks, setOpenWeeks] = useState<Set<string>>(new Set([currentWeekKey]));
+
+  const toggleWeek = (key: string) => {
+    setOpenWeeks((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) {
+        next.delete(key);
+      } else {
+        next.add(key);
+      }
+      return next;
+    });
+  };
+
+  const groupedMessages = messages
+    ? Object.entries(
+        messages.reduce<Record<string, typeof messages>>((acc, msg) => {
+          const start = getWeekStart(new Date(msg.createdAt));
+          const key = start.toISOString();
+          if (!acc[key]) acc[key] = [];
+          acc[key].push(msg);
+          return acc;
+        }, {})
+      )
+        .map(([key, msgs]) => ({
+          key,
+          start: new Date(key),
+          messages: msgs.sort(
+            (a, b) =>
+              new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          ),
+        }))
+        .sort((a, b) => b.start.getTime() - a.start.getTime())
+    : [];
 
   const recentOrders = [
     { id: '#ORD-001', customer: 'Ahmed Saleh', item: 'Pro Plan', amount: 599, status: 'completed' },
@@ -229,41 +295,66 @@ export default function AdminPage() {
                 {isRTL ? 'رسائل التواصل' : 'Contact Messages'}
               </h3>
               {messagesLoading ? (
-                <p className="text-gray-custom text-center py-8">{isRTL ? 'جاري التحميل...' : 'Loading...'}</p>
+                <p className="text-dark text-center py-8">{isRTL ? 'جاري التحميل...' : 'Loading...'}</p>
               ) : messagesError ? (
                 <p className="text-red-600 text-center py-8">{messagesError}</p>
               ) : messages && messages.length === 0 ? (
-                <p className="text-gray-custom text-center py-8">{isRTL ? 'لا توجد رسائل بعد' : 'No messages yet'}</p>
-              ) : messages ? (
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead>
-                      <tr className="border-b border-gray-100">
-                        <th className="text-start text-sm font-medium text-gray-custom py-3 px-4">{isRTL ? 'الاسم' : 'Name'}</th>
-                        <th className="text-start text-sm font-medium text-gray-custom py-3 px-4">{isRTL ? 'الجوال' : 'Phone'}</th>
-                        <th className="text-start text-sm font-medium text-gray-custom py-3 px-4">{isRTL ? 'النشاط' : 'Activity'}</th>
-                        <th className="text-start text-sm font-medium text-gray-custom py-3 px-4">{isRTL ? 'نوع الاستفسار' : 'Inquiry Type'}</th>
-                        <th className="text-start text-sm font-medium text-gray-custom py-3 px-4">{isRTL ? 'التاريخ' : 'Date'}</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {messages.map((msg) => (
-                        <tr key={msg.id} className="border-b border-gray-50 hover:bg-gray-50">
-                          <td className="py-3 px-4 font-medium text-dark">{msg.fullName}</td>
-                          <td className="py-3 px-4 text-gray-custom text-end" dir="ltr">{msg.phone}</td>
-                          <td className="py-3 px-4 text-gray-custom">{msg.activity}</td>
-                          <td className="py-3 px-4 text-gray-custom">
-                            {msg.inquiryType === 'whole-office' && (isRTL ? 'تأجير مكتب كامل' : 'Rent a whole office')}
-                            {msg.inquiryType === 'shared-desk' && (isRTL ? 'تأجير مكتب في مساحة عمل مشتركة' : 'Rent a desk in shared workspace')}
-                            {msg.inquiryType === 'general' && (isRTL ? 'استفسار عام' : 'General inquiry')}
-                          </td>
-                          <td className="py-3 px-4 text-gray-custom whitespace-nowrap">
-                            {new Date(msg.createdAt).toLocaleString(isRTL ? 'ar-SA' : 'en-US')}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                <p className="text-dark text-center py-8">{isRTL ? 'لا توجد رسائل بعد' : 'No messages yet'}</p>
+              ) : groupedMessages.length > 0 ? (
+                <div className="space-y-4">
+                  {groupedMessages.map(({ key, start, messages: weekMessages }) => {
+                    const isOpen = openWeeks.has(key);
+                    const isCurrent = key === currentWeekKey;
+                    return (
+                      <div key={key} className="border border-gray-200 rounded-xl overflow-hidden">
+                        <button
+                          onClick={() => toggleWeek(key)}
+                          className="w-full flex items-center justify-between px-4 py-3 bg-gray-50 hover:bg-gray-100 transition-colors"
+                        >
+                          <span className="font-bold text-dark">
+                            {formatWeekLabel(start, isCurrent, isRTL, weekMessages.length)}
+                          </span>
+                          <ChevronRight
+                            className={`w-5 h-5 text-dark transition-transform ${
+                              isOpen ? 'rotate-90' : isRTL ? 'rotate-180' : ''
+                            }`}
+                          />
+                        </button>
+                        {isOpen && (
+                          <div className="overflow-x-auto p-4">
+                            <table className="w-full">
+                              <thead>
+                                <tr className="border-b border-gray-100">
+                                  <th className="text-start text-sm font-semibold text-dark py-3 px-4">{isRTL ? 'الاسم' : 'Name'}</th>
+                                  <th className="text-start text-sm font-semibold text-dark py-3 px-4">{isRTL ? 'الجوال' : 'Phone'}</th>
+                                  <th className="text-start text-sm font-semibold text-dark py-3 px-4">{isRTL ? 'النشاط' : 'Activity'}</th>
+                                  <th className="text-start text-sm font-semibold text-dark py-3 px-4">{isRTL ? 'نوع الاستفسار' : 'Inquiry Type'}</th>
+                                  <th className="text-start text-sm font-semibold text-dark py-3 px-4">{isRTL ? 'التاريخ' : 'Date'}</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {weekMessages.map((msg) => (
+                                  <tr key={msg.id} className="border-b border-gray-50 hover:bg-gray-50">
+                                    <td className="py-3 px-4 font-medium text-dark">{msg.fullName}</td>
+                                    <td className="py-3 px-4 text-dark text-end whitespace-nowrap" dir="ltr">{msg.phone}</td>
+                                    <td className="py-3 px-4 text-dark">{msg.activity}</td>
+                                    <td className="py-3 px-4 text-dark">
+                                      {msg.inquiryType === 'whole-office' && (isRTL ? 'تأجير مكتب كامل' : 'Rent a whole office')}
+                                      {msg.inquiryType === 'shared-desk' && (isRTL ? 'تأجير مكتب في مساحة عمل مشتركة' : 'Rent a desk in shared workspace')}
+                                      {msg.inquiryType === 'general' && (isRTL ? 'استفسار عام' : 'General inquiry')}
+                                    </td>
+                                    <td className="py-3 px-4 text-dark whitespace-nowrap">
+                                      {new Date(msg.createdAt).toLocaleString(isRTL ? 'ar-SA' : 'en-US')}
+                                    </td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               ) : null}
             </div>
