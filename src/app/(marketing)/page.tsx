@@ -5,7 +5,6 @@ import Link from 'next/link';
 import ContactSection from '@/components/ContactSection';
 import Image from 'next/image';
 import {
-  Play,
   ArrowRight,
   Mail,
   MapPin,
@@ -19,7 +18,6 @@ import {
   Shield,
   Headphones,
   Check,
-  X,
 } from 'lucide-react';
 
 /* ------------------------------------------------------------------ */
@@ -91,7 +89,6 @@ export default function LandingPage() {
   const { i18n } = useTranslation();
   const isRTL = i18n.language === 'ar';
 
-  const [showVideo, setShowVideo] = useState(false);
 
   /* ----- Feature data ----- */
   const features = [
@@ -209,17 +206,6 @@ export default function LandingPage() {
                   />
                 </Link>
 
-                <button
-                  onClick={() => setShowVideo(true)}
-                  className="inline-flex items-center gap-3 group"
-                >
-                  <span className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-white/10 border border-white/30 flex items-center justify-center group-hover:bg-white/20 transition-colors backdrop-blur-sm">
-                    <Play className="w-5 h-5 sm:w-6 sm:h-6 text-white ms-0.5" />
-                  </span>
-                  <span className="text-sm sm:text-base font-medium text-white/90 group-hover:text-white transition-colors">
-                    {isRTL ? 'شاهد الفيديو' : 'Watch Video'}
-                  </span>
-                </button>
               </div>
             </div>
 
@@ -536,43 +522,6 @@ export default function LandingPage() {
 
       <ContactSection />
 
-      {/* ============================================================= */}
-      {/*  VIDEO MODAL                                                     */}
-      {/* ============================================================= */}
-      {showVideo && (
-        <div
-          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
-          onClick={() => setShowVideo(false)}
-        >
-          <div
-            className="relative w-full max-w-4xl bg-dark rounded-2xl overflow-hidden shadow-2xl"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button
-              onClick={() => setShowVideo(false)}
-              className="absolute top-4 end-4 z-10 w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-colors"
-            >
-              <X className="w-5 h-5" />
-            </button>
-
-            <div className="aspect-video flex items-center justify-center">
-              <GradientPlaceholder
-                className="absolute inset-0 w-full h-full rounded-none"
-                from="#2B2422"
-                to="#0d0f25"
-              />
-              <div className="relative text-center space-y-4">
-                <Play className="w-16 h-16 text-white/50 mx-auto" />
-                <p className="text-white/60 text-sm">
-                  {isRTL
-                    ? 'سيتم إضافة الفيديو قريباً'
-                    : 'Video will be added soon'}
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
