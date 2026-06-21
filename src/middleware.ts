@@ -1,12 +1,26 @@
-import { type NextRequest } from "next/server";
-import { createClient } from "@/utils/supabase/middleware";
+import { withAuth } from 'next-auth/middleware';
+import { NextResponse } from 'next/server';
 
-export function middleware(request: NextRequest) {
-  return createClient(request);
-}
+export default withAuth(
+  function middleware() {
+    return NextResponse.next();
+  },
+  {
+    callbacks: {
+      authorized({ req, token }) {
+        const { pathname } = req.nextUrl;
+        if (pathname.startsWith('/admin') && pathname !== '/admin/signin') {
+          return token?.role === 'ADMIN';
+        }
+        return true;
+      },
+    },
+    pages: {
+      signIn: '/admin/signin',
+    },
+  }
+);
 
 export const config = {
-  matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
-  ],
+  matcher: ['/admin/:path*'],
 };
