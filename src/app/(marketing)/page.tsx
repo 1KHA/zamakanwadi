@@ -5,6 +5,7 @@ import Link from 'next/link';
 import ContactSection from '@/components/ContactSection';
 import Image from 'next/image';
 import AnimateOnScroll from '@/components/AnimateOnScroll';
+import FlipImage from '@/components/FlipImage';
 import {
   ArrowRight,
   Mail,
@@ -307,46 +308,36 @@ export default function LandingPage() {
           </AnimateOnScroll>
 
           {/* Decorative image row */}
-          <AnimateOnScroll direction="up" delay={150}>
           <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
-            <div className="relative h-48 sm:h-64 rounded-2xl overflow-hidden">
-              <Image
-                src="/images/office/01.jpg"
-                alt={isRTL ? 'صورة زمكان 01' : 'Zamakan Image 01'}
-                fill
-                className="object-cover"
-                sizes="(max-width: 768px) 50vw, 25vw"
-              />
-            </div>
-            <div className="relative h-48 sm:h-64 rounded-2xl overflow-hidden md:mt-8">
-              <Image
-                src="/images/office/02.jpg"
-                alt={isRTL ? 'صورة زمكان 02' : 'Zamakan Image 02'}
-                fill
-                className="object-cover"
-                sizes="(max-width: 768px) 50vw, 25vw"
-              />
-            </div>
-            <div className="relative h-48 sm:h-64 rounded-2xl overflow-hidden">
-              <Image
-                src="/images/office/03.png"
-                alt={isRTL ? 'صورة موقع زمكان' : 'Zamakan Site Image'}
-                fill
-                className="object-cover"
-                sizes="(max-width: 768px) 50vw, 25vw"
-              />
-            </div>
-            <div className="relative h-48 sm:h-64 rounded-2xl overflow-hidden md:mt-8">
-              <Image
-                src="/images/office/04.png"
-                alt={isRTL ? 'صورة زمكان 03' : 'Zamakan Image 03'}
-                fill
-                className="object-cover"
-                sizes="(max-width: 768px) 50vw, 25vw"
-              />
-            </div>
+            <FlipImage
+              src="/images/office/01.jpg"
+              alt={isRTL ? 'صورة زمكان 01' : 'Zamakan Image 01'}
+              delay={0}
+              className="relative h-48 sm:h-64 rounded-2xl"
+              sizes="(max-width: 768px) 50vw, 25vw"
+            />
+            <FlipImage
+              src="/images/office/02.jpg"
+              alt={isRTL ? 'صورة زمكان 02' : 'Zamakan Image 02'}
+              delay={300}
+              className="relative h-48 sm:h-64 rounded-2xl md:mt-8"
+              sizes="(max-width: 768px) 50vw, 25vw"
+            />
+            <FlipImage
+              src="/images/office/03.png"
+              alt={isRTL ? 'صورة موقع زمكان' : 'Zamakan Site Image'}
+              delay={600}
+              className="relative h-48 sm:h-64 rounded-2xl"
+              sizes="(max-width: 768px) 50vw, 25vw"
+            />
+            <FlipImage
+              src="/images/office/04.png"
+              alt={isRTL ? 'صورة زمكان 03' : 'Zamakan Image 03'}
+              delay={900}
+              className="relative h-48 sm:h-64 rounded-2xl md:mt-8"
+              sizes="(max-width: 768px) 50vw, 25vw"
+            />
           </div>
-          </AnimateOnScroll>
         </div>
       </section>
 
