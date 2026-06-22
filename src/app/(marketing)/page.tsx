@@ -327,7 +327,7 @@ export default function LandingPage() {
           <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
             <div className="relative h-48 sm:h-64 rounded-2xl overflow-hidden">
               <Image
-                src="/images/decoimage/3.jpg"
+                src="/images/office/01.jpg"
                 alt={isRTL ? 'صورة زمكان 01' : 'Zamakan Image 01'}
                 fill
                 className="object-cover"
@@ -336,7 +336,7 @@ export default function LandingPage() {
             </div>
             <div className="relative h-48 sm:h-64 rounded-2xl overflow-hidden md:mt-8">
               <Image
-                src="/images/decoimage/6.jpg"
+                src="/images/office/02.jpg"
                 alt={isRTL ? 'صورة زمكان 02' : 'Zamakan Image 02'}
                 fill
                 className="object-cover"
@@ -345,7 +345,7 @@ export default function LandingPage() {
             </div>
             <div className="relative h-48 sm:h-64 rounded-2xl overflow-hidden">
               <Image
-                src="/images/decoimage/7.jpg"
+                src="/images/office/03.png"
                 alt={isRTL ? 'صورة موقع زمكان' : 'Zamakan Site Image'}
                 fill
                 className="object-cover"
@@ -354,7 +354,7 @@ export default function LandingPage() {
             </div>
             <div className="relative h-48 sm:h-64 rounded-2xl overflow-hidden md:mt-8">
               <Image
-                src="/images/decoimage/10.jpg"
+                src="/images/office/04.png"
                 alt={isRTL ? 'صورة زمكان 03' : 'Zamakan Image 03'}
                 fill
                 className="object-cover"
@@ -479,7 +479,7 @@ export default function LandingPage() {
             {features.map((feature, idx) => (
               <div
                 key={idx}
-                className="group relative rounded-2xl sm:rounded-3xl p-6 sm:p-8 transition-all hover:-translate-y-1 hover:shadow-xl bg-[#ffbf19] text-dark"
+                className="group relative rounded-2xl sm:rounded-3xl p-6 sm:p-8 transition-all hover:-translate-y-1 hover:shadow-xl bg-[#e2a026] text-dark"
               >
                 <div className="w-14 h-14 rounded-2xl bg-white/30 flex items-center justify-center mb-5 group-hover:bg-white/50 transition-colors">
                   {feature.icon}
