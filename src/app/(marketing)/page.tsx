@@ -156,26 +156,26 @@ export default function LandingPage() {
       {/* ============================================================= */}
       {/*  HERO                                                         */}
       {/* ============================================================= */}
-      <section className="relative w-full overflow-hidden bg-dark">
+      <section className="relative w-full min-h-screen overflow-hidden bg-dark flex flex-col">
         {/* Background images collage */}
         <div className="absolute inset-0">
           <div className="absolute inset-0 bg-gradient-to-br from-primary/90 via-primary/70 to-dark/90" />
           <img
-            src="/images/wmk01.png"
+            src="/images/wmk02.jpg"
             alt="Zamakan workspace"
             className="w-full h-full object-cover opacity-40"
             loading="eager"
           />
         </div>
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 sm:py-32 lg:py-40">
-          <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+        <div className="relative flex-1 flex items-center max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
+          <div className="grid grid-cols-2 gap-12 lg:gap-16 items-center w-full">
             {/* Text content */}
             <div className="text-white space-y-6 sm:space-y-8">
               <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight">
                 {isRTL ? (
                   <>
-                    زمكان
+                    زمـــــــــــــــــكـان
                     <br />
                     <span className="text-secondary">مجتمعك</span> الريادي
                   </>
@@ -210,7 +210,7 @@ export default function LandingPage() {
             </div>
 
             {/* White overlay card */}
-            <div className="relative">
+            <div className="relative py-10 px-10 self-end">
               <div className="bg-white rounded-2xl sm:rounded-3xl p-6 sm:p-8 lg:p-10 shadow-2xl space-y-6">
                 <div className="flex items-start gap-4">
                   <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
@@ -260,26 +260,6 @@ export default function LandingPage() {
                   </div>
                 </div>
 
-                <div className="pt-4 border-t border-gray-100">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-gray-custom">
-                        {isRTL ? 'انضم لمجتمعنا' : 'Join our community'}
-                      </p>
-                      <p className="text-2xl font-bold text-primary">500+</p>
-                    </div>
-                    <div className="flex -space-x-3 rtl:space-x-reverse">
-                      {[1, 2, 3, 4].map((i) => (
-                        <GradientPlaceholder
-                          key={i}
-                          className="w-10 h-10 rounded-full border-2 border-white"
-                          from={`hsl(${340 + i * 15}, 60%, ${40 + i * 5}%)`}
-                          to={`hsl(${20 + i * 10}, 70%, ${50 + i * 5}%)`}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                </div>
               </div>
 
               {/* Decorative gradient blocks */}

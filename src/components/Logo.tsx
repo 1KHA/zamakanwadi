@@ -11,7 +11,7 @@ interface LogoProps {
 export default function Logo({ width = 128, height = 58, className = '' }: LogoProps) {
   return (
     <Image
-      src="/images/logo/logo.png"
+      src="/images/logo/logo02.png"
       alt="Zamakan"
       width={width}
       height={height}
