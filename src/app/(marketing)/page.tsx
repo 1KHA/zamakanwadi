@@ -220,7 +220,7 @@ export default function LandingPage() {
                   </div>
                   <div>
                     <h3 className="text-lg sm:text-xl font-bold text-dark">
-                      {isRTL ? 'مكاتب عمل حديثة' : 'Modern Work Offices'}
+                      {isRTL ? 'مكاتب عمل متنوعة' : 'Modern Work Offices'}
                     </h3>
                     <p className="text-sm text-gray-custom mt-1">
                       {isRTL
@@ -252,11 +252,11 @@ export default function LandingPage() {
                   </div>
                   <div>
                     <h3 className="text-lg sm:text-xl font-bold text-dark">
-                      {isRTL ? 'خدمات استشارية' : 'Consulting Services'}
+                      {isRTL ? 'خدمات مساندة' : 'Consulting Services'}
                     </h3>
                     <p className="text-sm text-gray-custom mt-1">
                       {isRTL
-                        ? 'استشارات مهنية لتنمية أعمالك'
+                        ? 'حزمة متكاملة من الخدمات المساندة'
                         : 'Professional consulting to grow your business.'}
                     </p>
                   </div>
@@ -455,7 +455,7 @@ export default function LandingPage() {
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
             {features.map((feature, idx) => (
-              <AnimateOnScroll key={idx} direction="up" delay={idx * 80}>
+              <AnimateOnScroll key={idx} direction="up" delay={idx * 180} duration={500}>
               <div
                 className="group relative rounded-2xl sm:rounded-3xl p-6 sm:p-8 transition-all hover:-translate-y-1 hover:shadow-xl bg-[#e2a026] text-white h-full"
               >

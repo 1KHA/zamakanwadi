@@ -7,6 +7,7 @@ interface Props {
   className?: string;
   delay?: number;
   direction?: 'up' | 'down' | 'left' | 'right' | 'fade';
+  duration?: number;
 }
 
 export default function AnimateOnScroll({
@@ -14,6 +15,7 @@ export default function AnimateOnScroll({
   className = '',
   delay = 0,
   direction = 'up',
+  duration = 700,
 }: Props) {
   const ref = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
@@ -49,7 +51,7 @@ export default function AnimateOnScroll({
       style={{
         opacity: visible ? 1 : 0,
         transform: visible ? 'translate(0)' : translate,
-        transition: `opacity 0.7s ease ${delay}ms, transform 0.7s ease ${delay}ms`,
+        transition: `opacity ${duration}ms ease ${delay}ms, transform ${duration}ms cubic-bezier(0.25, 0.46, 0.45, 0.94) ${delay}ms`,
       }}
     >
       {children}
