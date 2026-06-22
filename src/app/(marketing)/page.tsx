@@ -169,7 +169,7 @@ export default function LandingPage() {
         </div>
 
         <div className="relative flex-1 flex items-center max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
-          <div className="grid grid-cols-2 gap-12 lg:gap-16 items-center w-full">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center w-full">
             {/* Text content */}
             <div className="text-white space-y-6 sm:space-y-8">
               <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight">
@@ -210,7 +210,7 @@ export default function LandingPage() {
             </div>
 
             {/* White overlay card */}
-            <div className="relative py-10 px-10 self-end">
+            <div className="relative py-8 px-4 sm:py-10 sm:px-10 self-end">
               <div className="bg-white rounded-2xl sm:rounded-3xl p-6 sm:p-8 lg:p-10 shadow-2xl space-y-6">
                 <div className="flex items-start gap-4">
                   <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
