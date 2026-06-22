@@ -6,6 +6,7 @@ import ContactSection from '@/components/ContactSection';
 import Image from 'next/image';
 import AnimateOnScroll from '@/components/AnimateOnScroll';
 import FlipImage from '@/components/FlipImage';
+import PackagesSection from '@/components/PackagesSection';
 import {
   ArrowRight,
   Mail,
@@ -523,6 +524,8 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
+
+      <PackagesSection />
 
       <ContactSection />
 
