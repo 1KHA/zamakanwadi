@@ -27,7 +27,7 @@ import {
 function GradientPlaceholder({
   className = '',
   from = '#9D1942',
-  to = '#F2B704',
+  to = '#e2a026',
   label,
 }: {
   className?: string;
@@ -58,7 +58,7 @@ function SectionTitle({
 }) {
   return (
     <h2
-      className={`text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-dark ${className}`}
+      className={`text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-[#9e1c45] ${className}`}
     >
       {children}
     </h2>
@@ -286,7 +286,7 @@ export default function LandingPage() {
               <GradientPlaceholder
                 className="absolute -top-6 -end-6 w-24 h-24 rounded-2xl opacity-60 hidden lg:block"
                 from="#ffbf19"
-                to="#F2B704"
+                to="#e2a026"
               />
               <GradientPlaceholder
                 className="absolute -bottom-8 -start-8 w-32 h-32 rounded-2xl opacity-40 hidden lg:block"
@@ -382,7 +382,7 @@ export default function LandingPage() {
             <div
               className={`space-y-6 ${isRTL ? 'lg:order-2' : 'lg:order-1'}`}
             >
-              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-dark leading-tight">
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#9e1c45] leading-tight">
                 {isRTL
                   ? 'قاعات اجتماعات لكل المناسبات'
                   : 'Meeting Rooms for Every Occasion'}
@@ -439,7 +439,7 @@ export default function LandingPage() {
               </div>
               <div className="absolute -bottom-6 -start-6 w-40 h-40 sm:w-48 sm:h-48 rounded-2xl shadow-lg border-4 border-white overflow-hidden">
                 <Image
-                  src="/images/decoimage/10.jpg"
+                  src="/images/decoimage/3.jpg"
                   alt={isRTL ? 'تفاصيل' : 'Details'}
                   fill
                   className="object-cover"
