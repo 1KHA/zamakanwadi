@@ -30,7 +30,7 @@ export default function Footer() {
             <ul className="space-y-3">
               <li className="flex items-center gap-2 text-gray-400 text-sm">
                 <Mail className="w-4 h-4 shrink-0" />
-                info@zamakan.com
+                m.alaa@wadimakkah.sa
               </li>
               <li className="flex items-center gap-2 text-gray-400 text-sm">
                 <Phone className="w-4 h-4 shrink-0" />

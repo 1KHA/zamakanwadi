@@ -198,7 +198,7 @@ export default function LandingPage() {
               <div className="flex flex-wrap items-center gap-4">
                 <Link
                   href="#contact"
-                  className="inline-flex items-center justify-center gap-2 px-6 py-3 sm:px-8 sm:py-4 bg-secondary text-dark font-semibold rounded-xl hover:bg-secondary-dark transition-colors shadow-lg shadow-secondary/20"
+                  className="inline-flex items-center justify-center gap-2 px-6 py-3 sm:px-8 sm:py-4 bg-secondary text-white font-semibold rounded-xl hover:bg-secondary-dark transition-colors shadow-lg shadow-secondary/20"
                 >
                   {isRTL ? 'احجز الآن' : 'Book Now'}
                   <ArrowRight
@@ -349,12 +349,12 @@ export default function LandingPage() {
       {/* ============================================================= */}
       {/*  MEETING ROOMS                                                   */}
       {/* ============================================================= */}
-      <section className="relative py-20 sm:py-28 lg:py-36 bg-white overflow-hidden">
+      <section className="relative py-20 sm:py-28 lg:py-36 bg-[#9e1c45] overflow-hidden">
         {/* Decorative background */}
         <div aria-hidden="true" className="pointer-events-none absolute top-8 left-6 w-28 h-28 border-2 border-secondary/20 rounded-xl rotate-12" />
         <div aria-hidden="true" className="pointer-events-none absolute top-28 left-16 w-10 h-10 bg-secondary/10 rounded-lg -rotate-6" />
-        <div aria-hidden="true" className="pointer-events-none absolute bottom-6 right-6 w-36 h-36 border-[3px] border-primary/10 rounded-2xl -rotate-12" />
-        <div aria-hidden="true" className="pointer-events-none absolute bottom-24 right-20 w-12 h-12 border-2 border-primary/10 rounded-lg rotate-6" />
+        <div aria-hidden="true" className="pointer-events-none absolute bottom-6 right-6 w-36 h-36 border-[3px] border-white/10 rounded-2xl -rotate-12" />
+        <div aria-hidden="true" className="pointer-events-none absolute bottom-24 right-20 w-12 h-12 border-2 border-white/10 rounded-lg rotate-6" />
         <div aria-hidden="true" className="pointer-events-none absolute inset-0" style={{ backgroundImage: 'repeating-linear-gradient(60deg, transparent, transparent 100px, rgba(242,183,4,0.035) 100px, rgba(242,183,4,0.035) 101px)' }} />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
@@ -362,13 +362,13 @@ export default function LandingPage() {
             <div
               className={`space-y-6 ${isRTL ? 'lg:order-2' : 'lg:order-1'}`}
             >
-              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#9e1c45] leading-tight">
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight">
                 {isRTL
                   ? 'قاعات اجتماعات لكل المناسبات'
                   : 'Meeting Rooms for Every Occasion'}
               </h2>
 
-              <p className="text-base sm:text-lg text-gray-custom leading-relaxed">
+              <p className="text-base sm:text-lg text-white/70 leading-relaxed">
                 {isRTL
                   ? 'سواء كنت تخطط لاجتماع صغير أو ورشة عمل كبيرة، نوفر قاعات مجهزة بالكامل بأحدث تقنيات العرض والصوت.'
                   : 'Whether you are planning a small meeting or a large workshop, we provide fully equipped rooms with the latest display and audio technologies.'}
@@ -383,10 +383,10 @@ export default function LandingPage() {
                 ].map((item) => (
                   <li
                     key={item}
-                    className="flex items-center gap-3 text-dark"
+                    className="flex items-center gap-3 text-white"
                   >
-                    <span className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                      <Check className="w-4 h-4 text-primary" />
+                    <span className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center shrink-0">
+                      <Check className="w-4 h-4 text-[#e2a026]" />
                     </span>
                     <span className="text-sm sm:text-base">{item}</span>
                   </li>
@@ -395,7 +395,7 @@ export default function LandingPage() {
 
               <Link
                 href="#contact"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-secondary text-dark font-medium rounded-xl hover:bg-secondary-dark transition-colors"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-secondary text-white font-medium rounded-xl hover:bg-secondary-dark transition-colors"
               >
                 {isRTL ? 'احجز قاعة' : 'Book a Room'}
                 <ArrowRight
@@ -459,7 +459,7 @@ export default function LandingPage() {
             {features.map((feature, idx) => (
               <div
                 key={idx}
-                className="group relative rounded-2xl sm:rounded-3xl p-6 sm:p-8 transition-all hover:-translate-y-1 hover:shadow-xl bg-[#e2a026] text-dark"
+                className="group relative rounded-2xl sm:rounded-3xl p-6 sm:p-8 transition-all hover:-translate-y-1 hover:shadow-xl bg-[#e2a026] text-white"
               >
                 <div className="w-14 h-14 rounded-2xl bg-white/30 flex items-center justify-center mb-5 group-hover:bg-white/50 transition-colors">
                   {feature.icon}
