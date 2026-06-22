@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import Link from 'next/link';
 import ContactSection from '@/components/ContactSection';
 import Image from 'next/image';
+import AnimateOnScroll from '@/components/AnimateOnScroll';
 import {
   ArrowRight,
   Mail,
@@ -171,7 +172,7 @@ export default function LandingPage() {
         <div className="relative flex-1 flex items-center max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center w-full">
             {/* Text content */}
-            <div className="text-white space-y-6 sm:space-y-8">
+            <AnimateOnScroll direction="right" className="text-white space-y-6 sm:space-y-8">
               <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight">
                 {isRTL ? (
                   <>
@@ -207,10 +208,10 @@ export default function LandingPage() {
                 </Link>
 
               </div>
-            </div>
+            </AnimateOnScroll>
 
             {/* White overlay card */}
-            <div className="relative py-8 px-4 sm:py-10 sm:px-10 self-end">
+            <AnimateOnScroll direction="left" delay={150} className="relative py-8 px-4 sm:py-10 sm:px-10 self-end">
               <div className="bg-white rounded-2xl sm:rounded-3xl p-6 sm:p-8 lg:p-10 shadow-2xl space-y-6">
                 <div className="flex items-start gap-4">
                   <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
@@ -273,7 +274,7 @@ export default function LandingPage() {
                 from="#9D1942"
                 to="#2B2422"
               />
-            </div>
+            </AnimateOnScroll>
           </div>
         </div>
       </section>
@@ -289,6 +290,7 @@ export default function LandingPage() {
         <div aria-hidden="true" className="pointer-events-none absolute bottom-24 left-20 w-8 h-8 bg-primary/5 rounded-lg rotate-12" />
         <div aria-hidden="true" className="pointer-events-none absolute inset-0" style={{ backgroundImage: 'repeating-linear-gradient(-45deg, transparent, transparent 80px, rgba(157,25,66,0.025) 80px, rgba(157,25,66,0.025) 81px)' }} />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <AnimateOnScroll direction="up">
           <div className="text-center max-w-4xl mx-auto space-y-6">
             <SectionTitle>
               {isRTL
@@ -302,8 +304,10 @@ export default function LandingPage() {
                 : 'Enjoy modern offices equipped with the latest technology, high-speed internet, and comfortable spaces that help you focus and achieve your goals efficiently.'}
             </SectionSubtitle>
           </div>
+          </AnimateOnScroll>
 
           {/* Decorative image row */}
+          <AnimateOnScroll direction="up" delay={150}>
           <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
             <div className="relative h-48 sm:h-64 rounded-2xl overflow-hidden">
               <Image
@@ -342,6 +346,7 @@ export default function LandingPage() {
               />
             </div>
           </div>
+          </AnimateOnScroll>
         </div>
       </section>
 
@@ -359,7 +364,7 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
             {/* Text — order changes on RTL/LTR via logical flow not needed because grid auto flows; we use order class */}
-            <div
+            <AnimateOnScroll direction="right"
               className={`space-y-6 ${isRTL ? 'lg:order-2' : 'lg:order-1'}`}
             >
               <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight">
@@ -402,10 +407,10 @@ export default function LandingPage() {
                   className={`w-5 h-5 ${isRTL ? 'rotate-180' : ''}`}
                 />
               </Link>
-            </div>
+            </AnimateOnScroll>
 
             {/* Images */}
-            <div
+            <AnimateOnScroll direction="left" delay={150}
               className={`relative ${isRTL ? 'lg:order-1' : 'lg:order-2'}`}
             >
               <div className="relative w-full h-80 sm:h-96 rounded-3xl shadow-xl overflow-hidden">
@@ -426,7 +431,7 @@ export default function LandingPage() {
                   sizes="200px"
                 />
               </div>
-            </div>
+            </AnimateOnScroll>
           </div>
         </div>
       </section>
@@ -443,6 +448,7 @@ export default function LandingPage() {
         <div aria-hidden="true" className="pointer-events-none absolute bottom-6 right-6 w-44 h-44 border-[3px] border-secondary/15 rounded-3xl -rotate-12" />
         <div aria-hidden="true" className="pointer-events-none absolute bottom-28 right-28 w-8 h-8 bg-primary/5 rounded-lg rotate-6" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <AnimateOnScroll direction="up">
           <div className="text-center max-w-3xl mx-auto space-y-4 mb-16">
             <SectionTitle>
               {isRTL ? 'مميزاتنا' : 'Our Features'}
@@ -454,12 +460,13 @@ export default function LandingPage() {
                 : 'We provide everything you need to achieve maximum productivity in an inspiring work environment.'}
             </SectionSubtitle>
           </div>
+          </AnimateOnScroll>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
             {features.map((feature, idx) => (
+              <AnimateOnScroll key={idx} direction="up" delay={idx * 80}>
               <div
-                key={idx}
-                className="group relative rounded-2xl sm:rounded-3xl p-6 sm:p-8 transition-all hover:-translate-y-1 hover:shadow-xl bg-[#e2a026] text-white"
+                className="group relative rounded-2xl sm:rounded-3xl p-6 sm:p-8 transition-all hover:-translate-y-1 hover:shadow-xl bg-[#e2a026] text-white h-full"
               >
                 <div className="w-14 h-14 rounded-2xl bg-white/30 flex items-center justify-center mb-5 group-hover:bg-white/50 transition-colors">
                   {feature.icon}
@@ -469,6 +476,7 @@ export default function LandingPage() {
                   {feature.desc}
                 </p>
               </div>
+              </AnimateOnScroll>
             ))}
           </div>
         </div>
@@ -487,6 +495,7 @@ export default function LandingPage() {
         <div aria-hidden="true" className="pointer-events-none absolute bottom-20 left-16 w-10 h-10 bg-secondary/10 rounded-lg rotate-12" />
         <div aria-hidden="true" className="pointer-events-none absolute inset-0" style={{ backgroundImage: 'repeating-linear-gradient(-30deg, transparent, transparent 60px, rgba(157,25,66,0.025) 60px, rgba(157,25,66,0.025) 61px)' }} />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <AnimateOnScroll direction="up">
           <div className="text-center max-w-3xl mx-auto space-y-4 mb-16">
             <SectionTitle>
               {isRTL ? 'استكشف زمكان' : 'Explore Zamakan'}
@@ -497,6 +506,7 @@ export default function LandingPage() {
                 : 'Glimpses of our distinctive spaces waiting for you.'}
             </SectionSubtitle>
           </div>
+          </AnimateOnScroll>
 
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
             {[
@@ -509,7 +519,7 @@ export default function LandingPage() {
               { h: 'h-48 sm:h-64 md:mt-8', src: '/images/disimage/space%26cafe-7.jpg' },
               { h: 'h-48 sm:h-64', src: '/images/disimage/NBL_9534.JPG' },
             ].map((item, idx) => (
-              <div key={idx} className={`relative ${item.h} rounded-2xl overflow-hidden`}>
+              <AnimateOnScroll key={idx} direction="up" delay={idx * 60} className={`relative ${item.h} rounded-2xl overflow-hidden`}>
                 <Image
                   src={item.src}
                   alt={`${isRTL ? 'صورة' : 'Image'} ${idx + 1}`}
@@ -517,7 +527,7 @@ export default function LandingPage() {
                   className="object-cover"
                   sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
                 />
-              </div>
+              </AnimateOnScroll>
             ))}
           </div>
         </div>
