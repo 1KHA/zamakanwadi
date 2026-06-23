@@ -17,35 +17,51 @@ const data = {
       label: { ar: 'مكاتب العمل', en: 'Work Offices' },
       packages: [
         {
-          title: { ar: 'الباقة المرنة ', en: 'Corporate Package' },
-          image: '/images/disimage/NSPACE FULL-10.jpg',
+          title: { ar: 'الباقة المرنة', en: 'Flex Package' },
+          desc: {
+            ar: 'مكتب حر في مساحة عمل مشتركة.',
+            en: 'Flexible shared workspace ideal for freelancers and remote workers with no long-term commitments.',
+          },
+          image: '/images/office/DSC_5994.JPG',
           features: {
-            ar: ['٧/٢٤ على مدار اليوم​', 'انترنت', 'صالة ترفيهية', 'مصلى'],
-            en: ['Security system', 'Library', 'Parking', 'High-speed Internet', 'Entertainment area', 'Meeting room'],
+            ar: ['٧/٢٤ على مدار اليوم', 'انترنت', 'صالة ترفيهية', 'مصلى'],
+            en: ['24/7 access', 'Internet', 'Lounge area', 'Prayer room'],
           },
         },
         {
-          title: { ar: ' باقة الرواد', en: '+ Pioneer Package' },
-          image: '/images/disimage/IMG_0219.jpg',
+          title: { ar: 'باقة الرواد', en: 'Pioneer Package' },
+          desc: {
+            ar: 'مكتب مخصص في مساحات عمل مشتركة تمكن المشتركين من تبادل الخبرات وتوسيع دائرة معارفهم​.',
+            en: 'A dedicated permanent desk giving you privacy and stability while enjoying community benefits.',
+          },
+          image: '/images/office/DSC_5994٤.JPG',
           features: {
-            ar: ['٧/٢٤ على مدار اليوم​', 'انترنت', 'صالة ترفيهية', 'مصلى', '٢ ساعات شهريا لقاعات الاجتماعات الرئيسية'],
-            en: ['Security system', 'Library', 'Parking', 'High-speed Internet', 'Entertainment area'],
+            ar: ['٧/٢٤ على مدار اليوم', 'انترنت', 'صالة ترفيهية', 'مصلى', '٢ ساعات شهريا لقاعات الاجتماعات'],
+            en: ['24/7 access', 'Internet', 'Lounge area', 'Prayer room', '2 hrs/month meeting rooms'],
           },
         },
         {
-          title: { ar: '  باقة الرواد +​', en: 'Pioneer Package' },
-          image: '/images/disimage/IMG_0368.jpg',
+          title: { ar: 'باقة الرواد +', en: 'Pioneer+ Package' },
+          desc: {
+            ar: 'مكاتب مغلقة للمشتركين الراغبين في خلق مساحة خاصة بهم في بيئة استثنائية ذات خصوصية تامة..',
+            en: 'A private enclosed workspace with full focus and professional meeting capabilities.',
+          },
+          image: '/images/office/DSC_5994.JPG',
           features: {
-            ar: ['٧/٢٤ على مدار اليوم​', 'انترنت', 'صالة ترفيهية', 'مصلى', '٤ ساعات شهريا لقاعات الاجتماعات الرئيسية', 'ساعتين شهريا لاستخدام المسرح'],
-            en: ['Security system', 'Library', 'Parking', 'High-speed Internet'],
+            ar: ['٧/٢٤ على مدار اليوم', 'انترنت', 'صالة ترفيهية', 'مصلى', '٤ ساعات شهريا لقاعات الاجتماعات', 'ساعتين شهريا للمسرح'],
+            en: ['24/7 access', 'Internet', 'Lounge area', 'Prayer room', '4 hrs/month meeting rooms', '2 hrs/month theater'],
           },
         },
         {
-          title: { ar: '​ باقة الشركات​', en: 'Student Package' },
-          image: '/images/disimage/IMG_0267.jpg',
+          title: { ar: 'باقة الشركات', en: 'Corporate Package' },
+          desc: {
+            ar: 'مساحة عمل مستقلة ،ومؤثثة بالكامل للشركات المتوسطة والكبيرة.​.',
+            en: 'A fully enclosed office for companies and growing teams with exclusive perks and booking priority.',
+          },
+          image: '/images/office/comp01.jpg',
           features: {
-            ar: ['٧/٢٤ على مدار اليوم​', 'انترنت', 'صالة ترفيهية', 'مصلى', '٤ ساعات شهريا لقاعات الاجتماعات الرئيسية', 'ساعتين شهريا لاستخدام المسرح', 'دخول ذكي'],
-            en: ['Security system', 'Library', 'High-speed Internet'],
+            ar: ['٧/٢٤ على مدار اليوم', 'انترنت', 'صالة ترفيهية', 'مصلى', '٤ ساعات شهريا لقاعات الاجتماعات', 'ساعتين شهريا للمسرح', 'دخول ذكي'],
+            en: ['24/7 access', 'Internet', 'Lounge area', 'Prayer room', '4 hrs/month meeting rooms', '2 hrs/month theater', 'Smart access'],
           },
         },
       ],
@@ -55,26 +71,38 @@ const data = {
       label: { ar: 'قاعات الاجتماعات', en: 'Meeting Rooms' },
       packages: [
         {
-          title: { ar: ' قاعة ريادة ١', en: 'Small Room' },
+          title: { ar: 'قاعة ريادة ١', en: 'Riyadah Room 1' },
+          desc: {
+            ar: 'قاعة اجتماعات تمتاز بتصميم عصري في بيئة مريحة تساعد على الإنتاجية  تم تجهيزها  بأفضل الوسائل التقنية المساعدة في الاجتماعات.',
+            en: 'Fully equipped small room for meetings and creative sessions for small teams.',
+          },
           image: '/images/decoimage/6.jpg',
           features: {
-            ar: ['سبورة ذكية', 'نظام صوتي', 'تكييف', 'واي فاي مخصص', 'تسع حتى 8 أشخاص'],
+            ar: ['شاشة تلفاز', 'دفتر ملاحظات', 'سبورة', 'دعم تقني', 'نظام صوتي'],
             en: ['Smart board', 'Audio system', 'AC', 'Dedicated Wi-Fi', 'Up to 8 persons'],
           },
         },
         {
-          title: { ar: 'قاعة ريادة ٢', en: 'Medium Room' },
+          title: { ar: 'قاعة ريادة ٢', en: 'Riyadah Room 2' },
+          desc: {
+            ar: 'قاعة اجتماعات تجمع بين التصميم العملي والراحة مع توفير وسائل العرض والخدمات المساندة.',
+            en: 'Medium room ideal for workshops, training sessions and extended meetings with catering.',
+          },
           image: '/images/decoimage/DSC_2340.JPG',
           features: {
-            ar: ['سبورة ذكية', 'نظام صوتي', 'تكييف', 'واي فاي مخصص', 'خدمة ضيافة', 'تسع حتى 20 شخصاً'],
+            ar: ['نظام عرض', 'دفتر ملاحظات', 'سبورة', 'دعم تقني'],
             en: ['Smart board', 'Audio system', 'AC', 'Dedicated Wi-Fi', 'Catering service', 'Up to 20 persons'],
           },
         },
         {
-          title: { ar: 'قاعة بناء (متعددة)', en: 'Large Room' },
+          title: { ar: 'قاعة بناء', en: 'Bina Room' },
+          desc: {
+            ar: 'قاعة مجهزة بالكامل لإقامة ورش العمل والدورات التدريبية​.',
+            en: 'Large multi-purpose room with the latest display and recording technologies for major events.',
+          },
           image: '/images/wmk01.png',
           features: {
-            ar: ['سبورة ذكية', 'نظام صوتي متكامل', 'تكييف', 'واي فاي مخصص', 'خدمة ضيافة', 'تسجيل فيديو', 'تسع حتى 50 شخصاً'],
+            ar: ['جهاز عرض','سبورة', 'دعم تقني', 'أثاث مرن', 'منصة تقديم'],
             en: ['Smart board', 'Full audio system', 'AC', 'Dedicated Wi-Fi', 'Catering service', 'Video recording', 'Up to 50 persons'],
           },
         },
@@ -85,27 +113,39 @@ const data = {
       label: { ar: 'المسارح', en: 'Theaters' },
       packages: [
         {
-          title: { ar: 'مسرح إثراء', en: 'Small Theater' },
+          title: { ar: 'مسرح إثراء', en: 'Ithraa Theater' },
+          desc: {
+            ar: 'مسرح متكامل يجمع بين التصميم الحديث والتقنية المتطورة لاستضافة الفعاليات .',
+            en: 'A full-featured theater combining modern design and advanced technology for events and conferences.',
+          },
           image: '/images/theater/DSC2119.jpg',
           features: {
-            ar: ['شاشة عرض كبيرة', 'نظام صوتي احترافي', 'إضاءة قابلة للضبط', 'تكييف', 'تسع حتى 40 شخصاً'],
+            ar: ['شاشة عرض كبيرة', 'نظام صوتي احترافي', 'إضاءة قابلة للضبط', 'تسع حتى 40 شخصاً'],
             en: ['Large display screen', 'Professional audio system', 'Adjustable lighting', 'AC', 'Up to 40 persons'],
           },
         },
         {
-          title: { ar: 'مسرح ترابط (خشبي)', en: 'Large Theater' },
+          title: { ar: 'مسرح ترابط', en: 'Tarabut Theater' },
+          desc: {
+            ar: 'مدرج مصمم بطريقة عصرية للقاءات والفعاليات.',
+            en: 'An authentic wooden theater offering a warm atmosphere for cultural, training and creative presentations.',
+          },
           image: '/images/theater/IMG_0181.jpg',
           features: {
-            ar: ['شاشة عرض ضخمة', 'نظام صوتي احترافي', 'إضاءة متقدمة', 'تكييف مركزي', 'منصة عرض', 'تسجيل بث مباشر', 'تسع حتى 120 شخصاً'],
-            en: ['Huge display screen', 'Professional audio system', 'Advanced lighting', 'Central AC', 'Stage', 'Live stream recording', 'Up to 120 persons'],
+            ar: ['نظام عرض', 'منصة عرض','سبورة','دعم تقني'],
+            en: ['Huge display screen', 'Professional audio system', 'Advanced lighting', 'Central AC', 'Stage', 'Live streaming', 'Up to 120 persons'],
           },
         },
         {
-          title: { ar: 'مسرح ركيزة', en: 'Large Theater' },
+          title: { ar: 'مسرح ركيزة', en: 'Rakeeza Theater' },
+          desc: {
+            ar: 'مسرح مرن يمكن تشكيله حسب الطلب.',
+            en: 'A large professional theater with cutting-edge sound and lighting for major conferences and events.',
+          },
           image: '/images/theater/DSC_55544.jpg',
           features: {
-            ar: ['شاشة عرض ضخمة', 'نظام صوتي احترافي', 'إضاءة متقدمة', 'تكييف مركزي', 'منصة عرض', 'تسجيل بث مباشر', 'تسع حتى 120 شخصاً'],
-            en: ['Huge display screen', 'Professional audio system', 'Advanced lighting', 'Central AC', 'Stage', 'Live stream recording', 'Up to 120 persons'],
+            ar: ['شاشة تلفاز', 'سبورة', 'دعم تقني'],
+            en: ['Huge display screen', 'Professional audio system', 'Advanced lighting', 'Central AC', 'Stage', 'Live streaming', 'Up to 120 persons'],
           },
         },
       ],
@@ -121,20 +161,17 @@ function PackageCard({
   pkg,
   isRTL,
   index,
-  active,
 }: {
   pkg: (typeof data.tabs)[0]['packages'][0];
   isRTL: boolean;
   index: number;
-  active: boolean;
 }) {
   return (
     <AnimateOnScroll direction="up" delay={index * 120} duration={500} className="h-full">
-      <div
-        className="rounded-2xl overflow-hidden border-2 border-gray-100 shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl flex flex-col h-full bg-white"
-      >
-        {/* Image */}
-        <div className="relative h-44 w-full">
+      <div className="rounded-2xl overflow-hidden border-2 border-gray-100 shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl flex flex-col h-full bg-white">
+
+        {/* Image with title badge */}
+        <div className="relative h-44 w-full shrink-0">
           <Image
             src={pkg.image}
             alt={isRTL ? pkg.title.ar : pkg.title.en}
@@ -142,13 +179,21 @@ function PackageCard({
             className="object-cover"
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
           />
+          {/* Gradient overlay so badge is readable */}
+          <div className="absolute inset-0 bg-gradient-to-b from-dark/60 via-transparent to-transparent" />
+          {/* Title badge — top start corner */}
+          <span className={`absolute top-3 ${isRTL ? 'right-3' : 'left-3'} bg-white/90 backdrop-blur-sm text-dark text-xs font-bold px-3 py-1.5 rounded-lg shadow-sm`}>
+            {isRTL ? pkg.title.ar : pkg.title.en}
+          </span>
         </div>
 
         {/* Content */}
         <div className="p-5 flex flex-col flex-1">
-          <h3 className="text-base font-bold text-dark mb-4">
-            {isRTL ? pkg.title.ar : pkg.title.en}
-          </h3>
+          {/* Description in place of old title */}
+          <p className="text-sm text-gray-500 leading-relaxed mb-4">
+            {isRTL ? pkg.desc.ar : pkg.desc.en}
+          </p>
+
           <ul className="space-y-2 flex-1">
             {(isRTL ? pkg.features.ar : pkg.features.en).map((f) => (
               <li key={f} className="flex items-center gap-2 text-sm text-gray-600">
@@ -236,7 +281,6 @@ export default function PackagesSection() {
               pkg={pkg}
               isRTL={isRTL}
               index={i}
-              active={i === 0}
             />
           ))}
         </div>
