@@ -46,7 +46,7 @@ const data = {
             ar: 'مكاتب مغلقة للمشتركين الراغبين في خلق مساحة خاصة بهم في بيئة استثنائية ذات خصوصية تامة..',
             en: 'A private enclosed workspace with full focus and professional meeting capabilities.',
           },
-          image: '/images/office/DSC_5994.JPG',
+          image: '/images/office/IMG_0349.jpg',
           features: {
             ar: ['٧/٢٤ على مدار اليوم', 'انترنت', 'صالة ترفيهية', 'مصلى', '٤ ساعات شهريا لقاعات الاجتماعات', 'ساعتين شهريا للمسرح'],
             en: ['24/7 access', 'Internet', 'Lounge area', 'Prayer room', '4 hrs/month meeting rooms', '2 hrs/month theater'],
