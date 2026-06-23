@@ -10,17 +10,18 @@ import PackagesSection from '@/components/PackagesSection';
 import {
   ArrowRight,
   Mail,
-  MapPin,
   Briefcase,
   Coffee,
   Wifi,
-  Monitor,
-  Users,
   Clock,
   Zap,
-  Shield,
-  Headphones,
   Check,
+  Users,
+  BookOpen,
+  Tv,
+  Moon,
+  Car,
+  ShieldCheck,
 } from 'lucide-react';
 
 /* ------------------------------------------------------------------ */
@@ -96,60 +97,44 @@ export default function LandingPage() {
   /* ----- Feature data ----- */
   const features = [
     {
-      icon: <MapPin className="w-7 h-7" />,
-      title: isRTL ? 'منطقة قهوة' : 'Prime Location',
-      desc: isRTL
-        ? '-'
-        : 'Strategically located and easily accessible from all parts of the city.',
+      icon: <Coffee className="w-7 h-7" />,
+      title: isRTL ? 'منطقة قهوة' : 'Coffee Area',
+      desc: isRTL ? '-' : 'Comfortable coffee area to recharge and connect.',
     },
     {
       icon: <Wifi className="w-7 h-7" />,
       title: isRTL ? 'إنترنت' : 'High-Speed Internet',
-      desc: isRTL
-        ? '-'
-        : 'Fast and reliable internet connection for all our members.',
+      desc: isRTL ? '-' : 'Fast and reliable internet for all members.',
     },
     {
-      icon: <Monitor className="w-7 h-7" />,
-      title: isRTL ? ' مكتبة' : 'Modern Technology',
-      desc: isRTL
-        ? '-'
-        : 'Cutting-edge equipment and technology to boost your productivity.',
+      icon: <BookOpen className="w-7 h-7" />,
+      title: isRTL ? 'مكتبة' : 'Library',
+      desc: isRTL ? '-' : 'A curated library to support learning and growth.',
     },
     {
-      icon: <Coffee className="w-7 h-7" />,
-      title: isRTL ? 'منطقة ترفيه' : 'Lounge Area',
-      desc: isRTL
-        ? '-'
-        : 'Comfortable spaces to relax and socialize.',
+      icon: <Tv className="w-7 h-7" />,
+      title: isRTL ? 'منطقة ترفيه' : 'Entertainment Area',
+      desc: isRTL ? '-' : 'Spaces to relax and socialize between work sessions.',
     },
     {
-      icon: <Users className="w-7 h-7" />,
-      title: isRTL ? 'مصلى' : 'Vibrant Community',
-      desc: isRTL
-        ? '-'
-        : 'Connect with professionals and creatives from various fields.',
+      icon: <Moon className="w-7 h-7" />,
+      title: isRTL ? 'مصلى' : 'Prayer Room',
+      desc: isRTL ? '-' : 'A quiet dedicated space for prayer.',
     },
     {
       icon: <Clock className="w-7 h-7" />,
       title: isRTL ? 'وصول على مدار الساعة' : '24/7 Access',
-      desc: isRTL
-        ? '-'
-        : 'Access your workspace anytime that fits your schedule.',
+      desc: isRTL ? '-' : 'Access your workspace anytime that fits your schedule.',
     },
     {
-      icon: <Shield className="w-7 h-7" />,
-      title: isRTL ? 'مواقف سيارات' : 'Round-the-Clock Security',
-      desc: isRTL
-        ? '-'
-        : 'Advanced security systems to protect your belongings.',
+      icon: <Car className="w-7 h-7" />,
+      title: isRTL ? 'مواقف سيارات' : 'Parking',
+      desc: isRTL ? '-' : 'Convenient parking available for all members.',
     },
     {
-      icon: <Headphones className="w-7 h-7" />,
-      title: isRTL ? 'نظام أمني ٢٤ ساعة' : 'Technical Support',
-      desc: isRTL
-        ? '-'
-        : 'Support team available to assist you at any time.',
+      icon: <ShieldCheck className="w-7 h-7" />,
+      title: isRTL ? 'نظام أمني ٢٤ ساعة' : '24/7 Security',
+      desc: isRTL ? '-' : 'Advanced security systems to protect your belongings.',
     },
   ];
 
