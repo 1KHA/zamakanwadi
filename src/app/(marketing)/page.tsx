@@ -97,58 +97,58 @@ export default function LandingPage() {
   const features = [
     {
       icon: <MapPin className="w-7 h-7" />,
-      title: isRTL ? 'موقع متميز' : 'Prime Location',
+      title: isRTL ? 'منطقة قهوة' : 'Prime Location',
       desc: isRTL
-        ? 'موقع استراتيجي يسهل الوصول إليه من جميع أنحاء المدينة'
+        ? '-'
         : 'Strategically located and easily accessible from all parts of the city.',
     },
     {
       icon: <Wifi className="w-7 h-7" />,
-      title: isRTL ? 'إنترنت فائق السرعة' : 'High-Speed Internet',
+      title: isRTL ? 'إنترنت' : 'High-Speed Internet',
       desc: isRTL
-        ? 'اتصال إنترنت سريع وموثوق لجميع أعضائنا'
+        ? '-'
         : 'Fast and reliable internet connection for all our members.',
     },
     {
       icon: <Monitor className="w-7 h-7" />,
-      title: isRTL ? 'تقنيات حديثة' : 'Modern Technology',
+      title: isRTL ? ' مكتبة' : 'Modern Technology',
       desc: isRTL
-        ? 'معدات وتقنيات متطورة لتعزيز إنتاجيتك'
+        ? '-'
         : 'Cutting-edge equipment and technology to boost your productivity.',
     },
     {
       icon: <Coffee className="w-7 h-7" />,
-      title: isRTL ? 'منطقة استراحة' : 'Lounge Area',
+      title: isRTL ? 'منطقة ترفيه' : 'Lounge Area',
       desc: isRTL
-        ? 'مساحات مريحة للاسترخاء والتفاعل الاجتماعي'
+        ? '-'
         : 'Comfortable spaces to relax and socialize.',
     },
     {
       icon: <Users className="w-7 h-7" />,
-      title: isRTL ? 'مجتمع نابض' : 'Vibrant Community',
+      title: isRTL ? 'مصلى' : 'Vibrant Community',
       desc: isRTL
-        ? 'تواصل مع محترفين ومبدعين من مختلف المجالات'
+        ? '-'
         : 'Connect with professionals and creatives from various fields.',
     },
     {
       icon: <Clock className="w-7 h-7" />,
       title: isRTL ? 'وصول على مدار الساعة' : '24/7 Access',
       desc: isRTL
-        ? 'ادخل مساحتك في أي وقت يناسب جدولك'
+        ? '-'
         : 'Access your workspace anytime that fits your schedule.',
     },
     {
       icon: <Shield className="w-7 h-7" />,
-      title: isRTL ? 'أمان على مدار الساعة' : 'Round-the-Clock Security',
+      title: isRTL ? 'مواقف سيارات' : 'Round-the-Clock Security',
       desc: isRTL
-        ? 'أنظمة أمان متقدمة لحماية ممتلكاتك'
+        ? '-'
         : 'Advanced security systems to protect your belongings.',
     },
     {
       icon: <Headphones className="w-7 h-7" />,
-      title: isRTL ? 'دعم فني' : 'Technical Support',
+      title: isRTL ? 'نظام أمني ٢٤ ساعة' : 'Technical Support',
       desc: isRTL
-        ? 'فريق دعم متاح لمساعدتك في أي وقت'
+        ? '-'
         : 'Support team available to assist you at any time.',
     },
   ];

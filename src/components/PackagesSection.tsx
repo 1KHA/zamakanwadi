@@ -43,7 +43,7 @@ const data = {
         {
           title: { ar: 'باقة الرواد +', en: 'Pioneer+ Package' },
           desc: {
-            ar: 'مكاتب مغلقة للمشتركين الراغبين في خلق مساحة خاصة بهم في بيئة استثنائية ذات خصوصية تامة..',
+            ar: 'مكاتب مغلقة للمشتركين الراغبين في خلق مساحة خاصة بهم في بيئة استثنائية ذات خصوصية تامة.',
             en: 'A private enclosed workspace with full focus and professional meeting capabilities.',
           },
           image: '/images/office/IMG_0349.jpg',
@@ -55,7 +55,7 @@ const data = {
         {
           title: { ar: 'باقة الشركات', en: 'Corporate Package' },
           desc: {
-            ar: 'مساحة عمل مستقلة ،ومؤثثة بالكامل للشركات المتوسطة والكبيرة.​.',
+            ar: 'مساحة عمل مستقلة، ومؤثثة بالكامل للشركات المتوسطة والكبيرة​.',
             en: 'A fully enclosed office for companies and growing teams with exclusive perks and booking priority.',
           },
           image: '/images/office/comp01.jpg',
@@ -190,7 +190,7 @@ function PackageCard({
         {/* Content */}
         <div className="p-5 flex flex-col flex-1">
           {/* Description in place of old title */}
-          <p className="text-sm text-gray-500 leading-relaxed mb-4">
+          <p className="text-sm font-bold text-gray-700 leading-relaxed mb-4">
             {isRTL ? pkg.desc.ar : pkg.desc.en}
           </p>
 
