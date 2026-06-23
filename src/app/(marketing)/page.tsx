@@ -346,9 +346,10 @@ export default function LandingPage() {
       <PackagesSection />
 
       {/* ============================================================= */}
-      {/*  MEETING ROOMS                                                   */}
+      {/*  MEETING ROOMS — hidden                                           */}
       {/* ============================================================= */}
-      <section className="relative py-20 sm:py-28 lg:py-36 bg-[#9e1c45] overflow-hidden">
+      {/* <section className="relative py-20 sm:py-28 lg:py-36 bg-[#9e1c45] overflow-hidden"> */}
+      {false && <section className="relative py-20 sm:py-28 lg:py-36 bg-[#9e1c45] overflow-hidden">
         {/* Decorative background */}
         <div aria-hidden="true" className="pointer-events-none absolute top-8 left-6 w-28 h-28 border-2 border-secondary/20 rounded-xl rotate-12" />
         <div aria-hidden="true" className="pointer-events-none absolute top-28 left-16 w-10 h-10 bg-secondary/10 rounded-lg -rotate-6" />
@@ -428,7 +429,7 @@ export default function LandingPage() {
             </AnimateOnScroll>
           </div>
         </div>
-      </section>
+      </section>}
 
 
 
