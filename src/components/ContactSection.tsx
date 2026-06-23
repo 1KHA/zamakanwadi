@@ -4,10 +4,38 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Send, Phone, User, Briefcase } from 'lucide-react';
 
-const INQUIRY_OPTIONS = [
-  { value: 'whole-office', ar: 'تأجير مكتب كامل', en: 'Rent a whole office' },
-  { value: 'shared-desk', ar: 'تأجير مكتب في مساحة عمل مشتركة', en: 'Rent a desk in shared workspace' },
-  { value: 'general', ar: 'استفسار عام', en: 'General inquiry' },
+const INQUIRY_GROUPS = [
+  {
+    label: { ar: 'مكاتب العمل', en: 'Work Offices' },
+    options: [
+      { value: 'office-flex',      ar: 'الباقة المرنة',    en: 'Flex Package' },
+      { value: 'office-pioneer',   ar: 'باقة الرواد',      en: 'Pioneer Package' },
+      { value: 'office-pioneer-plus', ar: 'باقة الرواد +', en: 'Pioneer+ Package' },
+      { value: 'office-corporate', ar: 'باقة الشركات',     en: 'Corporate Package' },
+    ],
+  },
+  {
+    label: { ar: 'قاعات الاجتماعات', en: 'Meeting Rooms' },
+    options: [
+      { value: 'room-riyadah-1', ar: 'قاعة ريادة ١', en: 'Riyadah Room 1' },
+      { value: 'room-riyadah-2', ar: 'قاعة ريادة ٢', en: 'Riyadah Room 2' },
+      { value: 'room-bina',      ar: 'قاعة بناء',    en: 'Bina Room' },
+    ],
+  },
+  {
+    label: { ar: 'المسارح', en: 'Theaters' },
+    options: [
+      { value: 'theater-ithraa',  ar: 'مسرح إثراء',  en: 'Ithraa Theater' },
+      { value: 'theater-tarabut', ar: 'مسرح ترابط',  en: 'Tarabut Theater' },
+      { value: 'theater-rakeeza', ar: 'مسرح ركيزة',  en: 'Rakeeza Theater' },
+    ],
+  },
+  {
+    label: { ar: 'أخرى', en: 'Other' },
+    options: [
+      { value: 'general', ar: 'استفسار عام', en: 'General Inquiry' },
+    ],
+  },
 ];
 
 export default function ContactSection() {
@@ -148,10 +176,14 @@ export default function ContactSection() {
                 <option value="">
                   {isRTL ? 'اختر نوع الاستفسار' : 'Select inquiry type'}
                 </option>
-                {INQUIRY_OPTIONS.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {isRTL ? option.ar : option.en}
-                  </option>
+                {INQUIRY_GROUPS.map((group) => (
+                  <optgroup key={group.label.en} label={isRTL ? group.label.ar : group.label.en}>
+                    {group.options.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {isRTL ? option.ar : option.en}
+                      </option>
+                    ))}
+                  </optgroup>
                 ))}
               </select>
             </div>

@@ -238,11 +238,11 @@ export default function LandingPage() {
                   </div>
                   <div>
                     <h3 className="text-lg sm:text-xl font-bold text-dark">
-                      {isRTL ? 'خدمات مساندة' : 'Consulting Services'}
+                      {isRTL ? 'مسارح' : 'Consulting Services'}
                     </h3>
                     <p className="text-sm text-gray-custom mt-1">
                       {isRTL
-                        ? 'حزمة متكاملة من الخدمات المساندة'
+                        ? 'مسارح متنوعة لفعاليات مختلفة'
                         : 'Professional consulting to grow your business.'}
                     </p>
                   </div>
