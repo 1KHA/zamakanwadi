@@ -159,19 +159,19 @@ export default function LandingPage() {
       {/* ============================================================= */}
       {/*  HERO                                                         */}
       {/* ============================================================= */}
-      <section className="relative w-full min-h-screen overflow-hidden bg-dark flex flex-col">
+      <section className="relative w-full h-screen overflow-hidden bg-dark flex flex-col">
         {/* Background images collage */}
         <div className="absolute inset-0">
           <div className="absolute inset-0 bg-gradient-to-br from-primary/90 via-primary/70 to-dark/90" />
           <img
-            src="/images/wmk02.jpg"
+            src="/images/IMG_8048-HDR2.png"
             alt="Zamakan workspace"
             className="w-full h-full object-cover opacity-40"
             loading="eager"
           />
         </div>
 
-        <div className="relative flex-1 flex items-center max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
+        <div className="relative flex-1 flex items-center max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center w-full">
             {/* Text content */}
             <AnimateOnScroll direction="right" className="text-white space-y-6 sm:space-y-8">
@@ -343,6 +343,8 @@ export default function LandingPage() {
       </section>
 
 
+      <PackagesSection />
+
       {/* ============================================================= */}
       {/*  MEETING ROOMS                                                   */}
       {/* ============================================================= */}
@@ -361,7 +363,7 @@ export default function LandingPage() {
             >
               <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight">
                 {isRTL
-                  ? 'قاعات اجتماعات لكل المناسبات'
+                  ? 'استديو زوايا'
                   : 'Meeting Rooms for Every Occasion'}
               </h2>
 
@@ -524,8 +526,6 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
-
-      <PackagesSection />
 
       <ContactSection />
 

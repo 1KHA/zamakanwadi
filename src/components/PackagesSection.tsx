@@ -17,34 +17,34 @@ const data = {
       label: { ar: 'مكاتب العمل', en: 'Work Offices' },
       packages: [
         {
-          title: { ar: 'الباقة المؤسسية', en: 'Corporate Package' },
+          title: { ar: 'الباقة المرنة ', en: 'Corporate Package' },
           image: '/images/disimage/NSPACE FULL-10.jpg',
           features: {
-            ar: ['نظام أمان', 'مكتبة', 'موقف سيارات', 'إنترنت عالي السرعة', 'منطقة ترفيه', 'قاعة اجتماعات'],
+            ar: ['٧/٢٤ على مدار اليوم​', 'انترنت', 'صالة ترفيهية', 'مصلى'],
             en: ['Security system', 'Library', 'Parking', 'High-speed Internet', 'Entertainment area', 'Meeting room'],
           },
         },
         {
-          title: { ar: 'باقة رائد+', en: '+ Pioneer Package' },
+          title: { ar: ' باقة الرواد', en: '+ Pioneer Package' },
           image: '/images/disimage/IMG_0219.jpg',
           features: {
-            ar: ['نظام أمان', 'مكتبة', 'موقف سيارات', 'إنترنت عالي السرعة', 'منطقة ترفيه'],
+            ar: ['٧/٢٤ على مدار اليوم​', 'انترنت', 'صالة ترفيهية', 'مصلى', '٢ ساعات شهريا لقاعات الاجتماعات الرئيسية'],
             en: ['Security system', 'Library', 'Parking', 'High-speed Internet', 'Entertainment area'],
           },
         },
         {
-          title: { ar: 'باقة رائد', en: 'Pioneer Package' },
+          title: { ar: '  باقة الرواد +​', en: 'Pioneer Package' },
           image: '/images/disimage/IMG_0368.jpg',
           features: {
-            ar: ['نظام أمان', 'مكتبة', 'موقف سيارات', 'إنترنت عالي السرعة'],
+            ar: ['٧/٢٤ على مدار اليوم​', 'انترنت', 'صالة ترفيهية', 'مصلى', '٤ ساعات شهريا لقاعات الاجتماعات الرئيسية', 'ساعتين شهريا لاستخدام المسرح'],
             en: ['Security system', 'Library', 'Parking', 'High-speed Internet'],
           },
         },
         {
-          title: { ar: 'باقة الطالب', en: 'Student Package' },
+          title: { ar: '​ باقة الشركات​', en: 'Student Package' },
           image: '/images/disimage/IMG_0267.jpg',
           features: {
-            ar: ['نظام أمان', 'مكتبة', 'إنترنت عالي السرعة'],
+            ar: ['٧/٢٤ على مدار اليوم​', 'انترنت', 'صالة ترفيهية', 'مصلى', '٤ ساعات شهريا لقاعات الاجتماعات الرئيسية', 'ساعتين شهريا لاستخدام المسرح', 'دخول ذكي'],
             en: ['Security system', 'Library', 'High-speed Internet'],
           },
         },
@@ -55,24 +55,24 @@ const data = {
       label: { ar: 'قاعات الاجتماعات', en: 'Meeting Rooms' },
       packages: [
         {
-          title: { ar: 'القاعة الصغيرة', en: 'Small Room' },
-          image: '/images/disimage/IMG_0376 - Copy.jpg',
+          title: { ar: ' قاعة ريادة ١', en: 'Small Room' },
+          image: '/images/decoimage/6.jpg',
           features: {
             ar: ['سبورة ذكية', 'نظام صوتي', 'تكييف', 'واي فاي مخصص', 'تسع حتى 8 أشخاص'],
             en: ['Smart board', 'Audio system', 'AC', 'Dedicated Wi-Fi', 'Up to 8 persons'],
           },
         },
         {
-          title: { ar: 'القاعة المتوسطة', en: 'Medium Room' },
-          image: '/images/disimage/NBL_9534.JPG',
+          title: { ar: 'قاعة ريادة ٢', en: 'Medium Room' },
+          image: '/images/decoimage/DSC_2340.JPG',
           features: {
             ar: ['سبورة ذكية', 'نظام صوتي', 'تكييف', 'واي فاي مخصص', 'خدمة ضيافة', 'تسع حتى 20 شخصاً'],
             en: ['Smart board', 'Audio system', 'AC', 'Dedicated Wi-Fi', 'Catering service', 'Up to 20 persons'],
           },
         },
         {
-          title: { ar: 'القاعة الكبيرة', en: 'Large Room' },
-          image: '/images/disimage/NSPACE FULL-8.jpg',
+          title: { ar: 'قاعة بناء (متعددة)', en: 'Large Room' },
+          image: '/images/wmk01.png',
           features: {
             ar: ['سبورة ذكية', 'نظام صوتي متكامل', 'تكييف', 'واي فاي مخصص', 'خدمة ضيافة', 'تسجيل فيديو', 'تسع حتى 50 شخصاً'],
             en: ['Smart board', 'Full audio system', 'AC', 'Dedicated Wi-Fi', 'Catering service', 'Video recording', 'Up to 50 persons'],
@@ -85,16 +85,24 @@ const data = {
       label: { ar: 'المسارح', en: 'Theaters' },
       packages: [
         {
-          title: { ar: 'المسرح الصغير', en: 'Small Theater' },
-          image: '/images/disimage/space&cafe-7.jpg',
+          title: { ar: 'مسرح إثراء', en: 'Small Theater' },
+          image: '/images/theater/DSC2119.jpg',
           features: {
             ar: ['شاشة عرض كبيرة', 'نظام صوتي احترافي', 'إضاءة قابلة للضبط', 'تكييف', 'تسع حتى 40 شخصاً'],
             en: ['Large display screen', 'Professional audio system', 'Adjustable lighting', 'AC', 'Up to 40 persons'],
           },
         },
         {
-          title: { ar: 'المسرح الكبير', en: 'Large Theater' },
-          image: '/images/disimage/GNR_1879 copy.jpg',
+          title: { ar: 'مسرح ترابط (خشبي)', en: 'Large Theater' },
+          image: '/images/theater/IMG_0181.jpg',
+          features: {
+            ar: ['شاشة عرض ضخمة', 'نظام صوتي احترافي', 'إضاءة متقدمة', 'تكييف مركزي', 'منصة عرض', 'تسجيل بث مباشر', 'تسع حتى 120 شخصاً'],
+            en: ['Huge display screen', 'Professional audio system', 'Advanced lighting', 'Central AC', 'Stage', 'Live stream recording', 'Up to 120 persons'],
+          },
+        },
+        {
+          title: { ar: 'مسرح ركيزة', en: 'Large Theater' },
+          image: '/images/theater/DSC_55544.jpg',
           features: {
             ar: ['شاشة عرض ضخمة', 'نظام صوتي احترافي', 'إضاءة متقدمة', 'تكييف مركزي', 'منصة عرض', 'تسجيل بث مباشر', 'تسع حتى 120 شخصاً'],
             en: ['Huge display screen', 'Professional audio system', 'Advanced lighting', 'Central AC', 'Stage', 'Live stream recording', 'Up to 120 persons'],
@@ -178,11 +186,11 @@ export default function PackagesSection() {
         <AnimateOnScroll direction="up">
           <div className="text-center max-w-3xl mx-auto space-y-4 mb-12">
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-[#9e1c45]">
-              {isRTL ? 'باقاتنا' : 'Our Packages'}
+              {isRTL ? 'مساحات الأعمال' : 'Our Packages'}
             </h2>
             <p className="text-base sm:text-lg text-gray-custom max-w-2xl mx-auto leading-relaxed">
               {isRTL
-                ? 'اختر الباقة التي تناسب احتياجاتك من مجموعة متنوعة من الخيارات المصممة لكل نوع من المستخدمين'
+                ? 'بيئة أعمال متكاملة تضم مكاتب وقاعات ومسارح متعددة الاستخدامات'
                 : 'Choose the package that suits your needs from a variety of options designed for every type of user.'}
             </p>
           </div>
