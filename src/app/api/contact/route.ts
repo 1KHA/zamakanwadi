@@ -6,7 +6,19 @@ const contactSchema = z.object({
   fullName: z.string().min(1, 'Full name is required'),
   phone: z.string().min(1, 'Phone is required'),
   activity: z.string().min(1, 'Activity is required'),
-  inquiryType: z.enum(['whole-office', 'shared-desk', 'general']),
+  inquiryType: z.enum([
+    'office-flex',
+    'office-pioneer',
+    'office-pioneer-plus',
+    'office-corporate',
+    'room-riyadah-1',
+    'room-riyadah-2',
+    'room-bina',
+    'theater-ithraa',
+    'theater-tarabut',
+    'theater-rakeeza',
+    'general',
+  ]),
 });
 
 function normalizeSaudiPhone(input: string): string | null {
