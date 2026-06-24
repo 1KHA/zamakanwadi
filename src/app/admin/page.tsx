@@ -8,6 +8,29 @@ import {
   ChevronRight, Bell, Search
 } from 'lucide-react';
 
+const INQUIRY_LABELS: Record<string, { ar: string; en: string }> = {
+  'office-flex':          { ar: 'الباقة المرنة',                          en: 'Flex Package' },
+  'office-pioneer':       { ar: 'باقة الرواد',                            en: 'Pioneer Package' },
+  'office-pioneer-plus':  { ar: 'باقة الرواد +',                          en: 'Pioneer+ Package' },
+  'office-corporate':     { ar: 'باقة الشركات',                           en: 'Corporate Package' },
+  'room-riyadah-1':       { ar: 'قاعة ريادة ١',                          en: 'Riyadah Room 1' },
+  'room-riyadah-2':       { ar: 'قاعة ريادة ٢',                          en: 'Riyadah Room 2' },
+  'room-bina':            { ar: 'قاعة بناء',                              en: 'Bina Room' },
+  'theater-ithraa':       { ar: 'مسرح إثراء',                            en: 'Ithraa Theater' },
+  'theater-tarabut':      { ar: 'مسرح ترابط',                            en: 'Tarabut Theater' },
+  'theater-rakeeza':      { ar: 'مسرح ركيزة',                            en: 'Rakeeza Theater' },
+  'general':              { ar: 'استفسار عام',                            en: 'General Inquiry' },
+  // legacy values
+  'whole-office':         { ar: 'تأجير مكتب كامل',                       en: 'Rent a whole office' },
+  'shared-desk':          { ar: 'تأجير مكتب في مساحة عمل مشتركة',       en: 'Rent a desk in shared workspace' },
+};
+
+function getInquiryLabel(value: string, isRTL: boolean): string {
+  const entry = INQUIRY_LABELS[value];
+  if (entry) return isRTL ? entry.ar : entry.en;
+  return value;
+}
+
 function getWeekStart(date: Date) {
   const d = new Date(date);
   const day = d.getDay();
@@ -337,9 +360,7 @@ export default function AdminPage() {
                                     <td className="py-3 px-4 text-dark text-end whitespace-nowrap" dir="ltr">{msg.phone}</td>
                                     <td className="py-3 px-4 text-dark">{msg.activity}</td>
                                     <td className="py-3 px-4 text-dark">
-                                      {msg.inquiryType === 'whole-office' && (isRTL ? 'تأجير مكتب كامل' : 'Rent a whole office')}
-                                      {msg.inquiryType === 'shared-desk' && (isRTL ? 'تأجير مكتب في مساحة عمل مشتركة' : 'Rent a desk in shared workspace')}
-                                      {msg.inquiryType === 'general' && (isRTL ? 'استفسار عام' : 'General inquiry')}
+                                      {getInquiryLabel(msg.inquiryType, isRTL)}
                                     </td>
                                     <td className="py-3 px-4 text-dark whitespace-nowrap">
                                       {new Date(msg.createdAt).toLocaleString(isRTL ? 'ar-SA' : 'en-US')}
