@@ -72,6 +72,7 @@ model Office {
   amenities   String[]
   description String?
   image       String?
+  images      String[]
   featured    Boolean    @default(false)
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
@@ -80,17 +81,21 @@ model Office {
 }
 
 model Booking {
-  id          String        @id @default(cuid())
-  userId      String
-  officeId    String?
-  itemType    String
-  itemName    String
-  status      BookingStatus @default(PENDING)
-  total       Float
-  startDate   DateTime?
-  endDate     DateTime?
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
+  id             String        @id @default(cuid())
+  userId         String
+  officeId       String?
+  itemType       String
+  itemName       String
+  itemNameAr     String?
+  status         BookingStatus @default(PENDING)
+  total          Float
+  startDate      DateTime?
+  endDate        DateTime?
+  durationType   String?
+  referenceNumber String?
+  notes          String?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
 
   user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   office Office? @relation(fields: [officeId], references: [id])
@@ -146,6 +151,8 @@ enum OfficeType {
 
 enum BookingStatus {
   PENDING
-  COMPLETED
+  APPROVED
+  REJECTED
   CANCELLED
+  COMPLETED
 }

@@ -3,6 +3,10 @@ import { getServerSession } from 'next-auth/next';
 import { prisma } from '@/lib/prisma';
 import { authOptions } from '@/lib/auth';
 
+function generateReference() {
+  return 'ZMK-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+}
+
 export async function GET() {
   try {
     const session = await getServerSession(authOptions);
@@ -52,9 +56,13 @@ export async function POST(req: NextRequest) {
         officeId: body.officeId,
         itemType: body.itemType,
         itemName: body.itemName,
+        itemNameAr: body.itemNameAr,
         total: body.total,
         startDate: body.startDate ? new Date(body.startDate) : null,
         endDate: body.endDate ? new Date(body.endDate) : null,
+        durationType: body.durationType,
+        referenceNumber: body.referenceNumber || generateReference(),
+        notes: body.notes,
       },
     });
 

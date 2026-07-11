@@ -76,3 +76,6 @@ next-env.d.ts
 
 .claude
 scripts/seed-admin.ts
+
+/testapi
+/update

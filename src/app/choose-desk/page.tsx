@@ -1,32 +1,75 @@
 'use client';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Monitor, Wifi, Coffee, Check, Armchair } from 'lucide-react';
+import { CART_STORAGE_KEY } from '@/lib/spaces';
+
+function generateId() {
+  return Math.random().toString(36).substring(2, 10);
+}
+
+function getCart() {
+  if (typeof window === 'undefined') return [];
+  try {
+    return JSON.parse(localStorage.getItem(CART_STORAGE_KEY) || '[]');
+  } catch {
+    return [];
+  }
+}
+
+function saveCart(cart: unknown[]) {
+  if (typeof window === 'undefined') return;
+  localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart));
+}
 
 export default function ChooseDeskPage() {
   const { i18n } = useTranslation();
   const isRTL = i18n.language === 'ar';
+  const router = useRouter();
   const [selectedDesk, setSelectedDesk] = useState<string | null>(null);
+  const [baseDesks] = useState(() =>
+    Array.from({ length: 24 }, (_, i) => {
+      const id = `desk-${i + 1}`;
+      const isWindow = i < 8;
+      const isCorner = [0, 7, 16, 23].includes(i);
+      const status = Math.random() > 0.7 ? 'occupied' : 'available';
+      return {
+        id,
+        number: i + 1,
+        status: status as 'available' | 'occupied',
+        type: isCorner ? 'corner' : isWindow ? 'window' : 'standard',
+        price: isCorner ? 200 : isWindow ? 150 : 100,
+      };
+    })
+  );
 
-  const desks = Array.from({ length: 24 }, (_, i) => {
-    const id = `desk-${i + 1}`;
-    const isWindow = i < 8;
-    const isCorner = [0, 7, 16, 23].includes(i);
-    const status = Math.random() > 0.7 ? 'occupied' : 'available';
-    return {
-      id,
-      number: i + 1,
-      status: status as 'available' | 'occupied' | 'selected',
-      type: isCorner ? 'corner' : isWindow ? 'window' : 'standard',
-      price: isCorner ? 200 : isWindow ? 150 : 100,
-    };
-  }).map((d) => ({
+  const desks = baseDesks.map((d) => ({
     ...d,
-    status: d.id === selectedDesk ? 'selected' : d.status,
+    status: d.id === selectedDesk ? ('selected' as const) : d.status,
   }));
 
   const selectedDeskData = desks.find((d) => d.id === selectedDesk);
+
+  const handleBookDesk = () => {
+    if (!selectedDeskData) return;
+    const today = new Date().toISOString().split('T')[0];
+    const cart = getCart();
+    cart.push({
+      id: generateId(),
+      spaceId: selectedDeskData.id,
+      name: isRTL ? `مكتب رقم ${selectedDeskData.number}` : `Desk ${selectedDeskData.number}`,
+      nameAr: `مكتب رقم ${selectedDeskData.number}`,
+      type: 'desk',
+      price: selectedDeskData.price,
+      quantity: 1,
+      startDate: today,
+      durationType: 'monthly',
+      durationLabel: isRTL ? 'شهري' : 'Monthly',
+    });
+    saveCart(cart);
+    router.push('/cart');
+  };
 
   return (
     <div className={`min-h-screen bg-gray-50 py-12 ${isRTL ? 'rtl' : 'ltr'}`}>
@@ -135,13 +178,13 @@ export default function ChooseDeskPage() {
                       <span className="text-gray-custom">{isRTL ? 'السعر/شهر' : 'Price/month'}</span>
                       <span className="text-2xl font-bold text-primary">{selectedDeskData.price} SAR</span>
                     </div>
-                    <Link
-                      href="/cart"
+                    <button
+                      onClick={handleBookDesk}
                       className="flex items-center justify-center gap-2 w-full py-3 bg-primary text-white font-bold rounded-xl hover:bg-primary-dark transition-colors"
                     >
                       <Check className="w-5 h-5" />
                       {isRTL ? 'احجز هذا المكتب' : 'Book This Desk'}
-                    </Link>
+                    </button>
                   </div>
                 </div>
               ) : (

@@ -60,7 +60,7 @@ export default function SignUpPage() {
         return;
       }
 
-      router.push('/profile');
+      router.push('/dashboard');
       router.refresh();
     } catch (err) {
       setError(isRTL ? 'حدث خطأ ما' : 'Something went wrong');
