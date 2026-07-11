@@ -17,6 +17,7 @@ import {
   Mail,
   Phone,
   Tag,
+  Bell,
 } from 'lucide-react';
 
 interface Booking {
@@ -69,10 +70,14 @@ function DashboardContent() {
   const confirmed = searchParams.get('confirmed');
   const reference = searchParams.get('ref');
 
-  const [activeTab, setActiveTab] = useState<'bookings' | 'profile'>('bookings');
+  const [activeTab, setActiveTab] = useState<'bookings' | 'notifications' | 'profile'>('bookings');
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+
+  const [notifications, setNotifications] = useState<Array<{ id: string; title: string; message: string; read: boolean; createdAt: string }>>([]);
+  const [notificationsLoading, setNotificationsLoading] = useState(false);
+  const [markingRead, setMarkingRead] = useState(false);
 
   useEffect(() => {
     if (status === 'authenticated') {
@@ -86,6 +91,38 @@ function DashboardContent() {
         .finally(() => setLoading(false));
     }
   }, [status]);
+
+  useEffect(() => {
+    if (status === 'authenticated' && activeTab === 'notifications') {
+      setNotificationsLoading(true);
+      fetch('/api/notifications')
+        .then(async (res) => {
+          if (!res.ok) throw new Error('Failed to fetch notifications');
+          return res.json();
+        })
+        .then((data) => setNotifications(data))
+        .catch((err) => setError(err.message))
+        .finally(() => setNotificationsLoading(false));
+    }
+  }, [status, activeTab]);
+
+  const markAllRead = async () => {
+    setMarkingRead(true);
+    try {
+      const res = await fetch('/api/notifications', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ all: true }),
+      });
+      if (!res.ok) throw new Error('Failed to mark notifications as read');
+      setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Failed to update notifications';
+      setError(message);
+    } finally {
+      setMarkingRead(false);
+    }
+  };
 
   if (status === 'loading') {
     return (
@@ -164,6 +201,23 @@ function DashboardContent() {
                 >
                   <Calendar className="w-5 h-5 shrink-0" />
                   <span className="text-start flex-1">{isRTL ? 'حجوزاتي' : 'My Bookings'}</span>
+                  <ChevronRight className={`w-4 h-4 shrink-0 ${isRTL ? 'rotate-180' : ''}`} />
+                </button>
+                <button
+                  onClick={() => setActiveTab('notifications')}
+                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors ${
+                    activeTab === 'notifications'
+                      ? 'bg-primary text-white'
+                      : 'text-gray-custom hover:bg-gray-50 hover:text-dark'
+                  }`}
+                >
+                  <Bell className="w-5 h-5 shrink-0" />
+                  <span className="text-start flex-1">{isRTL ? 'الإشعارات' : 'Notifications'}</span>
+                  {notifications.some((n) => !n.read) && (
+                    <span className="w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
+                      {notifications.filter((n) => !n.read).length}
+                    </span>
+                  )}
                   <ChevronRight className={`w-4 h-4 shrink-0 ${isRTL ? 'rotate-180' : ''}`} />
                 </button>
                 <button
@@ -264,6 +318,55 @@ function DashboardContent() {
                         </div>
                       );
                     })}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {activeTab === 'notifications' && (
+              <div className="bg-white rounded-2xl shadow-sm p-6">
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-xl font-bold text-dark flex items-center gap-2">
+                    <Bell className="w-5 h-5 text-primary" />
+                    {isRTL ? 'الإشعارات' : 'Notifications'}
+                  </h2>
+                  {notifications.some((n) => !n.read) && (
+                    <button
+                      onClick={markAllRead}
+                      disabled={markingRead}
+                      className="text-sm text-primary hover:text-primary-dark font-medium disabled:opacity-50"
+                    >
+                      {isRTL ? 'تحديد الكل كمقروء' : 'Mark all as read'}
+                    </button>
+                  )}
+                </div>
+
+                {notificationsLoading ? (
+                  <div className="text-center py-12 text-gray-custom">{isRTL ? 'جاري التحميل...' : 'Loading...'}</div>
+                ) : notifications.length === 0 ? (
+                  <div className="text-center py-12">
+                    <Bell className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                    <p className="text-gray-custom">{isRTL ? 'لا توجد إشعارات' : 'No notifications'}</p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {notifications.map((notification) => (
+                      <div
+                        key={notification.id}
+                        className={`p-4 rounded-xl border ${notification.read ? 'bg-gray-50 border-gray-100' : 'bg-primary/5 border-primary/10'}`}
+                      >
+                        <div className="flex items-start gap-3">
+                          <div className={`w-2 h-2 rounded-full mt-2 shrink-0 ${notification.read ? 'bg-gray-300' : 'bg-primary'}`} />
+                          <div className="flex-1">
+                            <div className="font-bold text-dark text-sm">{notification.title}</div>
+                            <p className="text-gray-custom text-sm mt-1">{notification.message}</p>
+                            <div className="text-xs text-gray-custom mt-2">
+                              {new Date(notification.createdAt).toLocaleString(isRTL ? 'ar-SA' : 'en-US')}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 )}
               </div>

@@ -3,9 +3,9 @@ import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import Logo from '@/components/Logo';
 import {
-  LayoutDashboard, Users, Folder, ShoppingCart, Settings, MessageSquare,
+  LayoutDashboard, Users, Folder, ShoppingCart, Settings, MessageSquare, Calendar,
   TrendingUp, TrendingDown, DollarSign, BarChart3,
-  ChevronRight, Bell, Search
+  ChevronRight, Bell, Search, Check, X, Eye
 } from 'lucide-react';
 
 const INQUIRY_LABELS: Record<string, { ar: string; en: string }> = {
@@ -66,6 +66,7 @@ export default function AdminPage() {
 
   const sidebarItems = [
     { id: 'dashboard', label: isRTL ? 'لوحة التحكم' : 'Dashboard', icon: LayoutDashboard },
+    { id: 'bookings', label: isRTL ? 'الحجوزات' : 'Bookings', icon: Calendar },
     { id: 'messages', label: isRTL ? 'رسائل التواصل' : 'Contact Messages', icon: MessageSquare },
     { id: 'users', label: isRTL ? 'المستخدمين' : 'Users', icon: Users },
     { id: 'files', label: isRTL ? 'الملفات' : 'Files', icon: Folder },
@@ -90,6 +91,32 @@ export default function AdminPage() {
   }> | null>(null);
   const [messagesLoading, setMessagesLoading] = useState(false);
   const [messagesError, setMessagesError] = useState('');
+
+  const [bookings, setBookings] = useState<Array<{
+    id: string;
+    itemName: string;
+    itemNameAr: string | null;
+    itemType: string;
+    status: string;
+    total: number;
+    startDate: string | null;
+    endDate: string | null;
+    durationType: string | null;
+    referenceNumber: string | null;
+    rejectionReason: string | null;
+    createdAt: string;
+    user: {
+      id: string;
+      name: string | null;
+      email: string;
+      phone: string | null;
+    };
+  }> | null>(null);
+  const [bookingsLoading, setBookingsLoading] = useState(false);
+  const [bookingsError, setBookingsError] = useState('');
+  const [rejectingBooking, setRejectingBooking] = useState<string | null>(null);
+  const [rejectionReason, setRejectionReason] = useState('');
+  const [updating, setUpdating] = useState(false);
 
   useEffect(() => {
     if (activeTab !== 'messages') return;
@@ -122,6 +149,65 @@ export default function AdminPage() {
       cancelled = true;
     };
   }, [activeTab]);
+
+  useEffect(() => {
+    if (activeTab !== 'bookings') return;
+
+    let cancelled = false;
+    setBookingsLoading(true);
+    setBookingsError('');
+
+    fetch('/api/admin/bookings')
+      .then(async (res) => {
+        if (!res.ok) {
+          const data = await res.json().catch(() => ({}));
+          throw new Error(data.error || `HTTP ${res.status}`);
+        }
+        return res.json();
+      })
+      .then((data) => {
+        if (!cancelled) setBookings(data);
+      })
+      .catch((err) => {
+        if (!cancelled) setBookingsError(err.message);
+      })
+      .finally(() => {
+        if (!cancelled) setBookingsLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [activeTab]);
+
+  const updateBookingStatus = async (id: string, status: string, reason?: string) => {
+    setUpdating(true);
+    try {
+      const res = await fetch('/api/admin/bookings', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, status, rejectionReason: reason }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || 'Failed to update booking');
+      }
+      setBookings((prev) =>
+        prev
+          ? prev.map((b) =>
+              b.id === id ? { ...b, status, rejectionReason: status === 'REJECTED' ? reason || null : null } : b
+            )
+          : prev
+      );
+      setRejectingBooking(null);
+      setRejectionReason('');
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Failed to update booking';
+      setBookingsError(message);
+    } finally {
+      setUpdating(false);
+    }
+  };
 
   const currentWeekStart = getWeekStart(new Date());
   const currentWeekKey = currentWeekStart.toISOString();
@@ -379,7 +465,152 @@ export default function AdminPage() {
             </div>
           )}
 
-          {activeTab !== 'dashboard' && activeTab !== 'messages' && (
+          {activeTab === 'bookings' && (
+            <div className="bg-white rounded-xl shadow-sm p-6">
+              <h3 className="font-bold text-dark mb-4">
+                {isRTL ? 'إدارة الحجوزات' : 'Booking Management'}
+              </h3>
+              {bookingsLoading ? (
+                <p className="text-dark text-center py-8">{isRTL ? 'جاري التحميل...' : 'Loading...'}</p>
+              ) : bookingsError ? (
+                <p className="text-red-600 text-center py-8">{bookingsError}</p>
+              ) : bookings && bookings.length === 0 ? (
+                <p className="text-dark text-center py-8">{isRTL ? 'لا توجد حجوزات بعد' : 'No bookings yet'}</p>
+              ) : bookings && bookings.length > 0 ? (
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="border-b border-gray-100">
+                        <th className="text-start text-sm font-semibold text-dark py-3 px-4">{isRTL ? 'المرجع' : 'Reference'}</th>
+                        <th className="text-start text-sm font-semibold text-dark py-3 px-4">{isRTL ? 'العميل' : 'Customer'}</th>
+                        <th className="text-start text-sm font-semibold text-dark py-3 px-4">{isRTL ? 'المساحة' : 'Space'}</th>
+                        <th className="text-start text-sm font-semibold text-dark py-3 px-4">{isRTL ? 'النوع' : 'Type'}</th>
+                        <th className="text-start text-sm font-semibold text-dark py-3 px-4">{isRTL ? 'التاريخ' : 'Dates'}</th>
+                        <th className="text-start text-sm font-semibold text-dark py-3 px-4">{isRTL ? 'المبلغ' : 'Amount'}</th>
+                        <th className="text-start text-sm font-semibold text-dark py-3 px-4">{isRTL ? 'الحالة' : 'Status'}</th>
+                        <th className="text-start text-sm font-semibold text-dark py-3 px-4">{isRTL ? 'إجراءات' : 'Actions'}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {bookings.map((booking) => (
+                        <tr key={booking.id} className="border-b border-gray-50 hover:bg-gray-50">
+                          <td className="py-3 px-4 font-medium text-dark whitespace-nowrap">{booking.referenceNumber || '-'}</td>
+                          <td className="py-3 px-4">
+                            <div className="font-medium text-dark">{booking.user.name || booking.user.email}</div>
+                            <div className="text-xs text-gray-custom">{booking.user.email}</div>
+                            {booking.user.phone && <div className="text-xs text-gray-custom" dir="ltr">{booking.user.phone}</div>}
+                          </td>
+                          <td className="py-3 px-4 text-dark">{isRTL && booking.itemNameAr ? booking.itemNameAr : booking.itemName}</td>
+                          <td className="py-3 px-4 text-gray-custom capitalize">{booking.itemType}</td>
+                          <td className="py-3 px-4 text-sm text-gray-custom whitespace-nowrap">
+                            {booking.startDate ? new Date(booking.startDate).toLocaleDateString(isRTL ? 'ar-SA' : 'en-US') : '-'}
+                            {booking.endDate && booking.endDate !== booking.startDate && (
+                              <>
+                                <br />
+                                {isRTL ? 'حتى' : 'to'} {new Date(booking.endDate).toLocaleDateString(isRTL ? 'ar-SA' : 'en-US')}
+                              </>
+                            )}
+                          </td>
+                          <td className="py-3 px-4 font-bold text-primary">{booking.total.toLocaleString()} SAR</td>
+                          <td className="py-3 px-4">
+                            <span className={`inline-block px-2 py-1 text-xs font-medium rounded-md ${
+                              booking.status === 'APPROVED'
+                                ? 'bg-green-100 text-green-700'
+                                : booking.status === 'REJECTED'
+                                ? 'bg-red-100 text-red-700'
+                                : booking.status === 'CANCELLED'
+                                ? 'bg-gray-100 text-gray-600'
+                                : booking.status === 'COMPLETED'
+                                ? 'bg-primary/10 text-primary'
+                                : 'bg-secondary/20 text-secondary-dark'
+                            }`}>
+                              {booking.status}
+                            </span>
+                            {booking.rejectionReason && (
+                              <div className="text-xs text-red-600 mt-1 max-w-xs truncate" title={booking.rejectionReason}>
+                                {booking.rejectionReason}
+                              </div>
+                            )}
+                          </td>
+                          <td className="py-3 px-4">
+                            <div className="flex items-center gap-2">
+                              {booking.status === 'PENDING' && (
+                                <>
+                                  <button
+                                    onClick={() => updateBookingStatus(booking.id, 'APPROVED')}
+                                    disabled={updating}
+                                    className="inline-flex items-center gap-1 px-3 py-1.5 bg-green-100 text-green-700 rounded-lg text-xs font-medium hover:bg-green-200 transition-colors disabled:opacity-50"
+                                  >
+                                    <Check className="w-3 h-3" />
+                                    {isRTL ? 'موافقة' : 'Approve'}
+                                  </button>
+                                  <button
+                                    onClick={() => setRejectingBooking(booking.id)}
+                                    disabled={updating}
+                                    className="inline-flex items-center gap-1 px-3 py-1.5 bg-red-100 text-red-700 rounded-lg text-xs font-medium hover:bg-red-200 transition-colors disabled:opacity-50"
+                                  >
+                                    <X className="w-3 h-3" />
+                                    {isRTL ? 'رفض' : 'Reject'}
+                                  </button>
+                                </>
+                              )}
+                              {booking.status === 'APPROVED' && (
+                                <button
+                                  onClick={() => updateBookingStatus(booking.id, 'COMPLETED')}
+                                  disabled={updating}
+                                  className="inline-flex items-center gap-1 px-3 py-1.5 bg-primary/10 text-primary rounded-lg text-xs font-medium hover:bg-primary/20 transition-colors disabled:opacity-50"
+                                >
+                                  <Check className="w-3 h-3" />
+                                  {isRTL ? 'إكمال' : 'Complete'}
+                                </button>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : null}
+
+              {/* Reject Modal */}
+              {rejectingBooking && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+                  <div className="bg-white rounded-2xl shadow-xl p-6 w-full max-w-md">
+                    <h3 className="text-lg font-bold text-dark mb-4">
+                      {isRTL ? 'سبب الرفض' : 'Rejection Reason'}
+                    </h3>
+                    <textarea
+                      value={rejectionReason}
+                      onChange={(e) => setRejectionReason(e.target.value)}
+                      placeholder={isRTL ? 'اكتب سبب رفض الحجز...' : 'Enter rejection reason...'}
+                      className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary min-h-[100px] mb-4"
+                    />
+                    <div className="flex gap-3 justify-end">
+                      <button
+                        onClick={() => {
+                          setRejectingBooking(null);
+                          setRejectionReason('');
+                        }}
+                        className="px-4 py-2 text-gray-custom hover:text-dark font-medium"
+                      >
+                        {isRTL ? 'إلغاء' : 'Cancel'}
+                      </button>
+                      <button
+                        onClick={() => updateBookingStatus(rejectingBooking, 'REJECTED', rejectionReason)}
+                        disabled={updating || !rejectionReason.trim()}
+                        className="px-4 py-2 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition-colors disabled:opacity-50"
+                      >
+                        {updating ? (isRTL ? 'جاري...' : 'Saving...') : (isRTL ? 'رفض الحجز' : 'Reject Booking')}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {activeTab !== 'dashboard' && activeTab !== 'messages' && activeTab !== 'bookings' && (
             <div className="bg-white rounded-xl shadow-sm p-12 text-center">
               <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Settings className="w-8 h-8 text-gray-400" />
