@@ -11,7 +11,6 @@ import {
   Calendar,
   Clock,
   ArrowRight,
-  Armchair,
   AlertCircle,
 } from 'lucide-react';
 import { getSpaceById, CartItem, CART_STORAGE_KEY } from '@/lib/spaces';
@@ -51,7 +50,6 @@ export default function SpaceDetailPage() {
   const [startDate, setStartDate] = useState('');
   const [duration, setDuration] = useState(space?.durationOptions[0]?.value || '');
   const [hours, setHours] = useState(1);
-  const [bookingType, setBookingType] = useState<'space' | 'desk'>('space');
 
   if (!space) {
     return (
@@ -91,7 +89,7 @@ export default function SpaceDetailPage() {
       spaceId: space.id,
       name: isRTL ? space.title.ar : space.title.en,
       nameAr: space.title.ar,
-      type: bookingType === 'desk' ? 'desk' : space.type,
+      type: space.type,
       price: total,
       quantity: 1,
       startDate,
@@ -213,45 +211,7 @@ export default function SpaceDetailPage() {
                 {isRTL ? 'الحجز' : 'Booking'}
               </h2>
 
-              {/* Space vs Desk toggle for workspaces */}
-              {space.type === 'workspace' && space.id !== 'office-flex' && (
-                <div className="flex rounded-lg bg-gray-100 p-1 mb-5">
-                  <button
-                    onClick={() => setBookingType('space')}
-                    className={`flex-1 py-2 text-sm font-medium rounded-md transition-colors ${
-                      bookingType === 'space' ? 'bg-primary text-white' : 'text-gray-custom hover:text-dark'
-                    }`}
-                  >
-                    {isRTL ? 'احجز مساحة' : 'Book Space'}
-                  </button>
-                  <button
-                    onClick={() => setBookingType('desk')}
-                    className={`flex-1 py-2 text-sm font-medium rounded-md transition-colors ${
-                      bookingType === 'desk' ? 'bg-primary text-white' : 'text-gray-custom hover:text-dark'
-                    }`}
-                  >
-                    {isRTL ? 'احجز مكتب' : 'Book Desk'}
-                  </button>
-                </div>
-              )}
-
-              {bookingType === 'desk' ? (
-                <div className="space-y-4">
-                  <p className="text-sm text-gray-custom">
-                    {isRTL
-                      ? 'اختر مكتبك المفضل من خريطة المكاتب المتاحة.'
-                      : 'Choose your preferred desk from the available desk map.'}
-                  </p>
-                  <Link
-                    href="/choose-desk"
-                    className="flex items-center justify-center gap-2 w-full py-3 bg-primary text-white font-bold rounded-xl hover:bg-primary-dark transition-colors"
-                  >
-                    <Armchair className="w-5 h-5" />
-                    {isRTL ? 'اختر مكتبك' : 'Choose Your Desk'}
-                  </Link>
-                </div>
-              ) : (
-                <div className="space-y-5">
+              <div className="space-y-5">
                   <div>
                     <label className="block text-sm font-medium text-dark mb-2">
                       {space.type === 'workspace'
@@ -332,7 +292,6 @@ export default function SpaceDetailPage() {
                     {isRTL ? 'احجز الآن' : 'Book Now'}
                   </button>
                 </div>
-              )}
             </div>
           </div>
         </div>
