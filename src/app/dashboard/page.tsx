@@ -7,7 +7,7 @@ import { useSearchParams } from 'next/navigation';
 import {
   User,
   Calendar,
-  ShoppingCart,
+  LampDesk,
   LogOut,
   Check,
   Clock,
@@ -16,7 +16,7 @@ import {
   ChevronRight,
   Mail,
   Phone,
-  Tag,
+  Monitor,
   Bell,
 } from 'lucide-react';
 
@@ -259,7 +259,7 @@ function DashboardContent() {
             {activeTab === 'bookings' && (
               <div className="bg-white rounded-2xl shadow-sm p-6">
                 <h2 className="text-xl font-bold text-dark mb-6 flex items-center gap-2">
-                  <ShoppingCart className="w-5 h-5 text-primary" />
+                  <LampDesk className="w-5 h-5 text-primary" />
                   {isRTL ? 'حجوزاتي' : 'My Bookings'}
                 </h2>
 
@@ -288,7 +288,7 @@ function DashboardContent() {
                           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
                             <div className="flex items-center gap-3">
                               <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
-                                <Tag className="w-6 h-6 text-primary" />
+                                <Monitor className="w-6 h-6 text-primary" />
                               </div>
                               <div>
                                 <div className="font-bold text-dark">

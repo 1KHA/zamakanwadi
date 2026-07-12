@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Trash2, ShoppingCart, ArrowRight, Tag, Calendar, Clock } from 'lucide-react';
+import { Trash2, LampDesk, ArrowRight, Monitor, Calendar, Clock } from 'lucide-react';
 import { CartItem, CART_STORAGE_KEY } from '@/lib/spaces';
 
 function getCart(): CartItem[] {
@@ -67,15 +67,15 @@ export default function CartPage() {
     <div className={`min-h-screen bg-gray-50 py-12 ${isRTL ? 'rtl' : 'ltr'}`}>
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <h1 className="text-3xl font-bold text-dark mb-8 flex items-center gap-3">
-          <ShoppingCart className="w-8 h-8 text-primary" />
-          {isRTL ? 'سلة التسوق' : 'Shopping Cart'}
+          <LampDesk className="w-8 h-8 text-primary" />
+          {isRTL ? 'تأكيد الحجز' : 'Confirm Booking'}
         </h1>
 
         {items.length === 0 ? (
           <div className="bg-white rounded-2xl p-12 text-center shadow-sm">
-            <ShoppingCart className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+            <LampDesk className="w-16 h-16 text-gray-300 mx-auto mb-4" />
             <h2 className="text-xl font-bold text-dark mb-2">
-              {isRTL ? 'سلة التسوق فارغة' : 'Your cart is empty'}
+              {isRTL ? 'لا توجد حجوزات للتأكيد' : 'No bookings to confirm'}
             </h2>
             <p className="text-gray-custom mb-6">
               {isRTL ? 'استكشف خدماتنا وأضف ما يناسبك' : 'Explore our services and add what suits you'}
@@ -95,7 +95,7 @@ export default function CartPage() {
               {items.map((item) => (
                 <div key={item.id} className="bg-white rounded-xl p-6 shadow-sm flex items-start gap-4">
                   <div className="w-20 h-20 bg-gradient-to-br from-primary/20 to-primary/5 rounded-lg flex items-center justify-center shrink-0">
-                    <Tag className="w-8 h-8 text-primary" />
+                    <Monitor className="w-8 h-8 text-primary" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="text-sm text-gray-custom capitalize">{item.type}</div>
@@ -165,7 +165,7 @@ export default function CartPage() {
 
                 <div className="mt-4 text-center">
                   <Link href="/#packages" className="text-primary text-sm hover:underline">
-                    {isRTL ? 'مواصلة التسوق' : 'Continue Shopping'}
+                    {isRTL ? 'عرض الخدمات' : 'View Services'}
                   </Link>
                 </div>
               </div>

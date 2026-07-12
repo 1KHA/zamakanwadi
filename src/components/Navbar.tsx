@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useTranslation } from 'react-i18next';
 import { useSession, signOut } from 'next-auth/react';
-import { User, LogOut, LayoutDashboard } from 'lucide-react';
+import { User, LogOut, LayoutDashboard, LampDesk } from 'lucide-react';
 import LanguageSwitcher from './LanguageSwitcher';
 import Logo from './Logo';
 
@@ -33,6 +33,14 @@ export default function Navbar() {
               className="text-sm font-medium text-gray-600 hover:text-primary transition-colors"
             >
               {isRTL ? 'تواصل معنا' : 'Contact Us'}
+            </Link>
+
+            <Link
+              href="/cart"
+              className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-primary bg-primary/5 rounded-lg hover:bg-primary/10 transition-colors"
+            >
+              <LampDesk className="w-4 h-4" />
+              <span className="hidden sm:inline">{isRTL ? 'تأكيد الحجز' : 'Confirm Booking'}</span>
             </Link>
 
             {isLoggedIn ? (
