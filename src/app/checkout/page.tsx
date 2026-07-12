@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useRouter } from 'next/navigation';
-import { signIn } from 'next-auth/react';
+import { signIn, useSession } from 'next-auth/react';
 import {
   ShoppingCart,
   User,
@@ -42,6 +42,7 @@ export default function CheckoutPage() {
   const { i18n } = useTranslation();
   const isRTL = i18n.language === 'ar';
   const router = useRouter();
+  const { data: session, status } = useSession();
 
   const [items, setItems] = useState<CartItem[]>([]);
   const [mounted, setMounted] = useState(false);
@@ -71,13 +72,54 @@ export default function CheckoutPage() {
   const tax = subtotal * 0.15;
   const total = subtotal + tax;
 
+  const submitBookings = async () => {
+    const reference = generateReference();
+    for (const item of items) {
+      const res = await fetch('/api/bookings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          itemType: item.type,
+          itemName: item.name,
+          itemNameAr: item.nameAr,
+          total: item.price,
+          startDate: item.startDate,
+          endDate: item.endDate || item.startDate,
+          startTime: item.startTime,
+          endTime: item.endTime,
+          durationType: item.durationType,
+          referenceNumber: reference,
+          spaceId: item.spaceId,
+        }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || (isRTL ? 'فشل إنشاء الحجز' : 'Failed to create booking'));
+      }
+    }
+    clearCart();
+    router.push('/dashboard?confirmed=1&ref=' + reference);
+    router.refresh();
+  };
+
+  const handleConfirm = async () => {
+    setError('');
+    setLoading(true);
+    try {
+      await submitBookings();
+    } catch (err: unknown) {
+      setLoading(false);
+      setError(err instanceof Error ? err.message : (isRTL ? 'حدث خطأ ما' : 'Something went wrong'));
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setLoading(true);
 
     try {
-      // 1. Create user account
+      // Create / sign in user account
       const userRes = await fetch('/api/users', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -123,35 +165,10 @@ export default function CheckoutPage() {
         }
       }
 
-      // 2. Create bookings from cart
-      const reference = generateReference();
-      for (const item of items) {
-        await fetch('/api/bookings', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            itemType: item.type,
-            itemName: item.name,
-            itemNameAr: item.nameAr,
-            total: item.price,
-            startDate: item.startDate,
-            endDate: item.endDate || item.startDate,
-            startTime: item.startTime,
-            endTime: item.endTime,
-            durationType: item.durationType,
-            referenceNumber: reference,
-            spaceId: item.spaceId,
-          }),
-        });
-      }
-
-      // 3. Clear cart and redirect to dashboard
-      clearCart();
-      router.push('/dashboard?confirmed=1&ref=' + reference);
-      router.refresh();
-    } catch {
+      await submitBookings();
+    } catch (err: unknown) {
       setLoading(false);
-      setError(isRTL ? 'حدث خطأ ما' : 'Something went wrong');
+      setError(err instanceof Error ? err.message : (isRTL ? 'حدث خطأ ما' : 'Something went wrong'));
     }
   };
 
@@ -181,115 +198,153 @@ export default function CheckoutPage() {
           {/* Account / Booking Form */}
           <div className="lg:col-span-2">
             <div className="bg-white rounded-2xl shadow-sm p-6 sm:p-8">
-              <h2 className="text-xl font-bold text-dark mb-6">
-                {isRTL ? 'معلومات الحساب' : 'Account Information'}
-              </h2>
+              {status === 'authenticated' ? (
+                <>
+                  <h2 className="text-xl font-bold text-dark mb-6">
+                    {isRTL ? 'تأكيد الحجز' : 'Confirm Booking'}
+                  </h2>
 
-              <p className="text-gray-custom mb-6">
-                {isRTL
-                  ? 'أدخل بياناتك لإنشاء حساب وتأكيد حجزك. سيتم إرسال تفاصيل الحجز إلى بريدك الإلكتروني.'
-                  : 'Enter your details to create an account and confirm your booking. Booking details will be sent to your email.'}
-              </p>
+                  <p className="text-gray-custom mb-6">
+                    {isRTL
+                      ? `أنت مسجل الدخول باسم ${session?.user?.email || ''}. اضغط الزر أدناه لتأكيد حجزك.`
+                      : `You are signed in as ${session?.user?.email || ''}. Press the button below to confirm your booking.`}
+                  </p>
 
-              <form onSubmit={handleSubmit} className="space-y-5">
-                <div>
-                  <label className="block text-sm font-medium text-dark mb-2">
-                    {isRTL ? 'الاسم الكامل' : 'Full Name'}
-                  </label>
-                  <div className="relative">
-                    <User className={`absolute top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 ${isRTL ? 'right-3' : 'left-3'}`} />
-                    <input
-                      type="text"
-                      required
-                      value={form.fullName}
-                      onChange={(e) => setForm({ ...form, fullName: e.target.value })}
-                      className={`w-full py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent ${isRTL ? 'pr-10 pl-4' : 'pl-10 pr-4'}`}
-                      placeholder={isRTL ? 'محمد علي' : 'John Doe'}
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-dark mb-2">
-                    {isRTL ? 'البريد الإلكتروني' : 'Email Address'}
-                  </label>
-                  <div className="relative">
-                    <Mail className={`absolute top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 ${isRTL ? 'right-3' : 'left-3'}`} />
-                    <input
-                      type="email"
-                      required
-                      value={form.email}
-                      onChange={(e) => setForm({ ...form, email: e.target.value })}
-                      className={`w-full py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent ${isRTL ? 'pr-10 pl-4' : 'pl-10 pr-4'}`}
-                      placeholder={isRTL ? 'your@email.com' : 'your@email.com'}
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-dark mb-2">
-                    {isRTL ? 'رقم الجوال' : 'Phone Number'}
-                  </label>
-                  <div className="relative">
-                    <Phone className={`absolute top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 ${isRTL ? 'right-3' : 'left-3'}`} />
-                    <input
-                      type="tel"
-                      required
-                      value={form.phone}
-                      onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                      className={`w-full py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent ${isRTL ? 'pr-10 pl-4' : 'pl-10 pr-4'}`}
-                      placeholder={isRTL ? '05xxxxxxxx' : '+1 234 567 890'}
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-dark mb-2">
-                    {isRTL ? 'كلمة المرور' : 'Password'}
-                  </label>
-                  <div className="relative">
-                    <Lock className={`absolute top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 ${isRTL ? 'right-3' : 'left-3'}`} />
-                    <input
-                      type={showPassword ? 'text' : 'password'}
-                      required
-                      minLength={6}
-                      value={form.password}
-                      onChange={(e) => setForm({ ...form, password: e.target.value })}
-                      className={`w-full py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent ${isRTL ? 'pr-10 pl-12' : 'pl-10 pr-12'}`}
-                      placeholder="••••••••"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className={`absolute top-1/2 -translate-y-1/2 ${isRTL ? 'left-3' : 'right-3'} text-gray-400 hover:text-dark`}
-                    >
-                      {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                    </button>
-                  </div>
-                </div>
-
-                {error && (
-                  <div className="p-3 bg-red-50 text-red-600 text-sm rounded-lg text-center">
-                    {error}
-                  </div>
-                )}
-
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full py-3 bg-primary text-white font-bold rounded-xl hover:bg-primary-dark transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
-                >
-                  {loading ? (
-                    isRTL ? 'جاري التأكيد...' : 'Confirming...'
-                  ) : (
-                    <>
-                      <Check className="w-5 h-5" />
-                      {isRTL ? 'تأكيد الحجز' : 'Confirm Booking'}
-                    </>
+                  {error && (
+                    <div className="p-3 bg-red-50 text-red-600 text-sm rounded-lg text-center mb-4">
+                      {error}
+                    </div>
                   )}
-                  <ArrowRight className={`w-5 h-5 ${isRTL ? 'rotate-180' : ''}`} />
-                </button>
-              </form>
+
+                  <button
+                    onClick={handleConfirm}
+                    disabled={loading}
+                    className="w-full py-3 bg-primary text-white font-bold rounded-xl hover:bg-primary-dark transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+                  >
+                    {loading ? (
+                      isRTL ? 'جاري التأكيد...' : 'Confirming...'
+                    ) : (
+                      <>
+                        <Check className="w-5 h-5" />
+                        {isRTL ? 'تأكيد الحجز' : 'Confirm Booking'}
+                      </>
+                    )}
+                    <ArrowRight className={`w-5 h-5 ${isRTL ? 'rotate-180' : ''}`} />
+                  </button>
+                </>
+              ) : (
+                <>
+                  <h2 className="text-xl font-bold text-dark mb-6">
+                    {isRTL ? 'معلومات الحساب' : 'Account Information'}
+                  </h2>
+
+                  <p className="text-gray-custom mb-6">
+                    {isRTL
+                      ? 'أدخل بياناتك لإنشاء حساب وتأكيد حجزك. سيتم إرسال تفاصيل الحجز إلى بريدك الإلكتروني.'
+                      : 'Enter your details to create an account and confirm your booking. Booking details will be sent to your email.'}
+                  </p>
+
+                  <form onSubmit={handleSubmit} className="space-y-5">
+                    <div>
+                      <label className="block text-sm font-medium text-dark mb-2">
+                        {isRTL ? 'الاسم الكامل' : 'Full Name'}
+                      </label>
+                      <div className="relative">
+                        <User className={`absolute top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 ${isRTL ? 'right-3' : 'left-3'}`} />
+                        <input
+                          type="text"
+                          required
+                          value={form.fullName}
+                          onChange={(e) => setForm({ ...form, fullName: e.target.value })}
+                          className={`w-full py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent ${isRTL ? 'pr-10 pl-4' : 'pl-10 pr-4'}`}
+                          placeholder={isRTL ? 'محمد علي' : 'John Doe'}
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-dark mb-2">
+                        {isRTL ? 'البريد الإلكتروني' : 'Email Address'}
+                      </label>
+                      <div className="relative">
+                        <Mail className={`absolute top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 ${isRTL ? 'right-3' : 'left-3'}`} />
+                        <input
+                          type="email"
+                          required
+                          value={form.email}
+                          onChange={(e) => setForm({ ...form, email: e.target.value })}
+                          className={`w-full py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent ${isRTL ? 'pr-10 pl-4' : 'pl-10 pr-4'}`}
+                          placeholder={isRTL ? 'your@email.com' : 'your@email.com'}
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-dark mb-2">
+                        {isRTL ? 'رقم الجوال' : 'Phone Number'}
+                      </label>
+                      <div className="relative">
+                        <Phone className={`absolute top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 ${isRTL ? 'right-3' : 'left-3'}`} />
+                        <input
+                          type="tel"
+                          required
+                          value={form.phone}
+                          onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                          className={`w-full py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent ${isRTL ? 'pr-10 pl-4' : 'pl-10 pr-4'}`}
+                          placeholder={isRTL ? '05xxxxxxxx' : '+1 234 567 890'}
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-dark mb-2">
+                        {isRTL ? 'كلمة المرور' : 'Password'}
+                      </label>
+                      <div className="relative">
+                        <Lock className={`absolute top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 ${isRTL ? 'right-3' : 'left-3'}`} />
+                        <input
+                          type={showPassword ? 'text' : 'password'}
+                          required
+                          minLength={6}
+                          value={form.password}
+                          onChange={(e) => setForm({ ...form, password: e.target.value })}
+                          className={`w-full py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent ${isRTL ? 'pr-10 pl-12' : 'pl-10 pr-12'}`}
+                          placeholder="••••••••"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className={`absolute top-1/2 -translate-y-1/2 ${isRTL ? 'left-3' : 'right-3'} text-gray-400 hover:text-dark`}
+                        >
+                          {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                        </button>
+                      </div>
+                    </div>
+
+                    {error && (
+                      <div className="p-3 bg-red-50 text-red-600 text-sm rounded-lg text-center">
+                        {error}
+                      </div>
+                    )}
+
+                    <button
+                      type="submit"
+                      disabled={loading}
+                      className="w-full py-3 bg-primary text-white font-bold rounded-xl hover:bg-primary-dark transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+                    >
+                      {loading ? (
+                        isRTL ? 'جاري التأكيد...' : 'Confirming...'
+                      ) : (
+                        <>
+                          <Check className="w-5 h-5" />
+                          {isRTL ? 'تأكيد الحجز' : 'Confirm Booking'}
+                        </>
+                      )}
+                      <ArrowRight className={`w-5 h-5 ${isRTL ? 'rotate-180' : ''}`} />
+                    </button>
+                  </form>
+                </>
+              )}
             </div>
           </div>
 
