@@ -50,6 +50,17 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
+
+    function combineDateTime(date: string, time?: string) {
+      if (!date) return null;
+      const result = new Date(date);
+      if (time) {
+        const [hours, minutes] = time.split(':').map(Number);
+        result.setHours(hours, minutes, 0, 0);
+      }
+      return result;
+    }
+
     const booking = await prisma.booking.create({
       data: {
         userId: user.id,
@@ -58,10 +69,11 @@ export async function POST(req: NextRequest) {
         itemName: body.itemName,
         itemNameAr: body.itemNameAr,
         total: body.total,
-        startDate: body.startDate ? new Date(body.startDate) : null,
-        endDate: body.endDate ? new Date(body.endDate) : null,
+        startDate: combineDateTime(body.startDate, body.startTime),
+        endDate: combineDateTime(body.endDate || body.startDate, body.endTime),
         durationType: body.durationType,
         referenceNumber: body.referenceNumber || generateReference(),
+        spaceId: body.spaceId,
         notes: body.notes,
       },
     });

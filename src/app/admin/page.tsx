@@ -5,7 +5,7 @@ import Logo from '@/components/Logo';
 import {
   LayoutDashboard, Users, Folder, ShoppingCart, Settings, MessageSquare, Calendar,
   TrendingUp, TrendingDown, DollarSign, BarChart3,
-  ChevronRight, Bell, Search, Check, X, Eye
+  ChevronRight, Bell, Search, Check, X
 } from 'lucide-react';
 
 const INQUIRY_LABELS: Record<string, { ar: string; en: string }> = {
@@ -122,29 +122,27 @@ export default function AdminPage() {
     if (activeTab !== 'messages') return;
 
     let cancelled = false;
-    setMessagesLoading(true);
-    setMessagesError('');
-
-    fetch('/api/contact-messages')
-      .then(async (res) => {
+    const loadMessages = async () => {
+      setMessagesLoading(true);
+      setMessagesError('');
+      try {
+        const res = await fetch('/api/contact-messages');
         if (!res.ok) {
           const data = await res.json().catch(() => ({}));
           const message = data.details || data.error || `HTTP ${res.status}`;
           console.error('[admin] Failed to fetch messages:', data);
           throw new Error(message);
         }
-        return res.json();
-      })
-      .then((data) => {
+        const data = await res.json();
         if (!cancelled) setMessages(data);
-      })
-      .catch((err) => {
-        if (!cancelled) setMessagesError(err.message);
-      })
-      .finally(() => {
+      } catch (err: unknown) {
+        if (!cancelled) setMessagesError(err instanceof Error ? err.message : 'Failed to load messages');
+      } finally {
         if (!cancelled) setMessagesLoading(false);
-      });
+      }
+    };
 
+    loadMessages();
     return () => {
       cancelled = true;
     };
@@ -154,27 +152,25 @@ export default function AdminPage() {
     if (activeTab !== 'bookings') return;
 
     let cancelled = false;
-    setBookingsLoading(true);
-    setBookingsError('');
-
-    fetch('/api/admin/bookings')
-      .then(async (res) => {
+    const loadBookings = async () => {
+      setBookingsLoading(true);
+      setBookingsError('');
+      try {
+        const res = await fetch('/api/admin/bookings');
         if (!res.ok) {
           const data = await res.json().catch(() => ({}));
           throw new Error(data.error || `HTTP ${res.status}`);
         }
-        return res.json();
-      })
-      .then((data) => {
+        const data = await res.json();
         if (!cancelled) setBookings(data);
-      })
-      .catch((err) => {
-        if (!cancelled) setBookingsError(err.message);
-      })
-      .finally(() => {
+      } catch (err: unknown) {
+        if (!cancelled) setBookingsError(err instanceof Error ? err.message : 'Failed to load bookings');
+      } finally {
         if (!cancelled) setBookingsLoading(false);
-      });
+      }
+    };
 
+    loadBookings();
     return () => {
       cancelled = true;
     };
@@ -504,11 +500,14 @@ export default function AdminPage() {
                           <td className="py-3 px-4 text-gray-custom capitalize">{booking.itemType}</td>
                           <td className="py-3 px-4 text-sm text-gray-custom whitespace-nowrap">
                             {booking.startDate ? new Date(booking.startDate).toLocaleDateString(isRTL ? 'ar-SA' : 'en-US') : '-'}
-                            {booking.endDate && booking.endDate !== booking.startDate && (
-                              <>
-                                <br />
-                                {isRTL ? 'حتى' : 'to'} {new Date(booking.endDate).toLocaleDateString(isRTL ? 'ar-SA' : 'en-US')}
-                              </>
+                            {booking.startDate && (booking.itemType === 'meeting' || booking.itemType === 'theater') && (
+                              <span className="block text-xs" dir="ltr">
+                                {new Date(booking.startDate).toLocaleTimeString(isRTL ? 'ar-SA' : 'en-US', { hour: '2-digit', minute: '2-digit' })}
+                                {' - '}
+                                {booking.endDate
+                                  ? new Date(booking.endDate).toLocaleTimeString(isRTL ? 'ar-SA' : 'en-US', { hour: '2-digit', minute: '2-digit' })
+                                  : '-'}
+                              </span>
                             )}
                           </td>
                           <td className="py-3 px-4 font-bold text-primary">{booking.total.toLocaleString()} SAR</td>

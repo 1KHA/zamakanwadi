@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, Suspense } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
@@ -95,17 +95,11 @@ function PackagesSectionContent() {
   const { i18n } = useTranslation();
   const isRTL = i18n.language === 'ar';
   const searchParams = useSearchParams();
-  const [activeTab, setActiveTab] = useState(0);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
+  const [activeTab, setActiveTab] = useState(() => {
     const tabParam = searchParams.get('tab');
     const tabIndex = tabs.findIndex((t) => t.key === tabParam);
-    if (tabIndex !== -1) {
-      setActiveTab(tabIndex);
-    }
-    setMounted(true);
-  }, [searchParams]);
+    return tabIndex !== -1 ? tabIndex : 0;
+  });
 
   const activeKey = tabs[activeTab].key;
   const visibleSpaces = spaces.filter((s) => s.category === activeKey);
@@ -165,7 +159,7 @@ function PackagesSectionContent() {
               : 'sm:grid-cols-2'
           }`}
         >
-          {mounted && visibleSpaces.map((space, i) => (
+          {visibleSpaces.map((space, i) => (
             <PackageCard key={space.id} space={space} isRTL={isRTL} index={i} />
           ))}
         </div>

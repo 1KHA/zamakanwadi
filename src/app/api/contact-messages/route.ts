@@ -35,13 +35,18 @@ export async function GET(request: NextRequest) {
 
     console.log(`[contact-messages] Fetched ${messages.length} messages`);
     return NextResponse.json(messages);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('[contact-messages] Failed to fetch contact messages:', error);
+    const details = error instanceof Error ? error.message : String(error);
+    const code =
+      error && typeof error === 'object' && 'code' in error
+        ? (error as { code?: string }).code
+        : undefined;
     return NextResponse.json(
       {
         error: 'Failed to fetch contact messages',
-        details: error?.message ?? String(error),
-        code: error?.code ?? undefined,
+        details,
+        code,
       },
       { status: 500 }
     );

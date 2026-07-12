@@ -254,6 +254,8 @@ export interface CartItem {
   quantity: number;
   startDate: string;
   endDate?: string;
+  startTime?: string;
+  endTime?: string;
   durationType: string;
   durationLabel: string;
 }

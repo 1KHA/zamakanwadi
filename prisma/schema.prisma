@@ -95,6 +95,7 @@ model Booking {
   durationType    String?
   referenceNumber String?
   rejectionReason String?
+  spaceId         String?
   notes           String?
   createdAt       DateTime      @default(now())
   updatedAt      DateTime      @updatedAt

@@ -94,15 +94,25 @@ function DashboardContent() {
 
   useEffect(() => {
     if (status === 'authenticated' && activeTab === 'notifications') {
-      setNotificationsLoading(true);
-      fetch('/api/notifications')
-        .then(async (res) => {
+      let cancelled = false;
+      const loadNotifications = async () => {
+        setNotificationsLoading(true);
+        try {
+          const res = await fetch('/api/notifications');
           if (!res.ok) throw new Error('Failed to fetch notifications');
-          return res.json();
-        })
-        .then((data) => setNotifications(data))
-        .catch((err) => setError(err.message))
-        .finally(() => setNotificationsLoading(false));
+          const data = await res.json();
+          if (!cancelled) setNotifications(data);
+        } catch (err: unknown) {
+          if (!cancelled) setError(err instanceof Error ? err.message : 'Failed to fetch notifications');
+        } finally {
+          if (!cancelled) setNotificationsLoading(false);
+        }
+      };
+
+      loadNotifications();
+      return () => {
+        cancelled = true;
+      };
     }
   }, [status, activeTab]);
 
@@ -301,13 +311,27 @@ function DashboardContent() {
                             <div>
                               <div className="text-gray-custom text-xs mb-1">{isRTL ? 'تاريخ البداية' : 'Start Date'}</div>
                               <div className="font-medium text-dark">
-                                {booking.startDate ? new Date(booking.startDate).toLocaleDateString(isRTL ? 'ar-SA' : 'en-US') : '-'}
+                                {booking.startDate
+                                  ? new Date(booking.startDate).toLocaleDateString(isRTL ? 'ar-SA' : 'en-US')
+                                  : '-'}
+                                {booking.startDate && (booking.itemType === 'meeting' || booking.itemType === 'theater') && (
+                                  <span className="block text-xs text-gray-custom" dir="ltr">
+                                    {new Date(booking.startDate).toLocaleTimeString(isRTL ? 'ar-SA' : 'en-US', { hour: '2-digit', minute: '2-digit' })}
+                                  </span>
+                                )}
                               </div>
                             </div>
                             <div>
                               <div className="text-gray-custom text-xs mb-1">{isRTL ? 'تاريخ النهاية' : 'End Date'}</div>
                               <div className="font-medium text-dark">
-                                {booking.endDate ? new Date(booking.endDate).toLocaleDateString(isRTL ? 'ar-SA' : 'en-US') : '-'}
+                                {booking.endDate
+                                  ? new Date(booking.endDate).toLocaleDateString(isRTL ? 'ar-SA' : 'en-US')
+                                  : '-'}
+                                {booking.endDate && (booking.itemType === 'meeting' || booking.itemType === 'theater') && (
+                                  <span className="block text-xs text-gray-custom" dir="ltr">
+                                    {new Date(booking.endDate).toLocaleTimeString(isRTL ? 'ar-SA' : 'en-US', { hour: '2-digit', minute: '2-digit' })}
+                                  </span>
+                                )}
                               </div>
                             </div>
                             <div>

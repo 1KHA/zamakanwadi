@@ -26,7 +26,7 @@ export async function GET() {
     });
 
     return NextResponse.json(bookings);
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Failed to fetch bookings' }, { status: 500 });
   }
 }
@@ -99,7 +99,7 @@ export async function PATCH(req: NextRequest) {
     });
 
     return NextResponse.json(updated);
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Failed to update booking' }, { status: 500 });
   }
 }

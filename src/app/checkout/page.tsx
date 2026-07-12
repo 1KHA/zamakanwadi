@@ -136,8 +136,11 @@ export default function CheckoutPage() {
             total: item.price,
             startDate: item.startDate,
             endDate: item.endDate || item.startDate,
+            startTime: item.startTime,
+            endTime: item.endTime,
             durationType: item.durationType,
             referenceNumber: reference,
+            spaceId: item.spaceId,
           }),
         });
       }
@@ -310,6 +313,12 @@ export default function CheckoutPage() {
                           <Calendar className="w-3 h-3" />
                           {item.startDate}
                         </span>
+                        {item.startTime && item.endTime && (
+                          <span className="inline-flex items-center gap-1">
+                            <Clock className="w-3 h-3" />
+                            {item.startTime} - {item.endTime}
+                          </span>
+                        )}
                         <span className="inline-flex items-center gap-1">
                           <Clock className="w-3 h-3" />
                           {item.durationLabel}

@@ -105,7 +105,13 @@ export default function CartPage() {
                         <Calendar className="w-4 h-4" />
                         {item.startDate}
                       </span>
-                      {item.endDate && item.endDate !== item.startDate && (
+                      {item.startTime && item.endTime && (
+                        <span className="inline-flex items-center gap-1">
+                          <Clock className="w-4 h-4" />
+                          {item.startTime} - {item.endTime}
+                        </span>
+                      )}
+                      {item.endDate && item.endDate !== item.startDate && !item.startTime && (
                         <span className="inline-flex items-center gap-1">
                           <ArrowRight className={`w-3 h-3 ${isRTL ? 'rotate-180' : ''}`} />
                           {item.endDate}
