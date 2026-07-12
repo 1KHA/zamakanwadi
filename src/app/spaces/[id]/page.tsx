@@ -11,7 +11,6 @@ import {
   Calendar,
   Clock,
   ArrowRight,
-  ShoppingCart,
   Armchair,
   AlertCircle,
 } from 'lucide-react';
@@ -53,7 +52,6 @@ export default function SpaceDetailPage() {
   const [duration, setDuration] = useState(space?.durationOptions[0]?.value || '');
   const [hours, setHours] = useState(1);
   const [bookingType, setBookingType] = useState<'space' | 'desk'>('space');
-  const [added, setAdded] = useState(false);
 
   if (!space) {
     return (
@@ -84,7 +82,7 @@ export default function SpaceDetailPage() {
       : startDate
     : '';
 
-  const handleAddToCart = () => {
+  const handleBookNow = () => {
     if (!startDate) return;
 
     const cart = getCart();
@@ -108,12 +106,6 @@ export default function SpaceDetailPage() {
     };
 
     saveCart([...cart, item]);
-    setAdded(true);
-    setTimeout(() => setAdded(false), 2000);
-  };
-
-  const handleBookNow = () => {
-    handleAddToCart();
     router.push('/cart');
   };
 
@@ -222,7 +214,7 @@ export default function SpaceDetailPage() {
               </h2>
 
               {/* Space vs Desk toggle for workspaces */}
-              {space.type === 'workspace' && (
+              {space.type === 'workspace' && space.id !== 'office-flex' && (
                 <div className="flex rounded-lg bg-gray-100 p-1 mb-5">
                   <button
                     onClick={() => setBookingType('space')}
@@ -330,21 +322,6 @@ export default function SpaceDetailPage() {
                       </div>
                     )}
                   </div>
-
-                  {added && (
-                    <div className="p-3 bg-green-50 text-green-700 text-sm rounded-lg text-center">
-                      {isRTL ? 'تمت الإضافة إلى السلة' : 'Added to cart'}
-                    </div>
-                  )}
-
-                  <button
-                    onClick={handleAddToCart}
-                    disabled={!startDate}
-                    className="flex items-center justify-center gap-2 w-full py-3 border-2 border-primary text-primary font-bold rounded-xl hover:bg-primary hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    <ShoppingCart className="w-5 h-5" />
-                    {isRTL ? 'أضف إلى السلة' : 'Add to Cart'}
-                  </button>
 
                   <button
                     onClick={handleBookNow}
