@@ -185,12 +185,12 @@ export default function LandingPage() {
 
               <div className="flex flex-wrap items-center gap-4">
                 <Link
-                  href="#contact"
-                  className="inline-flex items-center justify-center gap-2 px-6 py-3 sm:px-8 sm:py-4 bg-secondary text-white font-semibold rounded-xl hover:bg-secondary-dark transition-colors shadow-lg shadow-secondary/20"
+                  href="/?tab=meeting#packages"
+                  className="inline-flex items-center justify-center gap-3 px-8 py-4 sm:px-10 sm:py-5 bg-secondary text-white text-xl sm:text-2xl font-semibold rounded-xl hover:bg-secondary-dark transition-colors shadow-lg shadow-secondary/20"
                 >
-                  {isRTL ? 'احجز الآن' : 'Book Now'}
+                  {isRTL ? 'حجز فعالية' : 'Book Now'}
                   <ArrowRight
-                    className={`w-5 h-5 ${isRTL ? 'rotate-180' : ''}`}
+                    className={`w-6 h-6 ${isRTL ? 'rotate-180' : ''}`}
                   />
                 </Link>
 

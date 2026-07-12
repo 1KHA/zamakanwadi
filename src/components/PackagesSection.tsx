@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Check, Calendar } from 'lucide-react';
@@ -90,10 +91,21 @@ function PackageCard({
 /*  Main section                                                        */
 /* ------------------------------------------------------------------ */
 
-export default function PackagesSection() {
+function PackagesSectionContent() {
   const { i18n } = useTranslation();
   const isRTL = i18n.language === 'ar';
+  const searchParams = useSearchParams();
   const [activeTab, setActiveTab] = useState(0);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    const tabParam = searchParams.get('tab');
+    const tabIndex = tabs.findIndex((t) => t.key === tabParam);
+    if (tabIndex !== -1) {
+      setActiveTab(tabIndex);
+    }
+    setMounted(true);
+  }, [searchParams]);
 
   const activeKey = tabs[activeTab].key;
   const visibleSpaces = spaces.filter((s) => s.category === activeKey);
@@ -153,11 +165,35 @@ export default function PackagesSection() {
               : 'sm:grid-cols-2'
           }`}
         >
-          {visibleSpaces.map((space, i) => (
+          {mounted && visibleSpaces.map((space, i) => (
             <PackageCard key={space.id} space={space} isRTL={isRTL} index={i} />
           ))}
         </div>
       </div>
     </section>
+  );
+}
+
+export default function PackagesSection() {
+  return (
+    <Suspense fallback={
+      <section id="packages" className="relative py-20 sm:py-28 lg:py-36 bg-white overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-3xl mx-auto mb-12">
+            <div className="h-10 bg-gray-200 rounded w-48 mx-auto" />
+          </div>
+          <div className="flex justify-center mb-12">
+            <div className="h-10 bg-gray-200 rounded w-full max-w-lg" />
+          </div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="h-80 bg-gray-200 rounded-2xl" />
+            ))}
+          </div>
+        </div>
+      </section>
+    }>
+      <PackagesSectionContent />
+    </Suspense>
   );
 }
