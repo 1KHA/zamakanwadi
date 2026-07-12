@@ -2,7 +2,6 @@
 
 import { useState, Suspense } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Check, Calendar } from 'lucide-react';
@@ -94,12 +93,8 @@ function PackageCard({
 function PackagesSectionContent() {
   const { i18n } = useTranslation();
   const isRTL = i18n.language === 'ar';
-  const searchParams = useSearchParams();
-  const [activeTab, setActiveTab] = useState(() => {
-    const tabParam = searchParams.get('tab');
-    const tabIndex = tabs.findIndex((t) => t.key === tabParam);
-    return tabIndex !== -1 ? tabIndex : 0;
-  });
+  // Meeting rooms tab (middle) is the primary/default tab
+  const [activeTab, setActiveTab] = useState(1);
 
   const activeKey = tabs[activeTab].key;
   const visibleSpaces = spaces.filter((s) => s.category === activeKey);

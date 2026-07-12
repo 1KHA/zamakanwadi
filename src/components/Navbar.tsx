@@ -50,7 +50,7 @@ export default function Navbar() {
                   className="hidden sm:inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-primary bg-primary/5 rounded-lg hover:bg-primary/10 transition-colors"
                 >
                   <LayoutDashboard className="w-4 h-4" />
-                  {isRTL ? 'لوحتي' : 'Dashboard'}
+                  {isRTL ? 'الداشبورد' : 'Dashboard'}
                 </Link>
                 <button
                   onClick={() => signOut({ callbackUrl: '/' })}

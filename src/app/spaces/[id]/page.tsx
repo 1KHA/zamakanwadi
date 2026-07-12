@@ -96,6 +96,7 @@ export default function SpaceDetailPage() {
   const [endTime, setEndTime] = useState(formatTime(OPEN_HOUR + MIN_HOURS, 0));
   const [existingBookings, setExistingBookings] = useState<ExistingBooking[]>([]);
   const [availabilityLoading, setAvailabilityLoading] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(false);
 
   const isHourly = space?.type === 'meeting' || space?.type === 'theater';
 
@@ -242,7 +243,7 @@ export default function SpaceDetailPage() {
   })();
 
   const handleBookNow = () => {
-    if (!startDate || !isBookingValid()) return;
+    if (!startDate || !isBookingValid() || !termsAccepted) return;
 
     const cart = getCart();
     const item: CartItem = {
@@ -507,9 +508,36 @@ export default function SpaceDetailPage() {
                   )}
                 </div>
 
+                <div className="flex items-start gap-2">
+                  <input
+                    id="terms"
+                    type="checkbox"
+                    checked={termsAccepted}
+                    onChange={(e) => setTermsAccepted(e.target.checked)}
+                    className="mt-1 w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary"
+                  />
+                  <label htmlFor="terms" className="text-sm text-gray-custom leading-relaxed">
+                    {isRTL ? (
+                      <>
+                        أوافق على{' '}
+                        <Link href="/terms" target="_blank" className="text-primary hover:underline font-medium">
+                          الشروط والأحكام
+                        </Link>
+                      </>
+                    ) : (
+                      <>
+                        I agree to the{' '}
+                        <Link href="/terms" target="_blank" className="text-primary hover:underline font-medium">
+                          Terms and Conditions
+                        </Link>
+                      </>
+                    )}
+                  </label>
+                </div>
+
                 <button
                   onClick={handleBookNow}
-                  disabled={!isBookingValid()}
+                  disabled={!isBookingValid() || !termsAccepted}
                   className="flex items-center justify-center gap-2 w-full py-3 bg-primary text-white font-bold rounded-xl hover:bg-primary-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <ArrowRight className={`w-5 h-5 ${isRTL ? 'rotate-180' : ''}`} />
