@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import Image from 'next/image';
@@ -13,7 +13,7 @@ import {
   ArrowRight,
   AlertCircle,
 } from 'lucide-react';
-import { getSpaceById, CartItem, CART_STORAGE_KEY } from '@/lib/spaces';
+import { Space, CartItem, CART_STORAGE_KEY } from '@/lib/spaces';
 
 const OPEN_HOUR = 8;
 const CLOSE_HOUR = 22;
@@ -88,15 +88,37 @@ export default function SpaceDetailPage() {
   const { i18n } = useTranslation();
   const isRTL = i18n.language === 'ar';
 
-  const space = useMemo(() => (id ? getSpaceById(id as string) : undefined), [id]);
+  const [space, setSpace] = useState<Space | null>(null);
+  const [spaceLoading, setSpaceLoading] = useState(true);
   const [activeImage, setActiveImage] = useState(0);
   const [startDate, setStartDate] = useState('');
-  const [duration, setDuration] = useState(space?.durationOptions[0]?.value || '');
+  const [duration, setDuration] = useState('');
   const [startTime, setStartTime] = useState(formatTime(OPEN_HOUR, 0));
   const [endTime, setEndTime] = useState(formatTime(OPEN_HOUR + MIN_HOURS, 0));
   const [existingBookings, setExistingBookings] = useState<ExistingBooking[]>([]);
   const [availabilityLoading, setAvailabilityLoading] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
+
+  useEffect(() => {
+    if (!id) return;
+    let cancelled = false;
+    const loadSpace = async () => {
+      try {
+        const res = await fetch(`/api/spaces/${id}`);
+        if (!res.ok) throw new Error('Failed to fetch space');
+        const data = await res.json();
+        if (!cancelled && !data.error) setSpace(data);
+      } catch {
+        if (!cancelled) setSpace(null);
+      } finally {
+        if (!cancelled) setSpaceLoading(false);
+      }
+    };
+    loadSpace();
+    return () => {
+      cancelled = true;
+    };
+  }, [id]);
 
   const isHourly = space?.type === 'meeting' || space?.type === 'theater';
 
@@ -124,6 +146,17 @@ export default function SpaceDetailPage() {
     };
   }, [isHourly, startDate, space]);
 
+  if (spaceLoading) {
+    return (
+      <div className={`min-h-screen bg-gray-50 flex items-center justify-center ${isRTL ? 'rtl' : 'ltr'}`}>
+        <div className="text-center">
+          <div className="w-16 h-16 bg-gray-200 rounded-full animate-pulse mx-auto mb-4" />
+          <div className="h-6 w-48 bg-gray-200 rounded animate-pulse mx-auto" />
+        </div>
+      </div>
+    );
+  }
+
   if (!space) {
     return (
       <div className={`min-h-screen bg-gray-50 flex items-center justify-center ${isRTL ? 'rtl' : 'ltr'}`}>
@@ -140,7 +173,8 @@ export default function SpaceDetailPage() {
     );
   }
 
-  const selectedDuration = space.durationOptions.find((d) => d.value === duration);
+  const selectedDuration =
+    space.durationOptions.find((d) => d.value === duration) || space.durationOptions[0];
   const unitPrice = space.price;
 
   const hourlyMinutes = isHourly
@@ -400,7 +434,7 @@ export default function SpaceDetailPage() {
                       {isRTL ? 'مدة الاشتراك' : 'Duration'}
                     </label>
                     <select
-                      value={duration}
+                      value={duration || space.durationOptions[0]?.value || ''}
                       onChange={(e) => setDuration(e.target.value)}
                       className="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                     >

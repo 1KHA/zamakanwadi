@@ -5,8 +5,9 @@ import Logo from '@/components/Logo';
 import {
   LayoutDashboard, Users, Folder, ShoppingCart, Settings, MessageSquare, Calendar,
   TrendingUp, TrendingDown, DollarSign, BarChart3,
-  ChevronRight, Bell, Search, Check, X
+  ChevronRight, Bell, Search, Check, X, MapPin
 } from 'lucide-react';
+import AdminSpacesTab from '@/components/admin/SpacesTab';
 
 const INQUIRY_LABELS: Record<string, { ar: string; en: string }> = {
   'office-flex':          { ar: 'الباقة المرنة',                          en: 'Flex Package' },
@@ -70,6 +71,7 @@ export default function AdminPage() {
     { id: 'messages', label: isRTL ? 'رسائل التواصل' : 'Contact Messages', icon: MessageSquare },
     { id: 'users', label: isRTL ? 'المستخدمين' : 'Users', icon: Users },
     { id: 'files', label: isRTL ? 'الملفات' : 'Files', icon: Folder },
+    { id: 'spaces', label: isRTL ? 'المساحات' : 'Spaces', icon: MapPin },
     { id: 'orders', label: isRTL ? 'الطلبات' : 'Orders', icon: ShoppingCart },
     { id: 'settings', label: isRTL ? 'الإعدادات' : 'Settings', icon: Settings },
   ];
@@ -609,7 +611,9 @@ export default function AdminPage() {
             </div>
           )}
 
-          {activeTab !== 'dashboard' && activeTab !== 'messages' && activeTab !== 'bookings' && (
+          {activeTab === 'spaces' && <AdminSpacesTab />}
+
+          {activeTab !== 'dashboard' && activeTab !== 'messages' && activeTab !== 'bookings' && activeTab !== 'spaces' && (
             <div className="bg-white rounded-xl shadow-sm p-12 text-center">
               <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Settings className="w-8 h-8 text-gray-400" />

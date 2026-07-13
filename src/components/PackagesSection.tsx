@@ -1,12 +1,12 @@
 'use client';
 
-import { useState, Suspense } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useTranslation } from 'react-i18next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Check, Calendar } from 'lucide-react';
 import AnimateOnScroll from './AnimateOnScroll';
-import { spaces, Space } from '@/lib/spaces';
+import { Space } from '@/lib/spaces';
 
 /* ------------------------------------------------------------------ */
 /*  Tabs derived from spaces data                                     */
@@ -95,6 +95,28 @@ function PackagesSectionContent() {
   const isRTL = i18n.language === 'ar';
   // Meeting rooms tab (middle) is the primary/default tab
   const [activeTab, setActiveTab] = useState(1);
+  const [spaces, setSpaces] = useState<Space[]>([]);
+  const [spacesLoading, setSpacesLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    const loadSpaces = async () => {
+      try {
+        const res = await fetch('/api/spaces');
+        if (!res.ok) throw new Error('Failed to fetch spaces');
+        const data = await res.json();
+        if (!cancelled) setSpaces(data);
+      } catch {
+        if (!cancelled) setSpaces([]);
+      } finally {
+        if (!cancelled) setSpacesLoading(false);
+      }
+    };
+    loadSpaces();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const activeKey = tabs[activeTab].key;
   const visibleSpaces = spaces.filter((s) => s.category === activeKey);
@@ -145,19 +167,31 @@ function PackagesSectionContent() {
         </AnimateOnScroll>
 
         {/* Cards */}
-        <div
-          className={`grid gap-6 ${
-            visibleSpaces.length === 4
-              ? 'sm:grid-cols-2 lg:grid-cols-4'
-              : visibleSpaces.length === 3
-              ? 'sm:grid-cols-2 lg:grid-cols-3'
-              : 'sm:grid-cols-2'
-          }`}
-        >
-          {visibleSpaces.map((space, i) => (
-            <PackageCard key={space.id} space={space} isRTL={isRTL} index={i} />
-          ))}
-        </div>
+        {spacesLoading ? (
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="h-80 bg-gray-200 rounded-2xl animate-pulse" />
+            ))}
+          </div>
+        ) : visibleSpaces.length === 0 ? (
+          <div className="text-center py-12 text-gray-custom">
+            {isRTL ? 'لا توجد مساحات متاحة في هذا القسم' : 'No spaces available in this category'}
+          </div>
+        ) : (
+          <div
+            className={`grid gap-6 ${
+              visibleSpaces.length === 4
+                ? 'sm:grid-cols-2 lg:grid-cols-4'
+                : visibleSpaces.length === 3
+                ? 'sm:grid-cols-2 lg:grid-cols-3'
+                : 'sm:grid-cols-2'
+            }`}
+          >
+            {visibleSpaces.map((space, i) => (
+              <PackageCard key={space.id} space={space} isRTL={isRTL} index={i} />
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );

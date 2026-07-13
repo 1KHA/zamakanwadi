@@ -151,6 +151,27 @@ model ContactMessage {
   createdAt   DateTime @default(now())
 }
 
+model Space {
+  id              String   @id
+  category        String
+  type            String
+  titleAr         String
+  titleEn         String
+  descAr          String
+  descEn          String
+  price           Int
+  periodAr        String
+  periodEn        String
+  capacity        String
+  featuresAr      String[]
+  featuresEn      String[]
+  images          String[]
+  durationOptions Json
+  active          Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
 enum Role {
   USER
   ADMIN
