@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import type { HourlyPriceTier } from '@/lib/spaces';
 
 function dbToSpace(space: {
   id: string;
@@ -17,6 +18,7 @@ function dbToSpace(space: {
   featuresEn: string[];
   images: string[];
   durationOptions: unknown;
+  hourlyPrices: unknown;
   active: boolean;
 }) {
   return {
@@ -35,6 +37,7 @@ function dbToSpace(space: {
       label: { ar: string; en: string };
       multiplier: number;
     }[],
+    hourlyPrices: space.hourlyPrices as HourlyPriceTier[] | undefined,
     active: space.active,
   };
 }

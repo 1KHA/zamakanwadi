@@ -13,7 +13,7 @@ import {
   ArrowRight,
   AlertCircle,
 } from 'lucide-react';
-import { Space, CartItem, CART_STORAGE_KEY } from '@/lib/spaces';
+import { Space, CartItem, CART_STORAGE_KEY, calculateHourlyTotal, getLowestHourlyPrice } from '@/lib/spaces';
 
 const OPEN_HOUR = 8;
 const CLOSE_HOUR = 22;
@@ -183,7 +183,7 @@ export default function SpaceDetailPage() {
   const hourlyHours = hourlyMinutes / 60;
 
   const total = isHourly
-    ? unitPrice * hourlyHours
+    ? calculateHourlyTotal(hourlyHours, space.hourlyPrices) ?? unitPrice * hourlyHours
     : unitPrice * (selectedDuration?.multiplier || 1);
 
   const endDate = startDate
@@ -383,7 +383,16 @@ export default function SpaceDetailPage() {
                   </div>
                   <div>
                     <div className="text-xs text-gray-custom">{isRTL ? 'السعر' : 'Price'}</div>
-                    <div className="font-bold text-dark">{space.price.toLocaleString()} SAR {isRTL ? space.period.ar : space.period.en}</div>
+                    <div className="font-bold text-dark">
+                      {isHourly && space.hourlyPrices && space.hourlyPrices.length > 0 ? (
+                        <span>
+                          {isRTL ? 'يبدأ من ' : 'Starting from '}
+                          {getLowestHourlyPrice(space.hourlyPrices)?.toLocaleString() ?? space.price.toLocaleString()} SAR
+                        </span>
+                      ) : (
+                        <span>{space.price.toLocaleString()} SAR {isRTL ? space.period.ar : space.period.en}</span>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>

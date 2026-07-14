@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth/next';
 import { Prisma } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 import { authOptions } from '@/lib/auth';
+import type { HourlyPriceTier } from '@/lib/spaces';
 
 export interface SpacePayload {
   id: string;
@@ -16,6 +17,7 @@ export interface SpacePayload {
   features: { ar: string[]; en: string[] };
   images: string[];
   durationOptions: { value: string; label: { ar: string; en: string }; multiplier: number }[];
+  hourlyPrices?: HourlyPriceTier[];
   active?: boolean;
 }
 
@@ -36,6 +38,7 @@ function payloadToPrisma(data: SpacePayload) {
     featuresEn: data.features.en,
     images: data.images,
     durationOptions: data.durationOptions as Prisma.InputJsonValue,
+    hourlyPrices: (data.hourlyPrices as unknown) as Prisma.InputJsonValue | undefined,
     active: data.active ?? true,
   };
 }
@@ -56,6 +59,7 @@ function dbToSpace(space: {
   featuresEn: string[];
   images: string[];
   durationOptions: unknown;
+  hourlyPrices: unknown;
   active: boolean;
 }) {
   return {
@@ -70,6 +74,7 @@ function dbToSpace(space: {
     features: { ar: space.featuresAr, en: space.featuresEn },
     images: space.images,
     durationOptions: space.durationOptions as SpacePayload['durationOptions'],
+    hourlyPrices: space.hourlyPrices as SpacePayload['hourlyPrices'],
     active: space.active,
   };
 }

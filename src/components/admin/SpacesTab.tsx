@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Space } from '@/lib/spaces';
+import { Space, HourlyPriceTier } from '@/lib/spaces';
 import { defaultSpaces } from '@/lib/defaultSpaces';
-import { Pencil, Trash2, Plus, Save, X, MapPin } from 'lucide-react';
+import { Pencil, Trash2, Plus, Save, X, MapPin, Trash } from 'lucide-react';
 
 const emptySpace: Space = {
   id: '',
@@ -17,8 +17,51 @@ const emptySpace: Space = {
   features: { ar: [], en: [] },
   images: [],
   durationOptions: [{ value: 'hourly', label: { ar: 'بالساعة', en: 'Hourly' }, multiplier: 1 }],
+  hourlyPrices: [{ maxHours: null, price: 0 }],
   active: true,
 };
+
+function isHourlyType(type: Space['type']) {
+  return type === 'meeting' || type === 'theater';
+}
+
+function sortTiers(tiers: HourlyPriceTier[]): HourlyPriceTier[] {
+  return [...tiers].sort((a, b) => (a.maxHours ?? Infinity) - (b.maxHours ?? Infinity));
+}
+
+function formatTierSummary(tiers: HourlyPriceTier[]): string[] {
+  const sorted = sortTiers(tiers);
+  return sorted.map((tier, index) => {
+    const prevMax = sorted[index - 1]?.maxHours;
+    const priceStr = tier.price.toLocaleString() + ' SAR';
+    if (tier.maxHours === null) {
+      return `>${prevMax ?? 0}h: ${priceStr}`;
+    }
+    if (index === 0) return `≤${tier.maxHours}h: ${priceStr}`;
+    return `>${prevMax}h – ${tier.maxHours}h: ${priceStr}`;
+  });
+}
+
+function validateTiers(tiers: HourlyPriceTier[]): string | null {
+  if (!tiers || tiers.length === 0) return 'At least one price tier is required';
+  for (const tier of tiers) {
+    if (typeof tier.price !== 'number' || Number.isNaN(tier.price) || tier.price < 0) {
+      return 'All tier prices must be non-negative numbers';
+    }
+    if (tier.maxHours !== null && (tier.maxHours <= 0 || !Number.isFinite(tier.maxHours))) {
+      return 'Max hours must be a positive number or empty (unlimited)';
+    }
+  }
+  const sorted = sortTiers(tiers);
+  for (let i = 1; i < sorted.length; i++) {
+    const prev = sorted[i - 1].maxHours;
+    const curr = sorted[i].maxHours;
+    if (prev !== null && curr !== null && prev >= curr) {
+      return 'Max hours must be strictly increasing';
+    }
+  }
+  return null;
+}
 
 export default function AdminSpacesTab() {
   const [spaces, setSpaces] = useState<Space[]>([]);
@@ -172,6 +215,7 @@ export default function AdminSpacesTab() {
 
       {(editing || isCreating) && (
         <SpaceEditor
+          key={editing?.id ?? 'new'}
           space={editing || emptySpace}
           isNew={isCreating}
           saving={saving}
@@ -207,7 +251,17 @@ export default function AdminSpacesTab() {
                     <span className="block text-xs text-gray-500">{space.title.en}</span>
                   </td>
                   <td className="px-4 py-3 text-gray-600 capitalize">{space.category}</td>
-                  <td className="px-4 py-3 text-gray-600">{space.price.toLocaleString()} SAR</td>
+                  <td className="px-4 py-3 text-gray-600">
+                    {space.hourlyPrices && space.hourlyPrices.length > 0 ? (
+                      <div className="space-y-0.5">
+                        {formatTierSummary(space.hourlyPrices).map((line, i) => (
+                          <div key={i} className="text-xs">{line}</div>
+                        ))}
+                      </div>
+                    ) : (
+                      <span>{space.price.toLocaleString()} SAR</span>
+                    )}
+                  </td>
                   <td className="px-4 py-3 text-gray-600">{space.capacity}</td>
                   <td className="px-4 py-3">
                     <button
@@ -273,6 +327,7 @@ function SpaceEditor({
   const [featuresArText, setFeaturesArText] = useState(space.features.ar.join('\n'));
   const [featuresEnText, setFeaturesEnText] = useState(space.features.en.join('\n'));
   const [durationText, setDurationText] = useState(JSON.stringify(space.durationOptions, null, 2));
+  const [tiers, setTiers] = useState<HourlyPriceTier[]>(space.hourlyPrices ?? [{ maxHours: null, price: 0 }]);
 
   const updateField = <K extends keyof Space>(field: K, value: Space[K]) => {
     onChange({ ...space, [field]: value });
@@ -289,11 +344,19 @@ function SpaceEditor({
       alert('Invalid duration options JSON');
       return;
     }
+    if (isHourlyType(space.type)) {
+      const tierError = validateTiers(tiers);
+      if (tierError) {
+        alert(tierError);
+        return;
+      }
+    }
     onChange({
       ...space,
       images,
       features: { ar: featuresAr, en: featuresEn },
       durationOptions,
+      hourlyPrices: isHourlyType(space.type) ? sortTiers(tiers) : undefined,
     });
     onSave();
   };
@@ -384,7 +447,9 @@ function SpaceEditor({
           />
         </div>
         <div>
-          <label className="block text-xs font-medium text-gray-500 mb-1">السعر / Price</label>
+          <label className="block text-xs font-medium text-gray-500 mb-1">
+            {isHourlyType(space.type) ? 'السعر الأساسي (للعرض) / Base Price (display only)' : 'السعر / Price'}
+          </label>
           <input
             type="number"
             value={space.price}
@@ -392,6 +457,74 @@ function SpaceEditor({
             className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
           />
         </div>
+        {isHourlyType(space.type) && (
+          <div className="sm:col-span-2">
+            <label className="block text-xs font-medium text-gray-500 mb-1">أسعار الحجز بالساعة / Hourly Price Tiers</label>
+            <div className="space-y-2">
+              {sortTiers(tiers).map((tier, index) => {
+                const sorted = sortTiers(tiers);
+                const isLast = index === sorted.length - 1;
+                return (
+                  <div key={index} className="flex items-center gap-2">
+                    <input
+                      type="number"
+                      min={0}
+                      step={1}
+                      placeholder="Max hours / الحد الأقصى"
+                      value={tier.maxHours ?? ''}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        const newMax = value === '' ? null : Number(value);
+                        const newTiers = [...tiers];
+                        const originalIndex = tiers.indexOf(tier);
+                        newTiers[originalIndex] = { ...tier, maxHours: newMax };
+                        setTiers(newTiers);
+                      }}
+                      className="w-28 px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-sm"
+                    />
+                    <span className="text-xs text-gray-500">
+                      {isLast && tier.maxHours === null ? 'hours+ / ساعات فما فوق' : 'hours / ساعات'}
+                    </span>
+                    <input
+                      type="number"
+                      min={0}
+                      step={1}
+                      placeholder="Price / السعر"
+                      value={tier.price}
+                      onChange={(e) => {
+                        const newTiers = [...tiers];
+                        const originalIndex = tiers.indexOf(tier);
+                        newTiers[originalIndex] = { ...tier, price: Number(e.target.value) };
+                        setTiers(newTiers);
+                      }}
+                      className="flex-1 px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-sm"
+                    />
+                    <span className="text-xs text-gray-500">SAR</span>
+                    <button
+                      type="button"
+                      onClick={() => setTiers(tiers.filter((t) => t !== tier))}
+                      className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                      title="حذف / Remove"
+                    >
+                      <Trash className="w-4 h-4" />
+                    </button>
+                  </div>
+                );
+              })}
+              <button
+                type="button"
+                onClick={() => setTiers([...tiers, { maxHours: null, price: 0 }])}
+                className="inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-primary hover:bg-primary/5 rounded-lg transition-colors"
+              >
+                <Plus className="w-4 h-4" />
+                إضافة فئة سعرية / Add price tier
+              </button>
+            </div>
+            <p className="text-xs text-gray-500 mt-1">
+              Leave max hours empty for the last tier (above previous tier). / اترك الحد الأقصى فارغاً للفئة الأخيرة.
+            </p>
+          </div>
+        )}
         <div className="grid grid-cols-2 gap-2">
           <div>
             <label className="block text-xs font-medium text-gray-500 mb-1">الفترة عربي / Period AR</label>

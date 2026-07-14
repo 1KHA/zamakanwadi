@@ -6,7 +6,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Check, Calendar } from 'lucide-react';
 import AnimateOnScroll from './AnimateOnScroll';
-import { Space } from '@/lib/spaces';
+import { Space, getLowestHourlyPrice } from '@/lib/spaces';
 
 /* ------------------------------------------------------------------ */
 /*  Tabs derived from spaces data                                     */
@@ -69,8 +69,16 @@ function PackageCard({
 
           <div className="mt-4 pt-4 border-t border-gray-100">
             <div className="flex items-baseline gap-1 mb-3">
-              <span className="text-2xl font-bold text-primary">{space.price.toLocaleString()}</span>
-              <span className="text-gray-custom text-sm">SAR {isRTL ? space.period.ar : space.period.en}</span>
+              <span className="text-2xl font-bold text-primary">
+                {(space.type === 'meeting' || space.type === 'theater') && space.hourlyPrices
+                  ? (getLowestHourlyPrice(space.hourlyPrices) ?? space.price).toLocaleString()
+                  : space.price.toLocaleString()}
+              </span>
+              <span className="text-gray-custom text-sm">
+                {(space.type === 'meeting' || space.type === 'theater') && space.hourlyPrices
+                  ? (isRTL ? 'SAR يبدأ من' : 'SAR starting')
+                  : `SAR ${isRTL ? space.period.ar : space.period.en}`}
+              </span>
             </div>
             <Link
               href={`/spaces/${space.id}`}

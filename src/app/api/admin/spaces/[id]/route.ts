@@ -4,6 +4,7 @@ import { Prisma } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 import { authOptions } from '@/lib/auth';
 import type { SpacePayload } from '../route';
+import type { HourlyPriceTier } from '@/lib/spaces';
 
 function payloadToPrisma(data: Partial<SpacePayload>) {
   const result: Record<string, unknown> = {};
@@ -29,6 +30,7 @@ function payloadToPrisma(data: Partial<SpacePayload>) {
   }
   if (data.images) result.images = data.images;
   if (data.durationOptions) result.durationOptions = data.durationOptions as Prisma.InputJsonValue;
+  if (data.hourlyPrices) result.hourlyPrices = (data.hourlyPrices as unknown) as Prisma.InputJsonValue;
   if (typeof data.active === 'boolean') result.active = data.active;
   return result;
 }
@@ -49,6 +51,7 @@ function dbToSpace(space: {
   featuresEn: string[];
   images: string[];
   durationOptions: unknown;
+  hourlyPrices: unknown;
   active: boolean;
 }) {
   return {
@@ -63,6 +66,7 @@ function dbToSpace(space: {
     features: { ar: space.featuresAr, en: space.featuresEn },
     images: space.images,
     durationOptions: space.durationOptions as SpacePayload['durationOptions'],
+    hourlyPrices: space.hourlyPrices as HourlyPriceTier[] | undefined,
     active: space.active,
   };
 }
