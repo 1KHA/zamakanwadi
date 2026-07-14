@@ -121,6 +121,18 @@ export default function AdminPage() {
   const [rejectionReason, setRejectionReason] = useState('');
   const [updating, setUpdating] = useState(false);
 
+  const [spacesList, setSpacesList] = useState<Array<{ id: string; title: { ar: string; en: string } }>>([]);
+  const [availabilitySpace, setAvailabilitySpace] = useState('');
+  const [availabilityDate, setAvailabilityDate] = useState('');
+  const [availabilityBookings, setAvailabilityBookings] = useState<Array<{
+    id: string;
+    startDate: string;
+    endDate: string;
+    referenceNumber?: string | null;
+  }>>([]);
+  const [availabilityLoading, setAvailabilityLoading] = useState(false);
+  const [availabilityError, setAvailabilityError] = useState('');
+
   useEffect(() => {
     if (activeTab !== 'messages') return;
 
@@ -178,6 +190,83 @@ export default function AdminPage() {
       cancelled = true;
     };
   }, [activeTab]);
+
+  useEffect(() => {
+    if (activeTab !== 'bookings') return;
+
+    let cancelled = false;
+    const loadSpacesList = async () => {
+      try {
+        const res = await fetch('/api/admin/spaces');
+        if (!res.ok) throw new Error('Failed to load spaces');
+        const data = await res.json();
+        if (!cancelled) setSpacesList(data.map((s: { id: string; title: { ar: string; en: string } }) => ({ id: s.id, title: s.title })));
+      } catch {
+        if (!cancelled) setSpacesList([]);
+      }
+    };
+
+    loadSpacesList();
+    return () => {
+      cancelled = true;
+    };
+  }, [activeTab]);
+
+  const loadAvailability = async () => {
+    if (!availabilitySpace || !availabilityDate) return;
+    setAvailabilityLoading(true);
+    setAvailabilityError('');
+    setAvailabilityBookings([]);
+    try {
+      const res = await fetch(`/api/bookings/availability?spaceId=${availabilitySpace}&date=${availabilityDate}`);
+      if (!res.ok) throw new Error('Failed to load availability');
+      const data = await res.json();
+      setAvailabilityBookings(data);
+    } catch (err: unknown) {
+      setAvailabilityError(err instanceof Error ? err.message : 'Failed to load availability');
+    } finally {
+      setAvailabilityLoading(false);
+    }
+  };
+
+  const OPEN_HOUR = 8;
+  const CLOSE_HOUR = 22;
+
+  function minutesToTime(minutes: number) {
+    const h = Math.floor(minutes / 60);
+    const m = minutes % 60;
+    return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
+  }
+
+  function getBookedIntervals() {
+    return availabilityBookings
+      .map((b) => {
+        const start = new Date(b.startDate);
+        const end = new Date(b.endDate);
+        return {
+          start: start.getHours() * 60 + start.getMinutes(),
+          end: end.getHours() * 60 + end.getMinutes(),
+          ref: b.referenceNumber,
+        };
+      })
+      .sort((a, b) => a.start - b.start);
+  }
+
+  function getFreeIntervals() {
+    const booked = getBookedIntervals();
+    const free: { start: number; end: number }[] = [];
+    let cursor = OPEN_HOUR * 60;
+    for (const interval of booked) {
+      if (interval.start > cursor) {
+        free.push({ start: cursor, end: interval.start });
+      }
+      cursor = Math.max(cursor, interval.end);
+    }
+    if (cursor < CLOSE_HOUR * 60) {
+      free.push({ start: cursor, end: CLOSE_HOUR * 60 });
+    }
+    return free;
+  }
 
   const updateBookingStatus = async (id: string, status: string, reason?: string) => {
     setUpdating(true);
@@ -473,10 +562,109 @@ export default function AdminPage() {
           )}
 
           {activeTab === 'bookings' && (
-            <div className="bg-white rounded-xl shadow-sm p-6">
+            <div className="bg-white rounded-xl shadow-sm p-6 space-y-6">
               <h3 className="font-bold text-dark mb-4">
                 {isRTL ? 'إدارة الحجوزات' : 'Booking Management'}
               </h3>
+
+              {/* Availability checker */}
+              <div className="bg-gray-50 rounded-xl p-4 space-y-4">
+                <h4 className="font-bold text-dark">
+                  {isRTL ? 'التحقق من التوافر' : 'Availability Check'}
+                </h4>
+                <div className="flex flex-wrap items-end gap-3">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-500 mb-1">
+                      {isRTL ? 'المساحة' : 'Space'}
+                    </label>
+                    <select
+                      value={availabilitySpace}
+                      onChange={(e) => setAvailabilitySpace(e.target.value)}
+                      className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary min-w-[180px]"
+                    >
+                      <option value="">{isRTL ? 'اختر مساحة' : 'Select space'}</option>
+                      {spacesList.map((s) => (
+                        <option key={s.id} value={s.id}>
+                          {isRTL ? s.title.ar : s.title.en}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-500 mb-1">
+                      {isRTL ? 'اليوم' : 'Date'}
+                    </label>
+                    <input
+                      type="date"
+                      value={availabilityDate}
+                      onChange={(e) => setAvailabilityDate(e.target.value)}
+                      className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                    />
+                  </div>
+                  <button
+                    onClick={loadAvailability}
+                    disabled={availabilityLoading || !availabilitySpace || !availabilityDate}
+                    className="px-4 py-2 bg-primary text-white text-sm font-medium rounded-lg hover:bg-primary-dark transition-colors disabled:opacity-50"
+                  >
+                    {availabilityLoading ? (isRTL ? 'جاري التحميل...' : 'Loading...') : (isRTL ? 'عرض' : 'Show')}
+                  </button>
+                </div>
+
+                {availabilityError && (
+                  <p className="text-red-600 text-sm">{availabilityError}</p>
+                )}
+
+                {availabilityBookings.length > 0 && (
+                  <div className="space-y-3">
+                    <div>
+                      <h5 className="text-sm font-semibold text-dark mb-2">
+                        {isRTL ? 'الساعات المحجوزة' : 'Booked Hours'}
+                      </h5>
+                      <div className="flex flex-wrap gap-2">
+                        {getBookedIntervals().map((interval, idx) => (
+                          <span
+                            key={idx}
+                            className="inline-flex items-center gap-1 px-3 py-1 bg-red-100 text-red-700 rounded-lg text-sm"
+                            title={interval.ref || ''}
+                          >
+                            {minutesToTime(interval.start)} - {minutesToTime(interval.end)}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                    <div>
+                      <h5 className="text-sm font-semibold text-dark mb-2">
+                        {isRTL ? 'الساعات المتاحة' : 'Available Hours'}
+                      </h5>
+                      {getFreeIntervals().length > 0 ? (
+                        <div className="flex flex-wrap gap-2">
+                          {getFreeIntervals().map((interval, idx) => (
+                            <span
+                              key={idx}
+                              className="inline-flex items-center gap-1 px-3 py-1 bg-green-100 text-green-700 rounded-lg text-sm"
+                            >
+                              {minutesToTime(interval.start)} - {minutesToTime(interval.end)}
+                            </span>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-sm text-red-600">
+                          {isRTL ? 'لا توجد ساعات متاحة في هذا اليوم' : 'No available hours on this day'}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {availabilityBookings.length === 0 && !availabilityLoading && availabilitySpace && availabilityDate && !availabilityError && (
+                  <p className="text-sm text-green-700 bg-green-50 p-3 rounded-lg">
+                    {isRTL
+                      ? `اليوم كامل متاح من ${minutesToTime(OPEN_HOUR * 60)} إلى ${minutesToTime(CLOSE_HOUR * 60)}`
+                      : `The whole day is available from ${minutesToTime(OPEN_HOUR * 60)} to ${minutesToTime(CLOSE_HOUR * 60)}`}
+                  </p>
+                )}
+              </div>
+
               {bookingsLoading ? (
                 <p className="text-dark text-center py-8">{isRTL ? 'جاري التحميل...' : 'Loading...'}</p>
               ) : bookingsError ? (
