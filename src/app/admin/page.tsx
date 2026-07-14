@@ -1,11 +1,12 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { signOut } from 'next-auth/react';
 import Logo from '@/components/Logo';
 import {
   LayoutDashboard, Users, Folder, ShoppingCart, Settings, MessageSquare, Calendar,
   TrendingUp, TrendingDown, DollarSign, BarChart3,
-  ChevronRight, Bell, Search, Check, X, MapPin
+  ChevronRight, Bell, Search, Check, X, MapPin, LogOut
 } from 'lucide-react';
 import AdminSpacesTab from '@/components/admin/SpacesTab';
 
@@ -304,6 +305,14 @@ export default function AdminPage() {
               <button className="relative p-2 text-gray-500 hover:text-dark bg-white rounded-lg border border-gray-200">
                 <Bell className="w-5 h-5" />
                 <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" />
+              </button>
+              <button
+                onClick={() => signOut({ callbackUrl: '/' })}
+                className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-red-600 bg-white border border-gray-200 rounded-lg hover:bg-red-50 transition-colors"
+                title={isRTL ? 'تسجيل الخروج' : 'Sign out'}
+              >
+                <LogOut className="w-4 h-4" />
+                <span className="hidden sm:inline">{isRTL ? 'خروج' : 'Logout'}</span>
               </button>
             </div>
           </div>

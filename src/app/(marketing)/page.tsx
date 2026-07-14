@@ -10,7 +10,6 @@ import PackagesSection from '@/components/PackagesSection';
 import {
   ArrowRight,
   Mail,
-  Briefcase,
   Coffee,
   Wifi,
   Clock,
@@ -200,13 +199,13 @@ export default function LandingPage() {
             {/* White overlay card */}
             <AnimateOnScroll direction="left" delay={150} className="relative py-8 px-4 sm:py-10 sm:px-10 self-end">
               <div className="bg-white rounded-2xl sm:rounded-3xl p-6 sm:p-8 lg:p-10 shadow-2xl space-y-6">
-                <div className="flex items-start gap-4">
+                <Link href="#packages" className="flex items-start gap-4 group">
                   <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
                     <Zap className="w-6 h-6 text-primary" />
                   </div>
                   <div>
-                    <h3 className="text-lg sm:text-xl font-bold text-dark">
-                      {isRTL ? 'مكاتب عمل متنوعة' : 'Modern Work Offices'}
+                    <h3 className="text-lg sm:text-xl font-bold text-dark group-hover:text-primary transition-colors">
+                      {isRTL ? 'مكاتب عمل' : 'Work Offices'}
                     </h3>
                     <p className="text-sm text-gray-custom mt-1">
                       {isRTL
@@ -214,39 +213,23 @@ export default function LandingPage() {
                         : 'Comfortable spaces equipped with the latest technology.'}
                     </p>
                   </div>
-                </div>
+                </Link>
 
-                <div className="flex items-start gap-4">
+                <Link href="#packages" className="flex items-start gap-4 group">
                   <div className="w-12 h-12 rounded-xl bg-secondary/20 flex items-center justify-center shrink-0">
                     <Users className="w-6 h-6 text-secondary-dark" />
                   </div>
                   <div>
-                    <h3 className="text-lg sm:text-xl font-bold text-dark">
-                      {isRTL ? 'قاعات اجتماعات' : 'Meeting Rooms'}
+                    <h3 className="text-lg sm:text-xl font-bold text-dark group-hover:text-primary transition-colors">
+                      {isRTL ? 'قاعات ومسارح' : 'Halls & Theaters'}
                     </h3>
                     <p className="text-sm text-gray-custom mt-1">
                       {isRTL
-                        ? 'قاعات متنوعة الأحجام لجميع أنواع الاجتماعات'
+                        ? 'قاعات ومسارح متنوعة الأحجام لجميع أنواع الفعاليات'
                         : 'Various sizes for all types of meetings and events.'}
                     </p>
                   </div>
-                </div>
-
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-                    <Briefcase className="w-6 h-6 text-primary" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg sm:text-xl font-bold text-dark">
-                      {isRTL ? 'مسارح' : 'Consulting Services'}
-                    </h3>
-                    <p className="text-sm text-gray-custom mt-1">
-                      {isRTL
-                        ? 'مسارح متنوعة لفعاليات مختلفة'
-                        : 'Professional consulting to grow your business.'}
-                    </p>
-                  </div>
-                </div>
+                </Link>
 
               </div>
 
