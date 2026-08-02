@@ -1,15 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth/next';
 import { prisma } from '@/lib/prisma';
-import { authOptions } from '@/lib/auth';
+import { requireAdmin } from '@/lib/adminAuth';
+import { grantForBooking, refundAutoApplied, revokeForBooking } from '@/lib/entitlements';
 
 export async function GET() {
-  try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.email || session.user.role !== 'ADMIN') {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+  const { error } = await requireAdmin();
+  if (error) return error;
 
+  try {
     const bookings = await prisma.booking.findMany({
       include: {
         user: {
@@ -32,12 +30,10 @@ export async function GET() {
 }
 
 export async function PATCH(req: NextRequest) {
-  try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.email || session.user.role !== 'ADMIN') {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+  const { error, session } = await requireAdmin();
+  if (error) return error;
 
+  try {
     const body = await req.json();
     const { id, status, rejectionReason } = body;
 
@@ -59,12 +55,42 @@ export async function PATCH(req: NextRequest) {
       return NextResponse.json({ error: 'Booking not found' }, { status: 404 });
     }
 
-    const updated = await prisma.booking.update({
-      where: { id },
-      data: {
-        status,
-        rejectionReason: status === 'REJECTED' ? rejectionReason : null,
-      },
+    const adminId = session?.user?.id ?? null;
+    let grantedCount = 0;
+
+    const updated = await prisma.$transaction(async (tx) => {
+      const booking = await tx.booking.update({
+        where: { id },
+        data: {
+          status,
+          rejectionReason: status === 'REJECTED' ? rejectionReason : null,
+        },
+      });
+
+      if (status === 'APPROVED' && existing.status !== 'APPROVED' && existing.spaceId) {
+        const space = await tx.space.findUnique({
+          where: { id: existing.spaceId },
+          include: { spaceFeatures: { include: { feature: true } } },
+        });
+        if (space) {
+          grantedCount = await grantForBooking(
+            tx,
+            { id: existing.id, userId: existing.userId, durationType: existing.durationType },
+            space,
+            space.spaceFeatures,
+            adminId
+          );
+        }
+      }
+
+      if (status === 'CANCELLED' || status === 'REJECTED') {
+        if (existing.status === 'APPROVED') {
+          await revokeForBooking(tx, id, adminId);
+        }
+        await refundAutoApplied(tx, id, adminId);
+      }
+
+      return booking;
     });
 
     // Create user notification
@@ -81,11 +107,15 @@ export async function PATCH(req: NextRequest) {
 
     const message =
       status === 'APPROVED'
-        ? `Your booking for ${existing.itemName} has been approved.`
+        ? `Your booking for ${existing.itemName} has been approved.${
+            grantedCount > 0 ? ' Your package benefits have been added to your account.' : ''
+          }`
         : status === 'REJECTED'
         ? `Your booking for ${existing.itemName} was rejected. Reason: ${rejectionReason || 'No reason provided.'}`
         : status === 'CANCELLED'
-        ? `Your booking for ${existing.itemName} has been cancelled.`
+        ? `Your booking for ${existing.itemName} has been cancelled.${
+            existing.status === 'APPROVED' ? ' Unused package benefits from this booking were removed.' : ''
+          }`
         : status === 'COMPLETED'
         ? `Your booking for ${existing.itemName} has been completed.`
         : `Your booking for ${existing.itemName} has been updated.`;

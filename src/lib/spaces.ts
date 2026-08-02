@@ -1,3 +1,5 @@
+import type { SpaceEntitlementFeature } from './entitlementTypes';
+
 export interface HourlyPriceTier {
   maxHours: number | null;
   price: number;
@@ -17,6 +19,7 @@ export interface Space {
   type: 'workspace' | 'meeting' | 'theater';
   durationOptions: { value: string; label: { ar: string; en: string }; multiplier: number }[];
   active?: boolean;
+  entitlementFeatures?: SpaceEntitlementFeature[];
 }
 
 export function calculateHourlyTotal(

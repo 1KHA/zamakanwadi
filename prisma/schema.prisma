@@ -47,12 +47,14 @@ model User {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
-  accounts      Account[]
-  sessions      Session[]
-  bookings      Booking[]
-  files         File[]
-  cartItems     CartItem[]
-  notifications Notification[]
+  accounts         Account[]
+  sessions         Session[]
+  bookings         Booking[]
+  files            File[]
+  cartItems        CartItem[]
+  notifications    Notification[]
+  entitlements     Entitlement[]
+  purchaseRequests PurchaseRequest[]
 }
 
 model VerificationToken {
@@ -97,6 +99,8 @@ model Booking {
   rejectionReason String?
   spaceId         String?
   notes           String?
+  originalTotal   Float?
+  appliedHours    Float?
   createdAt       DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
 
@@ -171,6 +175,106 @@ model Space {
   active          Boolean  @default(true)
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
+
+  spaceFeatures SpaceFeature[]
+}
+
+model Feature {
+  id          String      @id
+  kind        FeatureKind
+  nameAr      String
+  nameEn      String
+  descAr      String?
+  descEn      String?
+  category    String?
+  unitPrice   Float?
+  purchasable Boolean     @default(false)
+  sortOrder   Int         @default(0)
+  active      Boolean     @default(true)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  spaceFeatures    SpaceFeature[]
+  purchaseRequests PurchaseRequest[]
+}
+
+model SpaceFeature {
+  id        String  @id @default(cuid())
+  spaceId   String
+  featureId String
+  amount    Float?
+  sortOrder Int     @default(0)
+
+  space   Space   @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  feature Feature @relation(fields: [featureId], references: [id], onDelete: Cascade)
+
+  @@unique([spaceId, featureId])
+}
+
+model Entitlement {
+  id                String            @id @default(cuid())
+  userId            String
+  featureId         String?
+  nameAr            String
+  nameEn            String
+  kind              FeatureKind
+  category          String?
+  totalAmount       Float
+  usedAmount        Float             @default(0)
+  source            EntitlementSource
+  bookingId         String?
+  purchaseRequestId String?
+  revoked           Boolean           @default(false)
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+
+  user   User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  ledger EntitlementLedger[]
+
+  @@unique([bookingId, featureId])
+  @@index([userId])
+}
+
+model EntitlementLedger {
+  id            String       @id @default(cuid())
+  entitlementId String
+  userId        String
+  action        LedgerAction
+  amount        Float
+  note          String?
+  bookingId     String?
+  actorId       String?
+  actorRole     Role?
+  createdAt     DateTime     @default(now())
+
+  entitlement Entitlement @relation(fields: [entitlementId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([entitlementId])
+  @@index([bookingId])
+}
+
+model PurchaseRequest {
+  id              String         @id @default(cuid())
+  userId          String
+  featureId       String
+  nameAr          String
+  nameEn          String
+  kind            FeatureKind
+  amount          Float
+  unitPrice       Float
+  total           Float
+  status          PurchaseStatus @default(PENDING)
+  rejectionReason String?
+  decidedAt       DateTime?
+  decidedById     String?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  feature Feature @relation(fields: [featureId], references: [id])
+
+  @@index([userId])
 }
 
 enum Role {
@@ -193,4 +297,31 @@ enum BookingStatus {
   REJECTED
   CANCELLED
   COMPLETED
+}
+
+enum FeatureKind {
+  INFO
+  TIME
+  QUANTITY
+}
+
+enum EntitlementSource {
+  BOOKING
+  PURCHASE
+  ADMIN
+}
+
+enum PurchaseStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum LedgerAction {
+  GRANT
+  CLAIM
+  AUTO_APPLY
+  REFUND
+  REVOKE
+  ADJUST
 }

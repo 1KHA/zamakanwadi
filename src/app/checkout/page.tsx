@@ -74,6 +74,7 @@ export default function CheckoutPage() {
 
   const submitBookings = async () => {
     const reference = generateReference();
+    let appliedTotal = 0;
     for (const item of items) {
       const res = await fetch('/api/bookings', {
         method: 'POST',
@@ -96,9 +97,12 @@ export default function CheckoutPage() {
         const data = await res.json().catch(() => ({}));
         throw new Error(data.error || (isRTL ? 'فشل إنشاء الحجز' : 'Failed to create booking'));
       }
+      const booking = await res.json().catch(() => null);
+      if (booking?.appliedHours) appliedTotal += booking.appliedHours;
     }
     clearCart();
-    router.push('/dashboard?confirmed=1&ref=' + reference);
+    const appliedParam = appliedTotal > 0 ? `&applied=${appliedTotal}` : '';
+    router.push(`/dashboard?confirmed=1&ref=${reference}${appliedParam}`);
     router.refresh();
   };
 

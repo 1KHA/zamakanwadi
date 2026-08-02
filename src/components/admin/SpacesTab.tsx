@@ -5,6 +5,22 @@ import { Space, HourlyPriceTier } from '@/lib/spaces';
 import { defaultSpaces } from '@/lib/defaultSpaces';
 import { Pencil, Trash2, Plus, Save, X, MapPin, Trash } from 'lucide-react';
 
+interface CatalogFeatureRow {
+  id: string;
+  kind: 'INFO' | 'TIME' | 'QUANTITY';
+  nameAr: string;
+  nameEn: string;
+  category: string | null;
+  active: boolean;
+}
+
+interface SelectedFeature {
+  featureId: string;
+  amount: number | null;
+}
+
+type SpaceSavePayload = Space & { catalogFeatures?: SelectedFeature[] };
+
 const emptySpace: Space = {
   id: '',
   category: 'meeting',
@@ -118,7 +134,7 @@ export default function AdminSpacesTab() {
     }
   };
 
-  const handleSave = async (space: Space) => {
+  const handleSave = async (space: SpaceSavePayload) => {
     setSaving(true);
     setError('');
     try {
@@ -220,7 +236,7 @@ export default function AdminSpacesTab() {
           isNew={isCreating}
           saving={saving}
           onChange={setEditing}
-          onSave={() => editing && handleSave(editing)}
+          onSave={handleSave}
           onCancel={() => {
             setEditing(null);
             setIsCreating(false);
@@ -320,7 +336,7 @@ function SpaceEditor({
   isNew: boolean;
   saving: boolean;
   onChange: (space: Space) => void;
-  onSave: () => void;
+  onSave: (payload: SpaceSavePayload) => void;
   onCancel: () => void;
 }) {
   const [imagesText, setImagesText] = useState(space.images.join('\n'));
@@ -328,9 +344,35 @@ function SpaceEditor({
   const [featuresEnText, setFeaturesEnText] = useState(space.features.en.join('\n'));
   const [durationText, setDurationText] = useState(JSON.stringify(space.durationOptions, null, 2));
   const [tiers, setTiers] = useState<HourlyPriceTier[]>(space.hourlyPrices ?? [{ maxHours: null, price: 0 }]);
+  const [catalog, setCatalog] = useState<CatalogFeatureRow[]>([]);
+  const [selectedFeatures, setSelectedFeatures] = useState<SelectedFeature[]>(
+    (space.entitlementFeatures ?? []).map((f) => ({ featureId: f.featureId, amount: f.amount }))
+  );
+  const [showLegacyFeatures, setShowLegacyFeatures] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch('/api/admin/features')
+      .then((res) => (res.ok ? res.json() : []))
+      .then((data) => {
+        if (!cancelled) setCatalog(data);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const updateField = <K extends keyof Space>(field: K, value: Space[K]) => {
     onChange({ ...space, [field]: value });
+  };
+
+  const toggleFeature = (featureId: string) => {
+    setSelectedFeatures((prev) =>
+      prev.some((f) => f.featureId === featureId)
+        ? prev.filter((f) => f.featureId !== featureId)
+        : [...prev, { featureId, amount: null }]
+    );
   };
 
   const commitChanges = () => {
@@ -351,14 +393,21 @@ function SpaceEditor({
         return;
       }
     }
-    onChange({
+    for (const selected of selectedFeatures) {
+      const feature = catalog.find((f) => f.id === selected.featureId);
+      if (feature && feature.kind !== 'INFO' && !(typeof selected.amount === 'number' && selected.amount > 0)) {
+        alert(`${feature.nameEn}: amount is required for time/quantity features / الكمية مطلوبة`);
+        return;
+      }
+    }
+    onSave({
       ...space,
       images,
       features: { ar: featuresAr, en: featuresEn },
       durationOptions,
       hourlyPrices: isHourlyType(space.type) ? sortTiers(tiers) : undefined,
+      catalogFeatures: selectedFeatures,
     });
-    onSave();
   };
 
   return (
@@ -554,25 +603,106 @@ function SpaceEditor({
             className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary font-mono text-xs"
           />
         </div>
-        <div className="grid grid-cols-2 gap-2">
-          <div>
-            <label className="block text-xs font-medium text-gray-500 mb-1">المميزات عربي / Features AR</label>
-            <textarea
-              value={featuresArText}
-              onChange={(e) => setFeaturesArText(e.target.value)}
-              rows={3}
-              className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-            />
-          </div>
-          <div>
-            <label className="block text-xs font-medium text-gray-500 mb-1">المميزات إنجليزي / Features EN</label>
-            <textarea
-              value={featuresEnText}
-              onChange={(e) => setFeaturesEnText(e.target.value)}
-              rows={3}
-              className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-            />
-          </div>
+        <div className="sm:col-span-2">
+          <label className="block text-xs font-medium text-gray-500 mb-1">
+            المميزات والخدمات / Features & Services
+          </label>
+          {catalog.length === 0 ? (
+            <p className="text-sm text-gray-500 p-3 bg-gray-50 rounded-lg">
+              لا توجد مميزات في الكتالوج بعد — أضفها من تبويب الخدمات والمزايا / No catalog features yet — add
+              them from the Features tab.
+            </p>
+          ) : (
+            <div className="grid sm:grid-cols-2 gap-2">
+              {catalog
+                .filter((f) => f.active || selectedFeatures.some((s) => s.featureId === f.id))
+                .map((feature) => {
+                  const selected = selectedFeatures.find((s) => s.featureId === feature.id);
+                  return (
+                    <div
+                      key={feature.id}
+                      className={`flex items-center gap-2 p-2.5 border rounded-lg transition-colors ${
+                        selected ? 'border-primary bg-primary/5' : 'border-gray-200'
+                      }`}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={!!selected}
+                        onChange={() => toggleFeature(feature.id)}
+                        className="w-4 h-4 accent-[var(--color-primary,#166534)] shrink-0"
+                      />
+                      <div className="flex-1 min-w-0">
+                        <span className="block text-sm text-dark truncate">{feature.nameAr}</span>
+                        <span className="block text-xs text-gray-500 truncate">{feature.nameEn}</span>
+                      </div>
+                      <span
+                        className={`text-[10px] font-medium px-1.5 py-0.5 rounded ${
+                          feature.kind === 'TIME'
+                            ? 'bg-blue-100 text-blue-700'
+                            : feature.kind === 'QUANTITY'
+                            ? 'bg-purple-100 text-purple-700'
+                            : 'bg-gray-100 text-gray-600'
+                        }`}
+                      >
+                        {feature.kind === 'TIME' ? 'ساعات' : feature.kind === 'QUANTITY' ? 'كمية' : 'عرض'}
+                      </span>
+                      {selected && feature.kind !== 'INFO' && (
+                        <input
+                          type="number"
+                          min={0}
+                          step={0.5}
+                          placeholder="Qty"
+                          value={selected.amount ?? ''}
+                          onChange={(e) => {
+                            const value = e.target.value === '' ? null : Number(e.target.value);
+                            setSelectedFeatures((prev) =>
+                              prev.map((s) => (s.featureId === feature.id ? { ...s, amount: value } : s))
+                            );
+                          }}
+                          className="w-20 px-2 py-1.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-sm"
+                        />
+                      )}
+                    </div>
+                  );
+                })}
+            </div>
+          )}
+          <p className="text-xs text-gray-500 mt-1">
+            المميزات المختارة تظهر في الموقع وتُمنح كرصيد للعميل عند الموافقة على الحجز / Selected features are
+            shown on the site and time/quantity ones are granted to the customer when a booking is approved.
+          </p>
+        </div>
+        <div className="sm:col-span-2">
+          <button
+            type="button"
+            onClick={() => setShowLegacyFeatures((v) => !v)}
+            className="text-xs font-medium text-gray-500 hover:text-gray-700 underline"
+          >
+            {showLegacyFeatures ? 'إخفاء' : 'إظهار'} النص القديم / {showLegacyFeatures ? 'Hide' : 'Show'} legacy
+            text features (fallback when no catalog features are selected)
+          </button>
+          {showLegacyFeatures && (
+            <div className="grid grid-cols-2 gap-2 mt-2">
+              <div>
+                <label className="block text-xs font-medium text-gray-500 mb-1">المميزات عربي / Features AR</label>
+                <textarea
+                  value={featuresArText}
+                  onChange={(e) => setFeaturesArText(e.target.value)}
+                  rows={3}
+                  className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-500 mb-1">المميزات إنجليزي / Features EN</label>
+                <textarea
+                  value={featuresEnText}
+                  onChange={(e) => setFeaturesEnText(e.target.value)}
+                  rows={3}
+                  className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                />
+              </div>
+            </div>
+          )}
         </div>
         <div className="sm:col-span-2">
           <label className="block text-xs font-medium text-gray-500 mb-1">خيارات المدة (JSON) / Duration Options (JSON)</label>

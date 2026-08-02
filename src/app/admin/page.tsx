@@ -6,9 +6,11 @@ import Logo from '@/components/Logo';
 import {
   LayoutDashboard, Users, Folder, ShoppingCart, Settings, MessageSquare, Calendar,
   TrendingUp, TrendingDown, DollarSign, BarChart3,
-  ChevronRight, Bell, Search, Check, X, MapPin, LogOut
+  ChevronRight, Bell, Search, Check, X, MapPin, LogOut, Gift
 } from 'lucide-react';
 import AdminSpacesTab from '@/components/admin/SpacesTab';
+import AdminFeaturesTab from '@/components/admin/FeaturesTab';
+import UserEntitlementsTab from '@/components/admin/UserEntitlementsTab';
 
 const INQUIRY_LABELS: Record<string, { ar: string; en: string }> = {
   'office-flex':          { ar: 'الباقة المرنة',                          en: 'Flex Package' },
@@ -70,7 +72,8 @@ export default function AdminPage() {
     { id: 'dashboard', label: isRTL ? 'لوحة التحكم' : 'Dashboard', icon: LayoutDashboard },
     { id: 'bookings', label: isRTL ? 'الحجوزات' : 'Bookings', icon: Calendar },
     { id: 'messages', label: isRTL ? 'رسائل التواصل' : 'Contact Messages', icon: MessageSquare },
-    { id: 'users', label: isRTL ? 'المستخدمين' : 'Users', icon: Users },
+    { id: 'users', label: isRTL ? 'المستخدمين والخدمات' : 'Users & Services', icon: Users },
+    { id: 'features', label: isRTL ? 'الخدمات والمزايا' : 'Features & Services', icon: Gift },
     { id: 'files', label: isRTL ? 'الملفات' : 'Files', icon: Folder },
     { id: 'spaces', label: isRTL ? 'المساحات' : 'Spaces', icon: MapPin },
     { id: 'orders', label: isRTL ? 'الطلبات' : 'Orders', icon: ShoppingCart },
@@ -810,7 +813,11 @@ export default function AdminPage() {
 
           {activeTab === 'spaces' && <AdminSpacesTab />}
 
-          {activeTab !== 'dashboard' && activeTab !== 'messages' && activeTab !== 'bookings' && activeTab !== 'spaces' && (
+          {activeTab === 'features' && <AdminFeaturesTab />}
+
+          {activeTab === 'users' && <UserEntitlementsTab />}
+
+          {activeTab !== 'dashboard' && activeTab !== 'messages' && activeTab !== 'bookings' && activeTab !== 'spaces' && activeTab !== 'features' && activeTab !== 'users' && (
             <div className="bg-white rounded-xl shadow-sm p-12 text-center">
               <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Settings className="w-8 h-8 text-gray-400" />

@@ -2,6 +2,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { prisma } from '@/lib/prisma';
 import { authOptions } from '@/lib/auth';
+import {
+  applyHours,
+  computeServerTotal,
+  parseHourlyDuration,
+  partialCoveragePrice,
+} from '@/lib/entitlements';
+import type { HourlyPriceTier } from '@/lib/spaces';
 
 function generateReference() {
   return 'ZMK-' + Math.random().toString(36).substring(2, 8).toUpperCase();
@@ -61,21 +68,52 @@ export async function POST(req: NextRequest) {
       return result;
     }
 
-    const booking = await prisma.booking.create({
-      data: {
-        userId: user.id,
-        officeId: body.officeId,
-        itemType: body.itemType,
-        itemName: body.itemName,
-        itemNameAr: body.itemNameAr,
-        total: body.total,
-        startDate: combineDateTime(body.startDate, body.startTime),
-        endDate: combineDateTime(body.endDate || body.startDate, body.endTime),
-        durationType: body.durationType,
-        referenceNumber: body.referenceNumber || generateReference(),
-        spaceId: body.spaceId,
-        notes: body.notes,
-      },
+    const space = body.spaceId
+      ? await prisma.space.findUnique({ where: { id: body.spaceId } })
+      : null;
+
+    // Server-side pricing when the space and duration are resolvable;
+    // client total is only a fallback for legacy items without a spaceId.
+    const serverTotal = space ? computeServerTotal(space, body.durationType) ?? body.total : body.total;
+
+    const booking = await prisma.$transaction(async (tx) => {
+      const created = await tx.booking.create({
+        data: {
+          userId: user.id,
+          officeId: body.officeId,
+          itemType: body.itemType,
+          itemName: body.itemName,
+          itemNameAr: body.itemNameAr,
+          total: serverTotal,
+          originalTotal: serverTotal,
+          appliedHours: 0,
+          startDate: combineDateTime(body.startDate, body.startTime),
+          endDate: combineDateTime(body.endDate || body.startDate, body.endTime),
+          durationType: body.durationType,
+          referenceNumber: body.referenceNumber || generateReference(),
+          spaceId: body.spaceId,
+          notes: body.notes,
+        },
+      });
+
+      const hours = parseHourlyDuration(body.durationType);
+      if (space && hours !== null && (space.type === 'meeting' || space.type === 'theater')) {
+        const { coveredHours } = await applyHours(tx, user.id, space.type, hours, created.id);
+        if (coveredHours > 0) {
+          const total = partialCoveragePrice(
+            hours,
+            coveredHours,
+            (space.hourlyPrices as unknown) as HourlyPriceTier[] | undefined,
+            space.price
+          );
+          return tx.booking.update({
+            where: { id: created.id },
+            data: { total, appliedHours: coveredHours },
+          });
+        }
+      }
+
+      return created;
     });
 
     return NextResponse.json(booking, { status: 201 });

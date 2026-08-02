@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import { useTranslation } from 'react-i18next';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -98,6 +99,8 @@ export default function SpaceDetailPage() {
   const [existingBookings, setExistingBookings] = useState<ExistingBooking[]>([]);
   const [availabilityLoading, setAvailabilityLoading] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
+  const { status: sessionStatus } = useSession();
+  const [availableHours, setAvailableHours] = useState(0);
 
   useEffect(() => {
     if (!id) return;
@@ -121,6 +124,25 @@ export default function SpaceDetailPage() {
   }, [id]);
 
   const isHourly = space?.type === 'meeting' || space?.type === 'theater';
+
+  useEffect(() => {
+    if (!isHourly || !space || sessionStatus !== 'authenticated') return;
+    let cancelled = false;
+    fetch(`/api/entitlements?category=${space.type}`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (cancelled || !data?.entitlements) return;
+        const sum = data.entitlements.reduce(
+          (acc: number, e: { available: number }) => acc + (e.available || 0),
+          0
+        );
+        setAvailableHours(sum);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [isHourly, space, sessionStatus]);
 
   useEffect(() => {
     if (!isHourly || !startDate || !space) return;
@@ -532,6 +554,17 @@ export default function SpaceDetailPage() {
                       </div>
                     )}
                   </>
+                )}
+
+                {isHourly && availableHours > 0 && (
+                  <div className="p-3 bg-green-50 border border-green-200 rounded-xl text-sm text-green-800 flex items-start gap-2">
+                    <Check className="w-4 h-4 shrink-0 mt-0.5" />
+                    <span>
+                      {isRTL
+                        ? `لديك ${availableHours} ساعة متاحة من رصيدك — سيتم خصمها تلقائياً عند إتمام الحجز`
+                        : `You have ${availableHours}h available in your balance — it will be applied automatically at checkout`}
+                    </span>
+                  </div>
                 )}
 
                 <div className="p-4 bg-primary/5 rounded-xl">

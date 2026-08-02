@@ -18,7 +18,9 @@ import {
   Phone,
   Monitor,
   Bell,
+  Gift,
 } from 'lucide-react';
+import ServicesTab from '@/components/dashboard/ServicesTab';
 
 interface Booking {
   id: string;
@@ -27,6 +29,8 @@ interface Booking {
   itemType: string;
   status: 'PENDING' | 'APPROVED' | 'REJECTED' | 'CANCELLED' | 'COMPLETED';
   total: number;
+  originalTotal: number | null;
+  appliedHours: number | null;
   startDate: string;
   endDate: string | null;
   durationType: string | null;
@@ -69,8 +73,9 @@ function DashboardContent() {
   const searchParams = useSearchParams();
   const confirmed = searchParams.get('confirmed');
   const reference = searchParams.get('ref');
+  const appliedHours = Number(searchParams.get('applied') || 0);
 
-  const [activeTab, setActiveTab] = useState<'bookings' | 'notifications' | 'profile'>('bookings');
+  const [activeTab, setActiveTab] = useState<'bookings' | 'services' | 'notifications' | 'profile'>('bookings');
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -178,6 +183,13 @@ function DashboardContent() {
                   {isRTL ? 'رقم مرجع الحجز:' : 'Booking reference:'}{' '}
                   <span className="font-bold">{reference}</span>
                 </div>
+                {appliedHours > 0 && (
+                  <div className="text-sm mt-1 font-medium">
+                    {isRTL
+                      ? `تم خصم ${appliedHours} ساعة من رصيدك تلقائياً.`
+                      : `${appliedHours}h were automatically applied from your balance.`}
+                  </div>
+                )}
                 <div className="text-sm mt-1">
                   {isRTL
                     ? 'سيتم مراجعة طلبك والرد عليك قريباً.'
@@ -211,6 +223,18 @@ function DashboardContent() {
                 >
                   <Calendar className="w-5 h-5 shrink-0" />
                   <span className="text-start flex-1">{isRTL ? 'حجوزاتي' : 'My Bookings'}</span>
+                  <ChevronRight className={`w-4 h-4 shrink-0 ${isRTL ? 'rotate-180' : ''}`} />
+                </button>
+                <button
+                  onClick={() => setActiveTab('services')}
+                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors ${
+                    activeTab === 'services'
+                      ? 'bg-primary text-white'
+                      : 'text-gray-custom hover:bg-gray-50 hover:text-dark'
+                  }`}
+                >
+                  <Gift className="w-5 h-5 shrink-0" />
+                  <span className="text-start flex-1">{isRTL ? 'خدماتي ورصيدي' : 'My Services'}</span>
                   <ChevronRight className={`w-4 h-4 shrink-0 ${isRTL ? 'rotate-180' : ''}`} />
                 </button>
                 <button
@@ -337,6 +361,13 @@ function DashboardContent() {
                             <div>
                               <div className="text-gray-custom text-xs mb-1">{isRTL ? 'المبلغ' : 'Amount'}</div>
                               <div className="font-bold text-primary">{booking.total.toLocaleString()} SAR</div>
+                              {(booking.appliedHours ?? 0) > 0 && (
+                                <div className="text-xs text-green-600 mt-0.5">
+                                  {isRTL
+                                    ? `تم خصم ${booking.appliedHours} ساعة من رصيدك`
+                                    : `−${booking.appliedHours}h credit applied`}
+                                </div>
+                              )}
                             </div>
                           </div>
                         </div>
@@ -346,6 +377,8 @@ function DashboardContent() {
                 )}
               </div>
             )}
+
+            {activeTab === 'services' && <ServicesTab />}
 
             {activeTab === 'notifications' && (
               <div className="bg-white rounded-2xl shadow-sm p-6">
