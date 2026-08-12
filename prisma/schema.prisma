@@ -55,6 +55,7 @@ model User {
   notifications    Notification[]
   entitlements     Entitlement[]
   purchaseRequests PurchaseRequest[]
+  payments         Payment[]
 }
 
 model VerificationToken {
@@ -101,6 +102,8 @@ model Booking {
   notes           String?
   originalTotal   Float?
   appliedHours    Float?
+  paymentStatus   PaymentRequirement @default(NOT_REQUIRED)
+  paidAt          DateTime?
   createdAt       DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
 
@@ -254,6 +257,23 @@ model EntitlementLedger {
   @@index([bookingId])
 }
 
+// Demo-only payment records (no real gateway)
+model Payment {
+  id              String   @id @default(cuid())
+  userId          String
+  referenceNumber String   // booking reference the payment covers
+  amount          Float
+  method          String   @default("card")
+  cardLast4       String?
+  status          String   @default("PAID")
+  createdAt       DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([referenceNumber])
+}
+
 model PurchaseRequest {
   id              String         @id @default(cuid())
   userId          String
@@ -324,4 +344,10 @@ enum LedgerAction {
   REFUND
   REVOKE
   ADJUST
+}
+
+enum PaymentRequirement {
+  NOT_REQUIRED
+  PENDING_PAYMENT
+  PAID
 }

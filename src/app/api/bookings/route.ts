@@ -76,6 +76,11 @@ export async function POST(req: NextRequest) {
     // client total is only a fallback for legacy items without a spaceId.
     const serverTotal = space ? computeServerTotal(space, body.durationType) ?? body.total : body.total;
 
+    // Offices booked monthly/quarterly pay online (demo); yearly offices and
+    // hourly spaces stay on the request → admin-approval flow.
+    const requiresPayment =
+      space?.type === 'workspace' && ['monthly', 'quarterly'].includes(body.durationType);
+
     const booking = await prisma.$transaction(async (tx) => {
       const created = await tx.booking.create({
         data: {
@@ -87,6 +92,7 @@ export async function POST(req: NextRequest) {
           total: serverTotal,
           originalTotal: serverTotal,
           appliedHours: 0,
+          paymentStatus: requiresPayment ? 'PENDING_PAYMENT' : 'NOT_REQUIRED',
           startDate: combineDateTime(body.startDate, body.startTime),
           endDate: combineDateTime(body.endDate || body.startDate, body.endTime),
           durationType: body.durationType,

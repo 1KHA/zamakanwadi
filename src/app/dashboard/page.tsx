@@ -31,6 +31,7 @@ interface Booking {
   total: number;
   originalTotal: number | null;
   appliedHours: number | null;
+  paymentStatus: 'NOT_REQUIRED' | 'PENDING_PAYMENT' | 'PAID' | null;
   startDate: string;
   endDate: string | null;
   durationType: string | null;
@@ -74,6 +75,7 @@ function DashboardContent() {
   const confirmed = searchParams.get('confirmed');
   const reference = searchParams.get('ref');
   const appliedHours = Number(searchParams.get('applied') || 0);
+  const paid = searchParams.get('paid');
 
   const [activeTab, setActiveTab] = useState<'bookings' | 'services' | 'notifications' | 'profile'>('bookings');
   const [bookings, setBookings] = useState<Booking[]>([]);
@@ -183,6 +185,11 @@ function DashboardContent() {
                   {isRTL ? 'رقم مرجع الحجز:' : 'Booking reference:'}{' '}
                   <span className="font-bold">{reference}</span>
                 </div>
+                {paid && (
+                  <div className="text-sm mt-1 font-medium">
+                    {isRTL ? 'تم استلام الدفع بنجاح.' : 'Payment received successfully.'}
+                  </div>
+                )}
                 {appliedHours > 0 && (
                   <div className="text-sm mt-1 font-medium">
                     {isRTL
@@ -368,6 +375,21 @@ function DashboardContent() {
                                     : `−${booking.appliedHours}h credit applied`}
                                 </div>
                               )}
+                              {booking.paymentStatus === 'PAID' && (
+                                <div className="text-xs text-green-600 mt-0.5">
+                                  {isRTL ? 'مدفوع' : 'Paid'}
+                                </div>
+                              )}
+                              {booking.paymentStatus === 'PENDING_PAYMENT' &&
+                                booking.status !== 'CANCELLED' &&
+                                booking.status !== 'REJECTED' && (
+                                  <a
+                                    href={`/payment?ref=${booking.referenceNumber}`}
+                                    className="inline-block text-xs font-bold text-red-600 hover:underline mt-0.5"
+                                  >
+                                    {isRTL ? 'بانتظار الدفع — ادفع الآن' : 'Payment pending — Pay now'}
+                                  </a>
+                                )}
                             </div>
                           </div>
                         </div>

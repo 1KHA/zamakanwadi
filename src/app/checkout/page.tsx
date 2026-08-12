@@ -75,6 +75,7 @@ export default function CheckoutPage() {
   const submitBookings = async () => {
     const reference = generateReference();
     let appliedTotal = 0;
+    let needsPayment = false;
     for (const item of items) {
       const res = await fetch('/api/bookings', {
         method: 'POST',
@@ -99,10 +100,17 @@ export default function CheckoutPage() {
       }
       const booking = await res.json().catch(() => null);
       if (booking?.appliedHours) appliedTotal += booking.appliedHours;
+      if (booking?.paymentStatus === 'PENDING_PAYMENT') needsPayment = true;
     }
     clearCart();
     const appliedParam = appliedTotal > 0 ? `&applied=${appliedTotal}` : '';
-    router.push(`/dashboard?confirmed=1&ref=${reference}${appliedParam}`);
+    // Monthly/quarterly office bookings go through the (demo) payment page;
+    // yearly offices and hourly spaces go straight to the pending-review flow.
+    if (needsPayment) {
+      router.push(`/payment?ref=${reference}${appliedParam}`);
+    } else {
+      router.push(`/dashboard?confirmed=1&ref=${reference}${appliedParam}`);
+    }
     router.refresh();
   };
 

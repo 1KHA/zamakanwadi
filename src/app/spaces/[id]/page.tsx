@@ -99,6 +99,7 @@ export default function SpaceDetailPage() {
   const [existingBookings, setExistingBookings] = useState<ExistingBooking[]>([]);
   const [availabilityLoading, setAvailabilityLoading] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
+  const [contractAccepted, setContractAccepted] = useState(false);
   const { status: sessionStatus } = useSession();
   const [availableHours, setAvailableHours] = useState(0);
 
@@ -198,6 +199,12 @@ export default function SpaceDetailPage() {
   const selectedDuration =
     space.durationOptions.find((d) => d.value === duration) || space.durationOptions[0];
   const unitPrice = space.price;
+
+  // Offices booked monthly/quarterly must also accept the contract document
+  // (وثيقة التعاقد); yearly offices and hourly spaces only need the terms.
+  const requiresContract =
+    space.type === 'workspace' && ['monthly', 'quarterly'].includes(selectedDuration?.value ?? '');
+  const allTermsAccepted = termsAccepted && (!requiresContract || contractAccepted);
 
   const hourlyMinutes = isHourly
     ? Math.max(0, timeToMinutes(endTime) - timeToMinutes(startTime))
@@ -299,7 +306,7 @@ export default function SpaceDetailPage() {
   })();
 
   const handleBookNow = () => {
-    if (!startDate || !isBookingValid() || !termsAccepted) return;
+    if (!startDate || !isBookingValid() || !allTermsAccepted) return;
 
     const cart = getCart();
     const item: CartItem = {
@@ -611,9 +618,38 @@ export default function SpaceDetailPage() {
                   </label>
                 </div>
 
+                {requiresContract && (
+                  <div className="flex items-start gap-2">
+                    <input
+                      id="contract"
+                      type="checkbox"
+                      checked={contractAccepted}
+                      onChange={(e) => setContractAccepted(e.target.checked)}
+                      className="mt-1 w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary"
+                    />
+                    <label htmlFor="contract" className="text-sm text-gray-custom leading-relaxed">
+                      {isRTL ? (
+                        <>
+                          أوافق على{' '}
+                          <Link href="/contract" target="_blank" className="text-primary hover:underline font-medium">
+                            وثيقة التعاقد
+                          </Link>
+                        </>
+                      ) : (
+                        <>
+                          I agree to the{' '}
+                          <Link href="/contract" target="_blank" className="text-primary hover:underline font-medium">
+                            Contract Document
+                          </Link>
+                        </>
+                      )}
+                    </label>
+                  </div>
+                )}
+
                 <button
                   onClick={handleBookNow}
-                  disabled={!isBookingValid() || !termsAccepted}
+                  disabled={!isBookingValid() || !allTermsAccepted}
                   className="flex items-center justify-center gap-2 w-full py-3 bg-primary text-white font-bold rounded-xl hover:bg-primary-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <ArrowRight className={`w-5 h-5 ${isRTL ? 'rotate-180' : ''}`} />

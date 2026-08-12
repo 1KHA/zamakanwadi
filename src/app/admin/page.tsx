@@ -105,6 +105,7 @@ export default function AdminPage() {
     itemType: string;
     status: string;
     total: number;
+    paymentStatus: string | null;
     startDate: string | null;
     endDate: string | null;
     durationType: string | null;
@@ -712,7 +713,19 @@ export default function AdminPage() {
                               </span>
                             )}
                           </td>
-                          <td className="py-3 px-4 font-bold text-primary">{booking.total.toLocaleString()} SAR</td>
+                          <td className="py-3 px-4 font-bold text-primary">
+                            {booking.total.toLocaleString()} SAR
+                            {booking.paymentStatus === 'PAID' && (
+                              <span className="block text-[10px] font-medium text-green-600">
+                                {isRTL ? 'مدفوع' : 'Paid'}
+                              </span>
+                            )}
+                            {booking.paymentStatus === 'PENDING_PAYMENT' && (
+                              <span className="block text-[10px] font-medium text-red-600">
+                                {isRTL ? 'بانتظار الدفع' : 'Unpaid'}
+                              </span>
+                            )}
+                          </td>
                           <td className="py-3 px-4">
                             <span className={`inline-block px-2 py-1 text-xs font-medium rounded-md ${
                               booking.status === 'APPROVED'
