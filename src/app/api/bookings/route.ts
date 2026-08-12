@@ -76,10 +76,13 @@ export async function POST(req: NextRequest) {
     // client total is only a fallback for legacy items without a spaceId.
     const serverTotal = space ? computeServerTotal(space, body.durationType) ?? body.total : body.total;
 
-    // Offices booked monthly/quarterly pay online (demo); yearly offices and
-    // hourly spaces stay on the request → admin-approval flow.
+    // Online (demo) payment applies to offices booked monthly/quarterly and to
+    // hourly meeting/theater bookings; yearly offices stay on the
+    // request → admin-approval flow (handled manually with the client).
+    const isHourlySpace = space?.type === 'meeting' || space?.type === 'theater';
     const requiresPayment =
-      space?.type === 'workspace' && ['monthly', 'quarterly'].includes(body.durationType);
+      (space?.type === 'workspace' && ['monthly', 'quarterly'].includes(body.durationType)) ||
+      isHourlySpace;
 
     const booking = await prisma.$transaction(async (tx) => {
       const created = await tx.booking.create({
@@ -92,7 +95,7 @@ export async function POST(req: NextRequest) {
           total: serverTotal,
           originalTotal: serverTotal,
           appliedHours: 0,
-          paymentStatus: requiresPayment ? 'PENDING_PAYMENT' : 'NOT_REQUIRED',
+          paymentStatus: requiresPayment && serverTotal > 0 ? 'PENDING_PAYMENT' : 'NOT_REQUIRED',
           startDate: combineDateTime(body.startDate, body.startTime),
           endDate: combineDateTime(body.endDate || body.startDate, body.endTime),
           durationType: body.durationType,
@@ -114,7 +117,12 @@ export async function POST(req: NextRequest) {
           );
           return tx.booking.update({
             where: { id: created.id },
-            data: { total, appliedHours: coveredHours },
+            data: {
+              total,
+              appliedHours: coveredHours,
+              // Fully covered by included hours → nothing left to pay
+              ...(total <= 0 ? { paymentStatus: 'NOT_REQUIRED' as const } : {}),
+            },
           });
         }
       }
