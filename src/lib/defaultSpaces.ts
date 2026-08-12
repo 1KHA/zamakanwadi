@@ -9,7 +9,7 @@ export const defaultSpaces: Space[] = [
       ar: 'مكتب حر في مساحة عمل مشتركة مثالي للمستقلين وعمال عن بعد دون التزامات طويلة الأجل.',
       en: 'Flexible shared workspace ideal for freelancers and remote workers with no long-term commitments.',
     },
-    images: ['/images/office/DSC_5994.JPG', '/images/office/01.jpg', '/images/office/02.jpg'],
+    images: ['/images/spaces/office-flex/main.jpg', '/images/spaces/office-flex/1.jpg', '/images/spaces/office-flex/2.jpg'],
     features: {
       ar: ['٧/٢٤ على مدار اليوم', 'انترنت', 'صالة ترفيهية', 'مصلى'],
       en: ['24/7 access', 'Internet', 'Lounge area', 'Prayer room'],
@@ -32,7 +32,7 @@ export const defaultSpaces: Space[] = [
       ar: 'مكتب مخصص في مساحات عمل مشتركة تمكن المشتركين من تبادل الخبرات وتوسيع دائرة معارفهم.',
       en: 'A dedicated permanent desk giving you privacy and stability while enjoying community benefits.',
     },
-    images: ['/images/office/DSC_5994.JPG', '/images/office/03.png', '/images/office/04.png'],
+    images: ['/images/spaces/office-pioneer/main.jpg', '/images/spaces/office-pioneer/1.jpg', '/images/spaces/office-pioneer/2.jpg'],
     features: {
       ar: ['٧/٢٤ على مدار اليوم', 'انترنت', 'صالة ترفيهية', 'مصلى', '٢ ساعات شهريا لقاعات الاجتماعات'],
       en: ['24/7 access', 'Internet', 'Lounge area', 'Prayer room', '2 hrs/month meeting rooms'],
@@ -55,7 +55,7 @@ export const defaultSpaces: Space[] = [
       ar: 'مكاتب مغلقة للمشتركين الراغبين في خلق مساحة خاصة بهم في بيئة استثنائية ذات خصوصية تامة.',
       en: 'A private enclosed workspace with full focus and professional meeting capabilities.',
     },
-    images: ['/images/office/IMG_0349.jpg', '/images/office/comp01.jpg', '/images/office/DSC_5994.JPG'],
+    images: ['/images/spaces/office-pioneer-plus/main.jpg', '/images/spaces/office-pioneer-plus/1.jpg', '/images/spaces/office-pioneer-plus/2.jpg'],
     features: {
       ar: ['٧/٢٤ على مدار اليوم', 'انترنت', 'صالة ترفيهية', 'مصلى', '٤ ساعات شهريا لقاعات الاجتماعات', 'ساعتين شهريا للمسرح'],
       en: ['24/7 access', 'Internet', 'Lounge area', 'Prayer room', '4 hrs/month meeting rooms', '2 hrs/month theater'],
@@ -78,7 +78,7 @@ export const defaultSpaces: Space[] = [
       ar: 'مساحة عمل مستقلة، ومؤثثة بالكامل للشركات المتوسطة والكبيرة.',
       en: 'A fully enclosed office for companies and growing teams with exclusive perks and booking priority.',
     },
-    images: ['/images/office/comp01.jpg', '/images/office/IMG_0349.jpg', '/images/office/01.jpg'],
+    images: ['/images/spaces/office-corporate/main.jpg', '/images/spaces/office-corporate/1.jpg', '/images/spaces/office-corporate/2.jpg'],
     features: {
       ar: ['٧/٢٤ على مدار اليوم', 'انترنت', 'صالة ترفيهية', 'مصلى', '٤ ساعات شهريا لقاعات الاجتماعات', 'ساعتين شهريا للمسرح', 'دخول ذكي'],
       en: ['24/7 access', 'Internet', 'Lounge area', 'Prayer room', '4 hrs/month meeting rooms', '2 hrs/month theater', 'Smart access'],
@@ -101,7 +101,7 @@ export const defaultSpaces: Space[] = [
       ar: 'قاعة اجتماعات تمتاز بتصميم عصري في بيئة مريحة تساعد على الإنتاجية وتم تجهيزها بأفضل الوسائل التقنية.',
       en: 'Fully equipped small room for meetings and creative sessions for small teams.',
     },
-    images: ['/images/decoimage/6.jpg', '/images/decoimage/3.jpg', '/images/decoimage/7.jpg'],
+    images: ['/images/spaces/room-riyadah-1/main.jpg', '/images/spaces/room-riyadah-1/1.jpg', '/images/spaces/room-riyadah-1/2.jpg'],
     features: {
       ar: ['شاشة تلفاز', 'دفتر ملاحظات', 'سبورة', 'دعم تقني', 'نظام صوتي'],
       en: ['Smart board', 'Audio system', 'AC', 'Dedicated Wi-Fi', 'Up to 8 persons'],
@@ -125,7 +125,7 @@ export const defaultSpaces: Space[] = [
       ar: 'قاعة اجتماعات تجمع بين التصميم العملي والراحة مع توفير وسائل العرض والخدمات المساندة.',
       en: 'Medium room ideal for workshops, training sessions and extended meetings with catering.',
     },
-    images: ['/images/decoimage/DSC_2340.JPG', '/images/decoimage/6.jpg', '/images/wmk01.png'],
+    images: ['/images/spaces/room-riyadah-2/main.jpg', '/images/spaces/room-riyadah-2/1.jpg', '/images/spaces/room-riyadah-2/2.jpg'],
     features: {
       ar: ['نظام عرض', 'دفتر ملاحظات', 'سبورة', 'دعم تقني'],
       en: ['Smart board', 'Audio system', 'AC', 'Dedicated Wi-Fi', 'Catering service', 'Up to 20 persons'],
@@ -149,7 +149,7 @@ export const defaultSpaces: Space[] = [
       ar: 'قاعة مجهزة بالكامل لإقامة ورش العمل والدورات التدريبية.',
       en: 'Large multi-purpose room with the latest display and recording technologies for major events.',
     },
-    images: ['/images/wmk01.png', '/images/decoimage/DSC_2340.JPG', '/images/decoimage/7.jpg'],
+    images: ['/images/spaces/room-bina/main.jpg', '/images/spaces/room-bina/1.jpg', '/images/spaces/room-bina/2.jpg'],
     features: {
       ar: ['جهاز عرض', 'سبورة', 'دعم تقني', 'أثاث مرن', 'منصة تقديم'],
       en: ['Smart board', 'Full audio system', 'AC', 'Dedicated Wi-Fi', 'Catering service', 'Video recording', 'Up to 50 persons'],
@@ -173,7 +173,7 @@ export const defaultSpaces: Space[] = [
       ar: 'مسرح متكامل يجمع بين التصميم الحديث والتقنية المتطورة لاستضافة الفعاليات.',
       en: 'A full-featured theater combining modern design and advanced technology for events and conferences.',
     },
-    images: ['/images/theater/DSC2119.jpg', '/images/theater/IMG_0181.jpg', '/images/theater/DSC_55544.jpg'],
+    images: ['/images/spaces/theater-ithraa/main.jpg', '/images/spaces/theater-ithraa/1.jpg', '/images/spaces/theater-ithraa/2.jpg'],
     features: {
       ar: ['شاشة عرض كبيرة', 'نظام صوتي احترافي', 'إضاءة قابلة للضبط', 'تسع حتى 40 شخصاً'],
       en: ['Large display screen', 'Professional audio system', 'Adjustable lighting', 'AC', 'Up to 40 persons'],
@@ -197,7 +197,7 @@ export const defaultSpaces: Space[] = [
       ar: 'مدرج مصمم بطريقة عصرية للقاءات والفعاليات.',
       en: 'An authentic wooden theater offering a warm atmosphere for cultural, training and creative presentations.',
     },
-    images: ['/images/theater/IMG_0181.jpg', '/images/theater/DSC_55544.jpg', '/images/theater/DSC2119.jpg'],
+    images: ['/images/spaces/theater-tarabut/main.jpg', '/images/spaces/theater-tarabut/1.jpg'],
     features: {
       ar: ['نظام عرض', 'منصة عرض', 'سبورة', 'دعم تقني'],
       en: ['Huge display screen', 'Professional audio system', 'Advanced lighting', 'Central AC', 'Stage', 'Live streaming', 'Up to 120 persons'],
@@ -221,7 +221,7 @@ export const defaultSpaces: Space[] = [
       ar: 'مسرح مرن يمكن تشكيله حسب الطلب.',
       en: 'A large professional theater with cutting-edge sound and lighting for major conferences and events.',
     },
-    images: ['/images/theater/DSC_55544.jpg', '/images/theater/DSC2119.jpg', '/images/theater/IMG_0181.jpg'],
+    images: ['/images/spaces/theater-rakeeza/main.jpg', '/images/spaces/theater-rakeeza/1.jpg', '/images/spaces/theater-rakeeza/2.jpg'],
     features: {
       ar: ['شاشة تلفاز', 'سبورة', 'دعم تقني'],
       en: ['Huge display screen', 'Professional audio system', 'Advanced lighting', 'Central AC', 'Stage', 'Live streaming', 'Up to 120 persons'],
