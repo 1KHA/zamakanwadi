@@ -24,19 +24,8 @@ export async function GET(request: NextRequest) {
     console.log(`[contact-messages] Fetched ${messages.length} messages`);
     return NextResponse.json(messages);
   } catch (error: unknown) {
+    // Log server-side only — Prisma messages carry query/schema internals.
     console.error('[contact-messages] Failed to fetch contact messages:', error);
-    const details = error instanceof Error ? error.message : String(error);
-    const code =
-      error && typeof error === 'object' && 'code' in error
-        ? (error as { code?: string }).code
-        : undefined;
-    return NextResponse.json(
-      {
-        error: 'Failed to fetch contact messages',
-        details,
-        code,
-      },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to fetch contact messages' }, { status: 500 });
   }
 }

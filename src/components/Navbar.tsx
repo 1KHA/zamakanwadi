@@ -3,15 +3,17 @@
 import Link from 'next/link';
 import { useTranslation } from 'react-i18next';
 import { useSession, signOut } from 'next-auth/react';
-import { User, LogOut, LayoutDashboard, LampDesk } from 'lucide-react';
+import { User, LogOut, LayoutDashboard, LampDesk, ShieldCheck } from 'lucide-react';
 import LanguageSwitcher from './LanguageSwitcher';
 import Logo from './Logo';
 
 export default function Navbar() {
   const { i18n } = useTranslation();
   const isRTL = i18n.language === 'ar';
-  const { status } = useSession();
+  const { data: session, status } = useSession();
   const isLoggedIn = status === 'authenticated';
+  const isLoading = status === 'loading';
+  const isAdmin = session?.user?.role === 'ADMIN';
 
   return (
     <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-100 shadow-sm">
@@ -43,8 +45,21 @@ export default function Navbar() {
               <span className="hidden sm:inline">{isRTL ? 'الحجوزات' : 'Bookings'}</span>
             </Link>
 
-            {isLoggedIn ? (
+            {/* While the session resolves, render a placeholder so signed-in
+                users don't get a "Sign In" flash on every page load. */}
+            {isLoading ? (
+              <div className="w-28 h-9 rounded-lg bg-gray-100 animate-pulse" aria-hidden />
+            ) : isLoggedIn ? (
               <div className="flex items-center gap-2">
+                {isAdmin && (
+                  <Link
+                    href="/admin"
+                    className="hidden sm:inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-secondary-dark bg-secondary/20 rounded-lg hover:bg-secondary/30 transition-colors"
+                  >
+                    <ShieldCheck className="w-4 h-4" />
+                    {isRTL ? 'لوحة الإدارة' : 'Admin Panel'}
+                  </Link>
+                )}
                 <Link
                   href="/dashboard"
                   className="hidden sm:inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-primary bg-primary/5 rounded-lg hover:bg-primary/10 transition-colors"

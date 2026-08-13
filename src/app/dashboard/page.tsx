@@ -21,6 +21,7 @@ import {
   Gift,
 } from 'lucide-react';
 import ServicesTab from '@/components/dashboard/ServicesTab';
+import { apiFetch } from '@/lib/apiFetch';
 
 interface Booking {
   id: string;
@@ -77,7 +78,10 @@ function DashboardContent() {
   const appliedHours = Number(searchParams.get('applied') || 0);
   const paid = searchParams.get('paid');
 
-  const [activeTab, setActiveTab] = useState<'bookings' | 'services' | 'notifications' | 'profile'>('bookings');
+  const tabParam = searchParams.get('tab');
+  const initialTab =
+    tabParam === 'services' || tabParam === 'notifications' || tabParam === 'profile' ? tabParam : 'bookings';
+  const [activeTab, setActiveTab] = useState<'bookings' | 'services' | 'notifications' | 'profile'>(initialTab);
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -88,7 +92,7 @@ function DashboardContent() {
 
   useEffect(() => {
     if (status === 'authenticated') {
-      fetch('/api/bookings')
+      apiFetch('/api/bookings')
         .then(async (res) => {
           if (!res.ok) throw new Error('Failed to fetch bookings');
           return res.json();
@@ -105,7 +109,7 @@ function DashboardContent() {
       const loadNotifications = async () => {
         setNotificationsLoading(true);
         try {
-          const res = await fetch('/api/notifications');
+          const res = await apiFetch('/api/notifications');
           if (!res.ok) throw new Error('Failed to fetch notifications');
           const data = await res.json();
           if (!cancelled) setNotifications(data);
@@ -126,7 +130,7 @@ function DashboardContent() {
   const markAllRead = async () => {
     setMarkingRead(true);
     try {
-      const res = await fetch('/api/notifications', {
+      const res = await apiFetch('/api/notifications', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ all: true }),

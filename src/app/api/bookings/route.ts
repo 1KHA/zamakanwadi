@@ -9,9 +9,16 @@ import {
   partialCoveragePrice,
 } from '@/lib/entitlements';
 import type { HourlyPriceTier } from '@/lib/spaces';
+import { bookingSchema, firstIssue } from '@/lib/validation';
+import { randomBytes } from 'crypto';
+
+const REFERENCE_ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
 
 function generateReference() {
-  return 'ZMK-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+  const bytes = randomBytes(6);
+  let out = '';
+  for (const byte of bytes) out += REFERENCE_ALPHABET[byte % REFERENCE_ALPHABET.length];
+  return `ZMK-${out}`;
 }
 
 export async function GET() {
@@ -56,9 +63,14 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    const body = await req.json();
+    const rawBody = await req.json();
+    const parsed = bookingSchema.safeParse(rawBody);
+    if (!parsed.success) {
+      return NextResponse.json({ error: firstIssue(parsed.error) }, { status: 400 });
+    }
+    const body = parsed.data;
 
-    function combineDateTime(date: string, time?: string) {
+    function combineDateTime(date: string, time?: string | null) {
       if (!date) return null;
       const result = new Date(date);
       if (time) {
@@ -68,13 +80,18 @@ export async function POST(req: NextRequest) {
       return result;
     }
 
-    const space = body.spaceId
-      ? await prisma.space.findUnique({ where: { id: body.spaceId } })
-      : null;
+    const space = await prisma.space.findUnique({ where: { id: body.spaceId } });
+    if (!space || !space.active) {
+      return NextResponse.json({ error: 'Space not found' }, { status: 400 });
+    }
 
-    // Server-side pricing when the space and duration are resolvable;
-    // client total is only a fallback for legacy items without a spaceId.
-    const serverTotal = space ? computeServerTotal(space, body.durationType) ?? body.total : body.total;
+    // The server prices every booking. If the duration can't be resolved we
+    // refuse rather than falling back to a client-supplied total — that
+    // fallback previously allowed booking for 0 SAR.
+    const serverTotal = computeServerTotal(space, body.durationType);
+    if (serverTotal === null || !Number.isFinite(serverTotal) || serverTotal < 0) {
+      return NextResponse.json({ error: 'Invalid duration for this space' }, { status: 400 });
+    }
 
     // Online (demo) payment applies to offices booked monthly/quarterly and to
     // hourly meeting/theater bookings; yearly offices stay on the

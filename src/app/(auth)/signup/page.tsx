@@ -143,6 +143,8 @@ export default function SignUpPage() {
                 <Lock className={`absolute top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 ${isRTL ? 'right-3' : 'left-3'}`} />
                 <input
                   type={showPassword ? 'text' : 'password'}
+                  required
+                  minLength={8}
                   value={form.password}
                   onChange={(e) => setForm({ ...form, password: e.target.value })}
                   className={`${inputClass} ${isRTL ? 'pr-10 pl-12' : 'pl-10 pr-12'}`}

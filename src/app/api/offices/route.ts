@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { requireAdmin } from '@/lib/adminAuth';
 
 export async function GET() {
   try {
@@ -7,12 +8,15 @@ export async function GET() {
       orderBy: { createdAt: 'desc' },
     });
     return NextResponse.json(offices);
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Failed to fetch offices' }, { status: 500 });
   }
 }
 
 export async function POST(req: NextRequest) {
+  const { error } = await requireAdmin();
+  if (error) return error;
+
   try {
     const body = await req.json();
     const office = await prisma.office.create({
@@ -29,7 +33,7 @@ export async function POST(req: NextRequest) {
       },
     });
     return NextResponse.json(office, { status: 201 });
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Failed to create office' }, { status: 500 });
   }
 }

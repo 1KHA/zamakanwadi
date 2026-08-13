@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useRouter } from 'next/navigation';
-import { signIn } from 'next-auth/react';
+import { signIn, signOut, getSession } from 'next-auth/react';
 import { Mail, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react';
 import Logo from '@/components/Logo';
 
@@ -28,14 +28,25 @@ export default function AdminSignInPage() {
       redirect: false,
     });
 
-    setLoading(false);
-
     if (result?.error) {
+      setLoading(false);
       setError(isRTL ? 'البريد الإلكتروني أو كلمة المرور غير صحيحة' : 'Invalid email or password');
-    } else {
-      router.push('/admin');
-      router.refresh();
+      return;
     }
+
+    // Credentials were valid, but this form is the admin entrance: a normal
+    // user must not walk away with a live session from here.
+    const session = await getSession();
+    if (session?.user?.role !== 'ADMIN') {
+      await signOut({ redirect: false });
+      setLoading(false);
+      setError(isRTL ? 'هذا الحساب ليس حساب إدارة' : 'This account is not an administrator');
+      return;
+    }
+
+    setLoading(false);
+    router.push('/admin');
+    router.refresh();
   };
 
   return (

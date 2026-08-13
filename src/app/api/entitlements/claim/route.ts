@@ -36,10 +36,20 @@ export async function POST(req: NextRequest) {
     }
 
     const updated = await prisma.$transaction(async (tx) => {
-      const result = await tx.entitlement.update({
-        where: { id: entitlementId },
-        data: { usedAmount: entitlement.usedAmount + amount },
+      // Conditional update: the balance is re-checked by the database itself,
+      // so two concurrent claims can't both pass a stale read and overdraw.
+      const claimed = await tx.entitlement.updateMany({
+        where: {
+          id: entitlementId,
+          userId: user.id,
+          revoked: false,
+          usedAmount: { lte: entitlement.totalAmount - amount },
+        },
+        data: { usedAmount: { increment: amount } },
       });
+
+      if (claimed.count === 0) return null;
+
       await tx.entitlementLedger.create({
         data: {
           entitlementId,
@@ -51,8 +61,13 @@ export async function POST(req: NextRequest) {
           actorRole: 'USER',
         },
       });
-      return result;
+
+      return tx.entitlement.findUnique({ where: { id: entitlementId } });
     });
+
+    if (!updated) {
+      return NextResponse.json({ error: 'Insufficient balance' }, { status: 400 });
+    }
 
     return NextResponse.json({
       id: updated.id,

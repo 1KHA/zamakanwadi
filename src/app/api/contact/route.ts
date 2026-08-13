@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
+import { enforceRateLimit } from '@/lib/rateLimit';
 
 const contactSchema = z.object({
-  fullName: z.string().min(1, 'Full name is required'),
-  phone: z.string().min(1, 'Phone is required'),
-  activity: z.string().min(1, 'Activity is required'),
+  fullName: z.string().min(1, 'Full name is required').max(100),
+  phone: z.string().min(1, 'Phone is required').max(20),
+  activity: z.string().min(1, 'Activity is required').max(500),
   inquiryType: z.enum([
     'office-flex',
     'office-pioneer',
@@ -34,6 +35,9 @@ function normalizeSaudiPhone(input: string): string | null {
 }
 
 export async function POST(req: NextRequest) {
+  const limited = enforceRateLimit(req, 'contact', 5, 10 * 60 * 1000);
+  if (limited) return limited;
+
   try {
     const body = await req.json();
     const parsed = contactSchema.safeParse(body);

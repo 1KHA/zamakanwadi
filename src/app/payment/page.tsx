@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { CreditCard, Lock, Check, AlertCircle, Calendar, Tag } from 'lucide-react';
+import { apiFetch } from '@/lib/apiFetch';
 
 interface DueBooking {
   id: string;
@@ -53,7 +54,7 @@ function PaymentContent() {
     // so no state change is needed here.
     if (status !== 'authenticated' || !reference) return;
     let cancelled = false;
-    fetch(`/api/payments?ref=${encodeURIComponent(reference)}`)
+    apiFetch(`/api/payments?ref=${encodeURIComponent(reference)}`)
       .then((res) => (res.ok ? res.json() : Promise.reject()))
       .then((data) => {
         if (cancelled) return;
@@ -76,7 +77,7 @@ function PaymentContent() {
     setError('');
     setPaying(true);
     try {
-      const res = await fetch('/api/payments', {
+      const res = await apiFetch('/api/payments', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ referenceNumber: reference, cardName, cardNumber, expiry, cvc }),

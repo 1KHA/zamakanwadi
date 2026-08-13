@@ -11,6 +11,7 @@ import {
 import AdminSpacesTab from '@/components/admin/SpacesTab';
 import AdminFeaturesTab from '@/components/admin/FeaturesTab';
 import UserEntitlementsTab from '@/components/admin/UserEntitlementsTab';
+import { apiFetch } from '@/lib/apiFetch';
 
 const INQUIRY_LABELS: Record<string, { ar: string; en: string }> = {
   'office-flex':          { ar: 'الباقة المرنة',                          en: 'Flex Package' },
@@ -145,7 +146,7 @@ export default function AdminPage() {
       setMessagesLoading(true);
       setMessagesError('');
       try {
-        const res = await fetch('/api/contact-messages');
+        const res = await apiFetch('/api/contact-messages');
         if (!res.ok) {
           const data = await res.json().catch(() => ({}));
           const message = data.details || data.error || `HTTP ${res.status}`;
@@ -175,7 +176,7 @@ export default function AdminPage() {
       setBookingsLoading(true);
       setBookingsError('');
       try {
-        const res = await fetch('/api/admin/bookings');
+        const res = await apiFetch('/api/admin/bookings');
         if (!res.ok) {
           const data = await res.json().catch(() => ({}));
           throw new Error(data.error || `HTTP ${res.status}`);
@@ -201,7 +202,7 @@ export default function AdminPage() {
     let cancelled = false;
     const loadSpacesList = async () => {
       try {
-        const res = await fetch('/api/admin/spaces');
+        const res = await apiFetch('/api/admin/spaces');
         if (!res.ok) throw new Error('Failed to load spaces');
         const data = await res.json();
         if (!cancelled) setSpacesList(data.map((s: { id: string; title: { ar: string; en: string } }) => ({ id: s.id, title: s.title })));
@@ -222,7 +223,7 @@ export default function AdminPage() {
     setAvailabilityError('');
     setAvailabilityBookings([]);
     try {
-      const res = await fetch(`/api/bookings/availability?spaceId=${availabilitySpace}&date=${availabilityDate}`);
+      const res = await apiFetch(`/api/bookings/availability?spaceId=${availabilitySpace}&date=${availabilityDate}`);
       if (!res.ok) throw new Error('Failed to load availability');
       const data = await res.json();
       setAvailabilityBookings(data);
@@ -275,7 +276,7 @@ export default function AdminPage() {
   const updateBookingStatus = async (id: string, status: string, reason?: string) => {
     setUpdating(true);
     try {
-      const res = await fetch('/api/admin/bookings', {
+      const res = await apiFetch('/api/admin/bookings', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id, status, rejectionReason: reason }),

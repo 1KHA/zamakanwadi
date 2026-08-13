@@ -9,6 +9,7 @@ import type {
   LedgerEntryDto,
   LedgerAction,
 } from '@/lib/entitlementTypes';
+import { apiFetch } from '@/lib/apiFetch';
 
 interface PurchaseRequestRow {
   id: string;
@@ -60,9 +61,9 @@ export default function ServicesTab() {
   const loadAll = useCallback(async () => {
     try {
       const [entRes, featRes, purRes] = await Promise.all([
-        fetch('/api/entitlements'),
-        fetch('/api/features'),
-        fetch('/api/purchase-requests'),
+        apiFetch('/api/entitlements'),
+        apiFetch('/api/features'),
+        apiFetch('/api/purchase-requests'),
       ]);
       if (entRes.ok) {
         const data = await entRes.json();
@@ -88,7 +89,7 @@ export default function ServicesTab() {
     setClaimBusy(true);
     setError('');
     try {
-      const res = await fetch('/api/entitlements/claim', {
+      const res = await apiFetch('/api/entitlements/claim', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ entitlementId: claiming.id, amount: claimAmount, note: claimNote || undefined }),
@@ -113,7 +114,7 @@ export default function ServicesTab() {
     setError('');
     setMessage('');
     try {
-      const res = await fetch('/api/purchase-requests', {
+      const res = await apiFetch('/api/purchase-requests', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ featureId: feature.id, amount }),

@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { prisma } from '@/lib/prisma';
 import { authOptions } from '@/lib/auth';
+import { enforceRateLimit } from '@/lib/rateLimit';
+import { firstIssue, paymentSchema } from '@/lib/validation';
 
 // DEMO ONLY — no real payment gateway. Card details are validated for shape
 // and never stored beyond the last 4 digits.
@@ -45,28 +47,24 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
+  const limited = enforceRateLimit(req, 'payments', 20, 10 * 60 * 1000);
+  if (limited) return limited;
+
   try {
     const user = await getSessionUser();
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const body = await req.json();
-    const { referenceNumber, cardName, cardNumber, expiry, cvc } = body;
-
-    if (!referenceNumber) {
-      return NextResponse.json({ error: 'Missing reference' }, { status: 400 });
+    const parsed = paymentSchema.safeParse(await req.json());
+    if (!parsed.success) {
+      return NextResponse.json({ error: firstIssue(parsed.error) }, { status: 400 });
     }
+    const { referenceNumber, cardNumber } = parsed.data;
 
-    const digits = String(cardNumber ?? '').replace(/\s/g, '');
-    if (!cardName?.trim() || !/^\d{13,19}$/.test(digits)) {
+    const digits = cardNumber.replace(/\s/g, '');
+    if (!/^\d{13,19}$/.test(digits)) {
       return NextResponse.json({ error: 'Invalid card details' }, { status: 400 });
-    }
-    if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(String(expiry ?? ''))) {
-      return NextResponse.json({ error: 'Invalid expiry (MM/YY)' }, { status: 400 });
-    }
-    if (!/^\d{3,4}$/.test(String(cvc ?? ''))) {
-      return NextResponse.json({ error: 'Invalid CVC' }, { status: 400 });
     }
 
     const bookings = await prisma.booking.findMany({

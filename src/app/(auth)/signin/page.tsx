@@ -1,19 +1,24 @@
 'use client';
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import { useTranslation } from 'react-i18next';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { signIn, getSession } from 'next-auth/react';
-import { Mail, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, ArrowRight, Clock } from 'lucide-react';
 import Logo from '@/components/Logo';
+import { resolveLoginDestination } from '@/lib/redirects';
+import { IDLE_TIMEOUT_MINUTES } from '@/lib/sessionPolicy';
 
-export default function SignInPage() {
+function SignInForm() {
   const { i18n } = useTranslation();
   const isRTL = i18n.language === 'ar';
   const [showPassword, setShowPassword] = useState(false);
-  const [form, setForm] = useState({ email: '', password: '', remember: false });
+  const [form, setForm] = useState({ email: '', password: '' });
 
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const expired = searchParams.get('expired');
+  const callbackUrl = searchParams.get('callbackUrl');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -32,15 +37,12 @@ export default function SignInPage() {
 
     if (result?.error) {
       setError(isRTL ? 'البريد الإلكتروني أو كلمة المرور غير صحيحة' : 'Invalid email or password');
-    } else {
-      const session = await getSession();
-      if (session?.user?.role === 'ADMIN') {
-        router.push('/admin');
-      } else {
-        router.push('/dashboard');
-      }
-      router.refresh();
+      return;
     }
+
+    const session = await getSession();
+    router.push(resolveLoginDestination(callbackUrl, session?.user?.role));
+    router.refresh();
   };
 
   return (
@@ -59,6 +61,17 @@ export default function SignInPage() {
             </p>
           </div>
 
+          {expired && (
+            <div className="mb-6 p-4 bg-secondary/15 border border-secondary/30 rounded-xl text-secondary-dark text-sm flex items-start gap-2">
+              <Clock className="w-4 h-4 shrink-0 mt-0.5" />
+              <span>
+                {isRTL
+                  ? `تم تسجيل خروجك تلقائياً بعد ${IDLE_TIMEOUT_MINUTES} دقيقة من عدم النشاط. يرجى تسجيل الدخول مرة أخرى.`
+                  : `You were signed out automatically after ${IDLE_TIMEOUT_MINUTES} minutes of inactivity. Please sign in again.`}
+              </span>
+            </div>
+          )}
+
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
               <label className="block text-sm font-medium text-dark mb-2">
@@ -68,10 +81,12 @@ export default function SignInPage() {
                 <Mail className={`absolute top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 ${isRTL ? 'right-3' : 'left-3'}`} />
                 <input
                   type="email"
+                  required
+                  autoComplete="email"
                   value={form.email}
                   onChange={(e) => setForm({ ...form, email: e.target.value })}
                   className={`w-full ${isRTL ? 'pr-10 pl-4' : 'pl-10 pr-4'} py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent`}
-                  placeholder={isRTL ? 'your@email.com' : 'your@email.com'}
+                  placeholder="your@email.com"
                 />
               </div>
             </div>
@@ -84,6 +99,8 @@ export default function SignInPage() {
                 <Lock className={`absolute top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 ${isRTL ? 'right-3' : 'left-3'}`} />
                 <input
                   type={showPassword ? 'text' : 'password'}
+                  required
+                  autoComplete="current-password"
                   value={form.password}
                   onChange={(e) => setForm({ ...form, password: e.target.value })}
                   className={`w-full ${isRTL ? 'pr-10 pl-12' : 'pl-10 pr-12'} py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent`}
@@ -97,23 +114,6 @@ export default function SignInPage() {
                   {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
               </div>
-            </div>
-
-            <div className="flex items-center justify-between">
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={form.remember}
-                  onChange={(e) => setForm({ ...form, remember: e.target.checked })}
-                  className="w-4 h-4 text-primary rounded border-gray-300 focus:ring-primary"
-                />
-                <span className="text-sm text-gray-custom">
-                  {isRTL ? 'تذكرني' : 'Remember me'}
-                </span>
-              </label>
-              <Link href="/forgot-password" className="text-sm text-primary hover:text-primary-dark font-medium">
-                {isRTL ? 'نسيت كلمة المرور؟' : 'Forgot password?'}
-              </Link>
             </div>
 
             {error && (
@@ -143,5 +143,19 @@ export default function SignInPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function SignInPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+          <div className="text-gray-custom">Loading...</div>
+        </div>
+      }
+    >
+      <SignInForm />
+    </Suspense>
   );
 }

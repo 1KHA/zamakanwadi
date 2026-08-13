@@ -34,8 +34,15 @@ function clearCart() {
   localStorage.removeItem(CART_STORAGE_KEY);
 }
 
+const REFERENCE_ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+
+// Must match the server's ^ZMK-[A-Z0-9]{6}$ check; groups one cart's bookings.
 function generateReference() {
-  return 'ZMK-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+  const values = new Uint8Array(6);
+  crypto.getRandomValues(values);
+  let out = '';
+  for (const value of values) out += REFERENCE_ALPHABET[value % REFERENCE_ALPHABET.length];
+  return `ZMK-${out}`;
 }
 
 export default function CheckoutPage() {
@@ -317,7 +324,7 @@ export default function CheckoutPage() {
                         <input
                           type={showPassword ? 'text' : 'password'}
                           required
-                          minLength={6}
+                          minLength={8}
                           value={form.password}
                           onChange={(e) => setForm({ ...form, password: e.target.value })}
                           className={`w-full py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent ${isRTL ? 'pr-10 pl-12' : 'pl-10 pr-12'}`}

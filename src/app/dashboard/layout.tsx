@@ -1,7 +1,8 @@
-'use client';
-
 import Layout from '@/components/Layout';
+import { requireUser } from '@/lib/serverSession';
 
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
+  // Real server-side gate; the proxy is only an optimistic pre-check.
+  await requireUser('/dashboard');
   return <Layout>{children}</Layout>;
 }
