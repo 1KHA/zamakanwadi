@@ -9,7 +9,9 @@ export const metadata = {
 };
 
 export default async function TermsPage() {
-  const filePath = join(process.cwd(), 'mdfiles', 'terms.md');
+  // Lives under src/content so it ships with the repo — mdfiles/ is gitignored
+  // and is not present on the build server.
+  const filePath = join(process.cwd(), 'src', 'content', 'terms.md');
   const markdown = readFileSync(filePath, 'utf8');
   const processed = await remark().use(html).process(markdown);
   const content = processed.toString();

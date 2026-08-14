@@ -9,7 +9,9 @@ export const metadata = {
 };
 
 export default async function ContractPage() {
-  const filePath = join(process.cwd(), 'mdfiles', 'contract.md');
+  // Lives under src/content so it ships with the repo — mdfiles/ is gitignored
+  // and is not present on the build server.
+  const filePath = join(process.cwd(), 'src', 'content', 'contract.md');
   const markdown = readFileSync(filePath, 'utf8');
   const processed = await remark().use(html).process(markdown);
   const content = processed.toString();
