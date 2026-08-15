@@ -12,7 +12,6 @@ import {
   Lock,
   Eye,
   EyeOff,
-  ArrowRight,
   Check,
   Tag,
   Calendar,
@@ -248,7 +247,6 @@ export default function CheckoutPage() {
                         {isRTL ? 'تأكيد الحجز' : 'Confirm Booking'}
                       </>
                     )}
-                    <ArrowRight className={`w-5 h-5 ${isRTL ? 'rotate-180' : ''}`} />
                   </button>
                 </>
               ) : (
@@ -359,7 +357,6 @@ export default function CheckoutPage() {
                           {isRTL ? 'تأكيد الحجز' : 'Confirm Booking'}
                         </>
                       )}
-                      <ArrowRight className={`w-5 h-5 ${isRTL ? 'rotate-180' : ''}`} />
                     </button>
                   </form>
                 </>
