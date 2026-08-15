@@ -14,7 +14,9 @@
     "db:seed": "tsx scripts/seed-admin.ts",
     "db:seed-features": "tsx scripts/seed-features.ts",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "images:shrink": "node scripts/shrink-images.mjs",
+    "images:shrink:check": "node scripts/shrink-images.mjs --dry-run"
   },
   "prisma": {
     "seed": "tsx scripts/seed-admin.ts"

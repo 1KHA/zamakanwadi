@@ -30,6 +30,11 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
+  images: {
+    // Serve modern formats automatically for every next/image on the site;
+    // the browser picks whichever it supports (AVIF first, then WebP).
+    formats: ['image/avif', 'image/webp'],
+  },
   async headers() {
     return [{ source: '/:path*', headers: securityHeaders }];
   },

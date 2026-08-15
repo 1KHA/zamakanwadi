@@ -147,11 +147,13 @@ export default function LandingPage() {
         {/* Background images collage */}
         <div className="absolute inset-0">
           <div className="absolute inset-0 bg-gradient-to-br from-primary/90 via-primary/70 to-dark/90" />
-          <img
-            src="/images/IMG_8048-HDR2.png"
+          <Image
+            src="/images/IMG_8048.png"
             alt="Zamakan workspace"
-            className="w-full h-full object-cover opacity-40"
-            loading="eager"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover opacity-40"
           />
         </div>
 
