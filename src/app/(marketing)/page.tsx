@@ -1,5 +1,4 @@
 'use client';
-import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Link from 'next/link';
 import ContactSection from '@/components/ContactSection';
@@ -9,7 +8,6 @@ import FlipImage from '@/components/FlipImage';
 import PackagesSection from '@/components/PackagesSection';
 import {
   ArrowRight,
-  Mail,
   Coffee,
   Wifi,
   Clock,

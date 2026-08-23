@@ -25,13 +25,13 @@ export default function Navbar() {
 
           <div className="flex items-center gap-4">
             <Link
-              href="#packages"
+              href="/#packages"
               className="hidden sm:inline-flex text-sm font-medium text-gray-600 hover:text-primary transition-colors"
             >
               {isRTL ? 'مساحات الأعمال' : 'Spaces'}
             </Link>
             <Link
-              href="#contact"
+              href="/#contact"
               className="text-sm font-medium text-gray-600 hover:text-primary transition-colors"
             >
               {isRTL ? 'تواصل معنا' : 'Contact Us'}

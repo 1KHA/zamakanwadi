@@ -73,6 +73,10 @@ next-env.d.ts
 .md
 *.md
 /mdfiles
+# ...but src/content/*.md is page content read at build time. If these are not
+# committed the Vercel build fails with ENOENT while prerendering /terms and
+# /contract, so they must never fall under the *.md rule above.
+!/src/content/*.md
 
 .claude
 scripts/seed-admin.ts

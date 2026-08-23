@@ -86,7 +86,7 @@ export default function ContactSection() {
   };
 
   return (
-    <section id="contact" className="relative py-20 sm:py-28 lg:py-36 bg-gray-50 overflow-hidden">
+    <section id="contact" className="relative scroll-mt-20 py-20 sm:py-28 lg:py-36 bg-gray-50 overflow-hidden">
       {/* Decorative background */}
       <div aria-hidden="true" className="pointer-events-none absolute top-6 left-6 w-36 h-36 border-[3px] border-primary/10 rounded-2xl rotate-12" />
       <div aria-hidden="true" className="pointer-events-none absolute top-20 left-20 w-10 h-10 border-2 border-secondary/20 rounded-lg -rotate-6" />

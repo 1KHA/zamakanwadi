@@ -130,7 +130,7 @@ function PackagesSectionContent() {
   const visibleSpaces = spaces.filter((s) => s.category === activeKey);
 
   return (
-    <section id="packages" className="relative py-20 sm:py-28 lg:py-36 bg-white overflow-hidden">
+    <section id="packages" className="relative scroll-mt-20 py-20 sm:py-28 lg:py-36 bg-white overflow-hidden">
       {/* Decorative */}
       <div aria-hidden="true" className="pointer-events-none absolute top-6 left-6 w-40 h-40 border-[3px] border-primary/8 rounded-3xl rotate-12" />
       <div aria-hidden="true" className="pointer-events-none absolute bottom-6 right-6 w-32 h-32 border-2 border-secondary/15 rounded-2xl -rotate-6" />
@@ -208,7 +208,7 @@ function PackagesSectionContent() {
 export default function PackagesSection() {
   return (
     <Suspense fallback={
-      <section id="packages" className="relative py-20 sm:py-28 lg:py-36 bg-white overflow-hidden">
+      <section id="packages" className="relative scroll-mt-20 py-20 sm:py-28 lg:py-36 bg-white overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-12">
             <div className="h-10 bg-gray-200 rounded w-48 mx-auto" />

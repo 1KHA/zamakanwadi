@@ -44,6 +44,8 @@ model User {
   image         String?
   phone         String?
   role          Role      @default(USER)
+  /// Opt-out switch for non-transactional notification emails (OTPs ignore it).
+  emailNotifications Boolean @default(true)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
@@ -257,6 +259,22 @@ model EntitlementLedger {
   @@index([bookingId])
 }
 
+/// One-time passcodes for email verification / passwordless flows.
+/// Codes are stored hashed, never in plaintext.
+model EmailOtp {
+  id         String    @id @default(cuid())
+  email      String
+  codeHash   String
+  purpose    OtpPurpose
+  attempts   Int       @default(0)
+  consumedAt DateTime?
+  expiresAt  DateTime
+  createdAt  DateTime  @default(now())
+
+  @@index([email, purpose])
+  @@index([expiresAt])
+}
+
 // Demo-only payment records (no real gateway)
 model Payment {
   id              String   @id @default(cuid())
@@ -350,4 +368,11 @@ enum PaymentRequirement {
   NOT_REQUIRED
   PENDING_PAYMENT
   PAID
+}
+
+enum OtpPurpose {
+  SIGNUP
+  LOGIN
+  PASSWORD_RESET
+  EMAIL_VERIFY
 }
