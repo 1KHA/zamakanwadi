@@ -1,0 +1,52 @@
+# Local stack: Postgres + schema/seed + the app. Never touches the live database.
+#
+#   cp docker.env.example .env.docker   # once; then put your credentials in .env.docker
+#   docker compose up -d --build        # start (migrate runs first, then web)
+#   docker compose logs -f web          # tail the app
+#   docker compose down                 # stop (data kept)   |  down -v  → wipe the local DB
+#
+# App: http://localhost:3100  (3000 is left free for other projects on this machine)
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: zamakan
+      POSTGRES_PASSWORD: zamakan
+      POSTGRES_DB: zamakan
+    volumes:
+      - zamakan-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U zamakan -d zamakan"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+  # One-shot: pushes the Prisma schema and seeds spaces, features and the admin
+  # user into the LOCAL db. Every seed is idempotent, so it re-runs safely.
+  migrate:
+    build:
+      context: .
+      target: migrate
+    env_file: .env.docker
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: "no"
+
+  web:
+    build:
+      context: .
+      target: runner
+    env_file: .env.docker
+    ports:
+      - "3100:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    restart: unless-stopped
+
+volumes:
+  zamakan-pgdata:

@@ -4,9 +4,7 @@ import { prisma } from '@/lib/prisma';
 import { authOptions } from '@/lib/auth';
 import { enforceRateLimit } from '@/lib/rateLimit';
 import { firstIssue, paymentSchema } from '@/lib/validation';
-
-// DEMO ONLY — no real payment gateway. Card details are validated for shape
-// and never stored beyond the last 4 digits.
+import { amountWithVat, isStrablConfigured, paymentProvider, vatOn } from '@/lib/strabl';
 
 async function getSessionUser() {
   const session = await getServerSession(authOptions);
@@ -14,6 +12,11 @@ async function getSessionUser() {
   return prisma.user.findUnique({ where: { email: session.user.email } });
 }
 
+/**
+ * What the customer owes for a reference, plus whether it has been paid.
+ * amountDue INCLUDES VAT (STRABL_CHECKOUT.md §2.3, option A) so it matches
+ * the total shown on /cart and /checkout.
+ */
 export async function GET(req: NextRequest) {
   try {
     const user = await getSessionUser();
@@ -26,27 +29,48 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Missing reference' }, { status: 400 });
     }
 
-    const bookings = await prisma.booking.findMany({
-      where: { userId: user.id, referenceNumber: ref, paymentStatus: 'PENDING_PAYMENT' },
-      select: {
-        id: true,
-        itemName: true,
-        itemNameAr: true,
-        total: true,
-        durationType: true,
-        startDate: true,
-      },
-      orderBy: { createdAt: 'asc' },
-    });
+    const [bookings, paidCount] = await Promise.all([
+      prisma.booking.findMany({
+        where: { userId: user.id, referenceNumber: ref, paymentStatus: 'PENDING_PAYMENT' },
+        select: {
+          id: true,
+          itemName: true,
+          itemNameAr: true,
+          total: true,
+          durationType: true,
+          startDate: true,
+        },
+        orderBy: { createdAt: 'asc' },
+      }),
+      prisma.payment.count({ where: { userId: user.id, referenceNumber: ref, status: 'PAID' } }),
+    ]);
 
-    const amountDue = bookings.reduce((sum, b) => sum + b.total, 0);
-    return NextResponse.json({ reference: ref, bookings, amountDue });
+    const subtotal = bookings.reduce((sum, b) => sum + b.total, 0);
+    return NextResponse.json({
+      reference: ref,
+      bookings,
+      subtotal,
+      vat: vatOn(subtotal),
+      amountDue: amountWithVat(subtotal),
+      paid: paidCount > 0,
+      provider: paymentProvider(),
+      providerConfigured: paymentProvider() === 'demo' || isStrablConfigured(),
+    });
   } catch {
     return NextResponse.json({ error: 'Failed to fetch payment details' }, { status: 500 });
   }
 }
 
+/**
+ * DEMO ONLY — marks bookings PAID for any well-formed card number. Real
+ * payments are confirmed exclusively by the signed Strabl webhook, so this
+ * endpoint is disabled the moment PAYMENT_PROVIDER=strabl.
+ */
 export async function POST(req: NextRequest) {
+  if (paymentProvider() === 'strabl') {
+    return NextResponse.json({ error: 'Demo payments are disabled' }, { status: 410 });
+  }
+
   const limited = enforceRateLimit(req, 'payments', 20, 10 * 60 * 1000);
   if (limited) return limited;
 
@@ -74,7 +98,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Nothing to pay for this reference' }, { status: 400 });
     }
 
-    const amount = bookings.reduce((sum, b) => sum + b.total, 0);
+    // Same VAT-inclusive figure the page displayed.
+    const amount = amountWithVat(bookings.reduce((sum, b) => sum + b.total, 0));
     const paidAt = new Date();
 
     const payment = await prisma.$transaction(async (tx) => {
@@ -83,7 +108,9 @@ export async function POST(req: NextRequest) {
           userId: user.id,
           referenceNumber,
           amount,
+          currency: 'SAR',
           method: 'card',
+          provider: 'demo',
           cardLast4: digits.slice(-4),
           status: 'PAID',
         },

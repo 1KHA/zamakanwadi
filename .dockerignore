@@ -1,0 +1,22 @@
+# Rebuilt inside the image
+node_modules
+.next
+coverage
+
+# Never bake secrets into a layer — pass them with `docker run --env-file`.
+.env
+.env.*
+!.env.example
+
+# Not needed to build or run (scripts/ IS needed — the migrate stage seeds with it)
+.git
+.gitignore
+.claude
+.vscode
+mdfiles
+testapi
+.DS_Store
+*.log
+Dockerfile
+.dockerignore
+docker-compose.yml

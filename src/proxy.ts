@@ -11,6 +11,13 @@ const SIGNIN_WINDOW_MS = 10 * 60 * 1000;
 /** Routes requiring any signed-in user. */
 const USER_PATHS = ['/dashboard', '/profile', '/payment'];
 
+/**
+ * Server-to-server webhooks are authenticated by their signature, not by a
+ * browser session, so the Origin-header CSRF check does not apply to them.
+ * (A browser could never produce a valid HMAC without the secret anyway.)
+ */
+const WEBHOOK_PATHS = new Set(['/api/payments/strabl/webhook']);
+
 function isUnder(pathname: string, base: string) {
   return pathname === base || pathname.startsWith(`${base}/`);
 }
@@ -28,7 +35,12 @@ export async function proxy(request: NextRequest) {
   // sameSite=lax cookies are the primary defence; this rejects cross-site
   // mutations that still manage to carry credentials. A missing Origin (server
   // to server, curl, native clients) is allowed.
-  if (pathname.startsWith('/api/') && !pathname.startsWith('/api/auth/') && MUTATING_METHODS.has(request.method)) {
+  if (
+    pathname.startsWith('/api/') &&
+    !pathname.startsWith('/api/auth/') &&
+    !WEBHOOK_PATHS.has(pathname) &&
+    MUTATING_METHODS.has(request.method)
+  ) {
     const origin = request.headers.get('origin');
     if (origin) {
       const host = request.headers.get('host');

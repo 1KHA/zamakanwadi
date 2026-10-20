@@ -5,15 +5,14 @@ import ContactSection from '@/components/ContactSection';
 import Image from 'next/image';
 import AnimateOnScroll from '@/components/AnimateOnScroll';
 import FlipImage from '@/components/FlipImage';
+import HeroVideoBackground from '@/components/HeroVideoBackground';
 import PackagesSection from '@/components/PackagesSection';
 import {
   ArrowRight,
   Coffee,
   Wifi,
   Clock,
-  Zap,
   Check,
-  Users,
   BookOpen,
   Tv,
   Moon,
@@ -24,31 +23,6 @@ import {
 /* ------------------------------------------------------------------ */
 /*  Helper components                                                   */
 /* ------------------------------------------------------------------ */
-
-function GradientPlaceholder({
-  className = '',
-  from = '#9D1942',
-  to = '#e2a026',
-  label,
-}: {
-  className?: string;
-  from?: string;
-  to?: string;
-  label?: string;
-}) {
-  return (
-    <div
-      className={`relative overflow-hidden rounded-xl ${className}`}
-      style={{ background: `linear-gradient(135deg, ${from}, ${to})` }}
-    >
-      {label && (
-        <span className="absolute inset-0 flex items-center justify-center text-white/80 text-sm font-medium">
-          {label}
-        </span>
-      )}
-    </div>
-  );
-}
 
 function SectionTitle({
   children,
@@ -141,24 +115,21 @@ export default function LandingPage() {
       {/* ============================================================= */}
       {/*  HERO                                                         */}
       {/* ============================================================= */}
-      <section className="relative w-full h-screen overflow-hidden bg-dark flex flex-col">
-        {/* Background images collage */}
+      {/* Height = viewport minus the sticky navbar above it (h-20 = 5rem, plus
+          its 1px bottom border), so the hero fits the screen exactly instead of
+          overflowing. dvh keeps that true on mobile as browser chrome collapses. */}
+      <section className="relative w-full h-[calc(100dvh-5rem-1px)] overflow-hidden bg-dark flex flex-col">
+        {/* Looping, silent video background */}
         <div className="absolute inset-0">
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/90 via-primary/70 to-dark/90" />
-          <Image
-            src="/images/IMG_8048.png"
-            alt="Zamakan workspace"
-            fill
-            priority
-            sizes="100vw"
-            className="object-cover opacity-40"
-          />
+          <HeroVideoBackground videoId="54r-UGo2h-o" />
+          {/* Light scrim, only enough to keep the white text readable. */}
+          <div className="absolute inset-0 z-10 bg-gradient-to-br from-primary/40 via-primary/20 to-dark/50" />
         </div>
 
         <div className="relative flex-1 flex items-center max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center w-full">
+          <div className="w-full">
             {/* Text content */}
-            <AnimateOnScroll direction="right" className="text-white space-y-6 sm:space-y-8">
+            <AnimateOnScroll direction="right" className="text-white space-y-6 sm:space-y-8 max-w-3xl">
               <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight">
                 {isRTL ? (
                   <>
@@ -196,55 +167,6 @@ export default function LandingPage() {
               </div>
             </AnimateOnScroll>
 
-            {/* White overlay card */}
-            <AnimateOnScroll direction="left" delay={150} className="relative py-8 px-4 sm:py-10 sm:px-10 self-end">
-              <div className="bg-white rounded-2xl sm:rounded-3xl p-6 sm:p-8 lg:p-10 shadow-2xl space-y-6">
-                <Link href="#packages" className="flex items-start gap-4 group">
-                  <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-                    <Zap className="w-6 h-6 text-primary" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg sm:text-xl font-bold text-dark group-hover:text-primary transition-colors">
-                      {isRTL ? 'مكاتب عمل' : 'Work Offices'}
-                    </h3>
-                    <p className="text-sm text-gray-custom mt-1">
-                      {isRTL
-                        ? 'مساحات مريحة مجهزة بأحدث التقنيات'
-                        : 'Comfortable spaces equipped with the latest technology.'}
-                    </p>
-                  </div>
-                </Link>
-
-                <Link href="#packages" className="flex items-start gap-4 group">
-                  <div className="w-12 h-12 rounded-xl bg-secondary/20 flex items-center justify-center shrink-0">
-                    <Users className="w-6 h-6 text-secondary-dark" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg sm:text-xl font-bold text-dark group-hover:text-primary transition-colors">
-                      {isRTL ? 'قاعات ومسارح' : 'Halls & Theaters'}
-                    </h3>
-                    <p className="text-sm text-gray-custom mt-1">
-                      {isRTL
-                        ? 'قاعات ومسارح متنوعة الأحجام لجميع أنواع الفعاليات'
-                        : 'Various sizes for all types of meetings and events.'}
-                    </p>
-                  </div>
-                </Link>
-
-              </div>
-
-              {/* Decorative gradient blocks */}
-              <GradientPlaceholder
-                className="absolute -top-6 -end-6 w-24 h-24 rounded-2xl opacity-60 hidden lg:block"
-                from="#ffbf19"
-                to="#e2a026"
-              />
-              <GradientPlaceholder
-                className="absolute -bottom-8 -start-8 w-32 h-32 rounded-2xl opacity-40 hidden lg:block"
-                from="#9D1942"
-                to="#2B2422"
-              />
-            </AnimateOnScroll>
           </div>
         </div>
       </section>
@@ -407,41 +329,81 @@ export default function LandingPage() {
       <section className="relative py-20 sm:py-28 lg:py-36 bg-white overflow-hidden">
         {/* Decorative background */}
         <div aria-hidden="true" className="pointer-events-none absolute top-6 left-6 w-44 h-44 border-[3px] border-primary/10 rounded-3xl rotate-12" />
-        <div aria-hidden="true" className="pointer-events-none absolute top-24 left-28 w-10 h-10 border-2 border-secondary/25 rounded-lg rotate-45" />
         <div aria-hidden="true" className="pointer-events-none absolute bottom-6 right-6 w-44 h-44 border-[3px] border-secondary/15 rounded-3xl -rotate-12" />
-        <div aria-hidden="true" className="pointer-events-none absolute bottom-28 right-28 w-8 h-8 bg-primary/5 rounded-lg rotate-6" />
+
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <AnimateOnScroll direction="up">
-          <div className="text-center max-w-3xl mx-auto space-y-4 mb-16">
-            <SectionTitle>
-              {isRTL ? 'مميزاتنا' : 'Our Features'}
-            </SectionTitle>
-
-            <SectionSubtitle className="mx-auto">
-              {isRTL
-                ? 'نوفر لك كل ما تحتاجه لتحقيق أقصى إنتاجية في بيئة عمل ملهمة'
-                : 'We provide everything you need to achieve maximum productivity in an inspiring work environment.'}
-            </SectionSubtitle>
-          </div>
-          </AnimateOnScroll>
-
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
-            {features.map((feature, idx) => (
-              <AnimateOnScroll key={idx} direction="up" delay={idx * 180} duration={500}>
+            <div className="relative rounded-[2rem] sm:rounded-[2.5rem] bg-primary text-white overflow-hidden shadow-2xl shadow-primary/20">
+              {/* Panel decorations */}
               <div
-                className="group relative rounded-2xl sm:rounded-3xl p-6 sm:p-8 transition-all hover:-translate-y-1 hover:shadow-xl bg-[#e2a026] text-white h-full"
-              >
-                <div className="w-14 h-14 rounded-2xl bg-white/30 flex items-center justify-center mb-5 group-hover:bg-white/50 transition-colors">
-                  {feature.icon}
+                aria-hidden="true"
+                className="pointer-events-none absolute -top-32 -end-32 w-[28rem] h-[28rem] rounded-full bg-secondary/25 blur-3xl"
+              />
+              <div
+                aria-hidden="true"
+                className="pointer-events-none absolute -bottom-40 -start-24 w-[26rem] h-[26rem] rounded-full bg-white/10 blur-3xl"
+              />
+              <div
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-0 opacity-[0.07]"
+                style={{
+                  backgroundImage:
+                    'radial-gradient(rgba(255,255,255,0.9) 1px, transparent 1px)',
+                  backgroundSize: '22px 22px',
+                }}
+              />
+
+              <div className="relative grid lg:grid-cols-12 gap-10 lg:gap-14 px-6 py-12 sm:px-10 sm:py-16 lg:px-16 lg:py-20">
+                {/* Heading column */}
+                <div className="lg:col-span-4 flex flex-col justify-center">
+                  <span
+                    aria-hidden="true"
+                    className="block w-14 h-1.5 rounded-full bg-secondary mb-6"
+                  />
+                  <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight leading-tight">
+                    {isRTL ? 'مميزاتنا' : 'Our Features'}
+                  </h2>
+                  <p className="mt-5 text-base sm:text-lg text-white/75 leading-relaxed max-w-md">
+                    {isRTL
+                      ? 'نوفر لك كل ما تحتاجه لتحقيق أقصى إنتاجية في بيئة عمل ملهمة'
+                      : 'We provide everything you need to achieve maximum productivity in an inspiring work environment.'}
+                  </p>
                 </div>
-                <h3 className="text-lg font-bold mb-2">{feature.title}</h3>
-                <p className="text-sm leading-relaxed opacity-80">
-                  {feature.desc}
-                </p>
+
+                {/* Features column */}
+                <div className="lg:col-span-8">
+                  <ul className="grid sm:grid-cols-2 gap-3 sm:gap-4">
+                    {features.map((feature, idx) => (
+                      <li key={idx} className="h-full">
+                        <AnimateOnScroll
+                          direction="up"
+                          delay={idx * 70}
+                          duration={500}
+                          className="h-full"
+                        >
+                          <div className="group h-full flex items-center gap-4 rounded-2xl bg-white/[0.06] border border-white/10 backdrop-blur-sm p-4 sm:p-5 transition-all duration-300 hover:bg-white hover:border-white hover:-translate-y-0.5 hover:shadow-lg hover:shadow-black/10">
+                            <div className="shrink-0 w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-secondary text-white flex items-center justify-center shadow-md shadow-black/10 transition-transform duration-300 group-hover:scale-105">
+                              {feature.icon}
+                            </div>
+                            <div className="min-w-0">
+                              <h3 className="text-base sm:text-lg font-bold leading-snug text-white transition-colors group-hover:text-primary">
+                                {feature.title}
+                              </h3>
+                              {feature.desc && feature.desc !== '-' && (
+                                <p className="mt-1 text-sm leading-relaxed text-white/65 transition-colors group-hover:text-gray-custom">
+                                  {feature.desc}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        </AnimateOnScroll>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               </div>
-              </AnimateOnScroll>
-            ))}
-          </div>
+            </div>
+          </AnimateOnScroll>
         </div>
       </section>
 

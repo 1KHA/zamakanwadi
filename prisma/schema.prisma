@@ -281,9 +281,16 @@ model Payment {
   userId          String
   referenceNumber String   // booking reference the payment covers
   amount          Float
+  currency        String   @default("SAR")
   method          String   @default("card")
+  provider        String   @default("demo")   // demo | strabl
+  /// Strabl orderShortCode. Unique so a retried/replayed webhook is a no-op.
+  providerOrderId String?  @unique
   cardLast4       String?
+  /// PAID | AMOUNT_MISMATCH (tampered cart) | UNMATCHED (no pending bookings)
   status          String   @default("PAID")
+  /// Raw webhook body, kept for disputes and reconciliation.
+  rawPayload      Json?
   createdAt       DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
