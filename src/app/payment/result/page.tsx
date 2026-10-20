@@ -24,7 +24,9 @@ function ResultContent() {
   const status = params.get('status');
   const ref = params.get('ref') ?? '';
   const applied = params.get('applied') ?? '';
+  // Both appended by the Strabl SDK itself when it navigates to merchantUrls.
   const failureReason = params.get('failureReason');
+  const orderShortCode = params.get('orderShortCode') ?? '';
   const [timedOut, setTimedOut] = useState(false);
 
   useEffect(() => {
@@ -102,6 +104,12 @@ function ResultContent() {
             ? 'التأكيد في الطريق. سنرسل لك إشعاراً فور تأكيد الحجز.'
             : "Confirmation is on its way. We'll notify you as soon as the booking is confirmed."}
         </p>
+        {orderShortCode && (
+          <p className="text-sm text-gray-custom mb-6" dir="ltr">
+            {isRTL ? 'رقم الطلب لدى مزود الدفع: ' : 'Payment order code: '}
+            <span className="font-mono font-semibold">{orderShortCode}</span>
+          </p>
+        )}
         <a href="/dashboard" className="text-primary hover:underline font-medium">
           {isRTL ? 'الذهاب إلى لوحة التحكم' : 'Go to dashboard'}
         </a>

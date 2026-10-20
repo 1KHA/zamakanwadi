@@ -133,8 +133,13 @@ export async function buildStrablCart(
     productId: b.spaceId ?? b.id,
     // Unique per booking — useful for reconciliation in Strabl's dashboard.
     variantId: b.id,
+    // README lists sku as required; the SDK's own types and validation treat
+    // it as optional (only title/price/quantity/productId/variantId are checked).
     sku: b.durationType ?? undefined,
     url: b.spaceId ? `${origin}/spaces/${b.spaceId}` : undefined,
+    // Optional per the SDK; shown next to the line in the hosted checkout.
+    // Every seeded space ships public/images/spaces/<id>/main.jpg.
+    image: b.spaceId ? `${origin}/images/spaces/${b.spaceId}/main.jpg` : undefined,
   }));
 
   const subtotal = round2(bookings.reduce((sum, b) => sum + b.total, 0));
@@ -161,6 +166,8 @@ export async function buildStrablCart(
     lineItems,
     // Lets the webhook find the bookings. Both values are ours, not the user's.
     extra: { referenceNumber, userId },
+    // The SDK appends ?orderShortCode=… to successUrl and ?failureReason=… to
+    // failureUrl before navigating (verified in dist/index.js, not in the README).
     merchantUrls: {
       successUrl: `${origin}/payment/result?status=success&ref=${referenceNumber}${applied}`,
       failureUrl: `${origin}/payment/result?status=failed&ref=${referenceNumber}`,
