@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Prisma } from '@prisma/client';
 import {
+  describeWebhookShape,
   isPaidEvent,
   markReferencePaid,
   parseStrablWebhook,
@@ -32,15 +33,25 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
   }
 
+  // From here on the request is authentic, so anything we cannot handle is
+  // logged with its key structure (names and types, no customer values) —
+  // that log line is how a payload shape we did not anticipate gets fixed.
+  const contentType = req.headers.get('content-type') ?? '-';
+
   let body: unknown;
   try {
     body = JSON.parse(raw);
   } catch {
+    console.error(`[strabl] webhook body is not JSON (content-type=${contentType}, ${raw.length} bytes)`);
     return NextResponse.json({ error: 'Invalid body' }, { status: 400 });
   }
 
   const event = parseStrablWebhook(body);
   if (!event) {
+    console.error(
+      `[strabl] webhook body not recognised (content-type=${contentType}, ${raw.length} bytes): ` +
+        describeWebhookShape(body)
+    );
     return NextResponse.json({ error: 'Missing order data' }, { status: 400 });
   }
 
@@ -58,8 +69,9 @@ export async function POST(req: NextRequest) {
       ? console.warn
       : console.log;
     log(
-      `[strabl] webhook ${event.eventType} for ${event.orderShortCode} ignored ` +
-        `(paymentStatus=${event.paymentStatus || '-'}, status=${event.orderStatus || '-'})`
+      `[strabl] webhook ${event.eventType || '(no type)'} for ${event.orderShortCode} ignored ` +
+        `(paymentStatus=${event.paymentStatus || '-'}, status=${event.orderStatus || '-'}): ` +
+        describeWebhookShape(body)
     );
     return NextResponse.json({ received: true, ignored: event.eventType, paymentStatus: event.paymentStatus });
   }
@@ -83,7 +95,8 @@ export async function POST(req: NextRequest) {
       // UNMATCHED: nothing we could attach it to — Strabl's dashboard has the order.
       console.error(
         `[strabl] order ${event.orderShortCode} recorded as ${result.status} ` +
-          `(ref ${result.referenceNumber ?? '-'}, ${result.amount} SAR, bookings ${event.bookingIds.join(',') || '-'}) — needs manual review`
+          `(ref ${result.referenceNumber ?? '-'}, ${result.amount} SAR, bookings ${event.bookingIds.join(',') || '-'}) — needs manual review: ` +
+          describeWebhookShape(body)
       );
     }
 

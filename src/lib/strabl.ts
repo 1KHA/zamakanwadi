@@ -264,23 +264,70 @@ export interface StrablWebhookEvent {
 const str = (v: unknown): string => (typeof v === 'string' ? v : '');
 const obj = (v: unknown): Record<string, unknown> =>
   v && typeof v === 'object' && !Array.isArray(v) ? (v as Record<string, unknown>) : {};
+const hasKeys = (v: Record<string, unknown>) => Object.keys(v).length > 0;
+
+/** 'orderCreated' / 'ORDER-CREATED' / ' order_created ' → 'order_created'. */
+export function normaliseEventType(v: unknown): string {
+  return str(v)
+    .replace(/([a-z0-9])([A-Z])/g, '$1_$2')
+    .toLowerCase()
+    .replace(/[^a-z]+/g, '_')
+    .replace(/^_+|_+$/g, '');
+}
+
+/** Scalar fields whose values are safe and useful to log (enum-like, no customer data). */
+const SHAPE_VALUE_KEYS = new Set([
+  'type', 'webhookEventType', 'eventType', 'event', 'status', 'paymentStatus', 'fulfillmentStatus',
+  'orderShortCode', 'currency', 'totalPrice',
+]);
 
 /**
- * Normalises the documented envelope
- *   { eventId, webhookEventType, platformUuid, orderUuid, orderShortCode, publishedAt,
- *     payload: { type, orderUpdate: {...}, customerUpdate: {...} } }
- * into the fields we act on. Returns null only when the body is not a Strabl
- * event at all (no event type or order code); every real event parses so the
- * route can acknowledge and log it.
+ * Key structure of a webhook body for the logs — names and types only, never
+ * customer values — so an unrecognised payload can be fixed from the logs.
+ */
+export function describeWebhookShape(value: unknown, depth = 0): string {
+  if (Array.isArray(value)) {
+    return value.length ? `[${value.length}×${describeWebhookShape(value[0], depth + 1)}]` : '[]';
+  }
+  if (value === null) return 'null';
+  if (typeof value !== 'object') return typeof value;
+  if (depth >= 4) return '{…}';
+  const parts = Object.entries(value as Record<string, unknown>).map(([k, v]) => {
+    const shown = SHAPE_VALUE_KEYS.has(k) && (typeof v === 'string' || typeof v === 'number')
+      ? JSON.stringify(String(v).slice(0, 40))
+      : describeWebhookShape(v, depth + 1);
+    return `${k}:${shown}`;
+  });
+  return `{${parts.join(',')}}`;
+}
+
+/**
+ * Normalises a Strabl event into the fields we act on. The docs describe two
+ * shapes and the live sandbox rejected the first one we implemented, so both
+ * are accepted:
+ *   1. envelope — { eventId, webhookEventType, platformUuid, orderUuid, orderShortCode,
+ *                   publishedAt, payload: { type, orderUpdate, customerUpdate } }
+ *   2. bare    — { type, orderUpdate: {...}, customerUpdate: {...} }   (the per-event schema pages)
+ * plus either of those wrapped in { data: … }. Returns null only when no order
+ * code can be found anywhere; every real event parses so the route can
+ * acknowledge and log it.
  */
 export function parseStrablWebhook(event: unknown): StrablWebhookEvent | null {
-  const e = obj(event);
-  const eventType = str(e.webhookEventType);
-  const orderShortCode = str(e.orderShortCode);
-  if (!eventType || !orderShortCode) return null;
+  let e = obj(event);
+  if (!hasKeys(obj(e.payload)) && !hasKeys(obj(e.orderUpdate))) {
+    const inner = obj(e.data);
+    if (hasKeys(obj(inner.payload)) || hasKeys(obj(inner.orderUpdate))) e = inner;
+  }
 
   const payload = obj(e.payload);
-  const order = obj(payload.orderUpdate);
+  const order = hasKeys(obj(payload.orderUpdate)) ? obj(payload.orderUpdate) : obj(e.orderUpdate);
+
+  // Event type may be blank: the bare schema only has `type`, whose values are undocumented.
+  const eventType = normaliseEventType(
+    e.webhookEventType ?? e.eventType ?? e.event ?? e.type ?? payload.type
+  );
+  const orderShortCode = str(e.orderShortCode) || str(order.orderShortCode);
+  if (!orderShortCode) return null;
 
   const products = Array.isArray(order.products) ? order.products.map(obj) : [];
   const bookingIds = products
@@ -316,12 +363,23 @@ export function parseStrablWebhook(event: unknown): StrablWebhookEvent | null {
 }
 
 /**
- * Only these event types can carry a successful payment ("order_updated: an
- * order is marked paid or fulfilled"). The docs type paymentStatus as a free
- * string and list no values, so the accepted set is deliberately broad and the
- * route logs every status it ignores — add the real value here once seen.
+ * Documented event types that can never mean "money received". Anything else
+ * (order_created, order_updated — "marked paid or fulfilled" — or a blank or
+ * unknown label, since the real `type` vocabulary is undocumented) is judged
+ * on paymentStatus alone. That is safe because the body is signed and the
+ * amount is still checked against our own booking total.
  */
-const PAID_EVENT_TYPES = new Set<string>(['order_created', 'order_updated']);
+const NON_PAYMENT_EVENT_TYPES = new Set<string>([
+  'order_failed',
+  'order_refunded',
+  'order_abandoned',
+  'order_chargeback',
+]);
+/**
+ * The docs type paymentStatus as a free string and list no values, so the
+ * accepted set is deliberately broad and the route logs every status it
+ * ignores — add the real value here once seen.
+ */
 const PAID_STATUSES = new Set([
   'paid',
   'captured',
@@ -331,10 +389,12 @@ const PAID_STATUSES = new Set([
   'completed',
   'complete',
   'approved',
+  'settled',
+  'confirmed',
 ]);
 
 export function isPaidEvent(event: StrablWebhookEvent): boolean {
-  return PAID_EVENT_TYPES.has(event.eventType) && PAID_STATUSES.has(event.paymentStatus);
+  return !NON_PAYMENT_EVENT_TYPES.has(event.eventType) && PAID_STATUSES.has(event.paymentStatus);
 }
 
 export type PaymentRecordStatus = 'PAID' | 'AMOUNT_MISMATCH' | 'UNMATCHED';
