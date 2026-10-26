@@ -83,3 +83,4 @@ scripts/seed-admin.ts
 
 /testapi
 /update
+.env.docker

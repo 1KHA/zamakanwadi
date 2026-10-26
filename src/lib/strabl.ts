@@ -179,92 +179,195 @@ export async function buildStrablCart(
 }
 
 // ---------------------------------------------------------------------------
-// Webhook
+// Webhook — spec: https://docs.strabl.io/webhook-1615585m0 (fetched 2026-10-26)
 // ---------------------------------------------------------------------------
 
-/** TODO(strabl): confirm the real header name with Strabl (§2.2 Q3). */
-export const STRABL_SIGNATURE_HEADER = 'x-strabl-signature';
+/** The three headers Strabl sends with every webhook (Headers API is case-insensitive). */
+export const STRABL_WEBHOOK_HEADERS = {
+  id: 'x-webhook-id',
+  timestamp: 'x-webhook-timestamp',
+  signature: 'x-webhook-signature',
+} as const;
+
+/** Strabl: "Reject requests where |now - X-Webhook-Timestamp| > 300" seconds. */
+export const STRABL_TIMESTAMP_TOLERANCE_S = 300;
+
+export interface StrablWebhookHeaders {
+  id: string | null;
+  timestamp: string | null;
+  signature: string | null;
+}
 
 /**
- * ⚠️ ASSUMPTION (STRABL_CHECKOUT.md Step 4): HMAC-SHA256 of the raw request
- * body, hex-encoded. Replace with the scheme Strabl documents (header name,
- * algorithm, encoding) before going live.
+ * X-Webhook-Signature = "v1=" + hex(HMAC-SHA256(secret, `${id}.${timestamp}.${rawBody}`))
  *
- * Fails CLOSED: no secret configured, or no signature sent, means rejected.
+ * Fails CLOSED: no secret configured, any header missing, a non-numeric or
+ * stale timestamp, or a malformed signature all mean "rejected". The raw body
+ * must be the bytes as received — never re-serialised JSON.
  */
-export function verifyStrablSignature(rawBody: string, signature: string | null): boolean {
+export function verifyStrablSignature(
+  rawBody: string,
+  headers: StrablWebhookHeaders,
+  nowMs: number = Date.now()
+): boolean {
   const secret = process.env.STRABL_WEBHOOK_SECRET;
-  if (!secret || !signature) return false;
+  const { id, timestamp, signature } = headers;
+  if (!secret || !id || !timestamp || !signature) return false;
 
-  const expected = Buffer.from(createHmac('sha256', secret).update(rawBody).digest('hex'));
+  // Replay window. Epoch seconds only; anything else is malformed.
+  if (!/^\d{1,12}$/.test(timestamp)) return false;
+  if (Math.abs(Math.floor(nowMs / 1000) - Number(timestamp)) > STRABL_TIMESTAMP_TOLERANCE_S) return false;
+
+  const expected = Buffer.from(
+    'v1=' + createHmac('sha256', secret).update(`${id}.${timestamp}.${rawBody}`).digest('hex')
+  );
   const received = Buffer.from(signature.trim());
   // Length is not secret; a mismatch here just means a malformed signature.
   return expected.length === received.length && timingSafeEqual(expected, received);
 }
 
+/** Documented webhookEventType values. */
+export type StrablEventType =
+  | 'order_created'
+  | 'order_updated'
+  | 'order_failed'
+  | 'order_refunded'
+  | 'order_abandoned'
+  | 'order_chargeback';
+
 export interface StrablWebhookEvent {
-  status: string;
+  eventId: string;
+  eventType: string;
+  platformUuid: string;
+  orderUuid: string;
   orderShortCode: string;
-  /** In Strabl's unit — convert with fromProviderAmount(). */
-  amount: number;
+  /** payload.orderUpdate.paymentStatus, lower-cased ('' when absent). */
+  paymentStatus: string;
+  /** payload.orderUpdate.status, lower-cased ('' when absent). */
+  orderStatus: string;
+  /** payload.orderUpdate.totalPrice in Strabl's unit — convert with fromProviderAmount(). */
+  amount: number | null;
   currency: string;
-  referenceNumber: string;
-  userId: string;
+  /**
+   * Our booking ids. buildStrablCart sends booking.id as variantId and Strabl
+   * echoes it as products[].externalVariantId — the reliable way to find what
+   * was paid for. The synthetic "vat-…" line is excluded.
+   */
+  bookingIds: string[];
+  /** Σ payload.orderUpdate.taxes[].value — Strabl-side taxes; should be 0 for us (VAT is our own line). */
+  taxes: number;
+  /** cart.extra, if echoed. The docs promise it; the schema doesn't say where, so this is best-effort. */
+  referenceNumber: string | null;
+  userId: string | null;
+}
+
+const str = (v: unknown): string => (typeof v === 'string' ? v : '');
+const obj = (v: unknown): Record<string, unknown> =>
+  v && typeof v === 'object' && !Array.isArray(v) ? (v as Record<string, unknown>) : {};
+
+/**
+ * Normalises the documented envelope
+ *   { eventId, webhookEventType, platformUuid, orderUuid, orderShortCode, publishedAt,
+ *     payload: { type, orderUpdate: {...}, customerUpdate: {...} } }
+ * into the fields we act on. Returns null only when the body is not a Strabl
+ * event at all (no event type or order code); every real event parses so the
+ * route can acknowledge and log it.
+ */
+export function parseStrablWebhook(event: unknown): StrablWebhookEvent | null {
+  const e = obj(event);
+  const eventType = str(e.webhookEventType);
+  const orderShortCode = str(e.orderShortCode);
+  if (!eventType || !orderShortCode) return null;
+
+  const payload = obj(e.payload);
+  const order = obj(payload.orderUpdate);
+
+  const products = Array.isArray(order.products) ? order.products.map(obj) : [];
+  const bookingIds = products
+    .map((p) => str(p.externalVariantId))
+    .filter((id) => id.length > 0 && !id.startsWith('vat-'));
+
+  const taxes = (Array.isArray(order.taxes) ? order.taxes.map(obj) : []).reduce(
+    (sum, t) => sum + (Number(t.value) || 0),
+    0
+  );
+
+  const totalPrice = Number(order.totalPrice);
+
+  // Where `extra` is echoed is not in the published schema — accept the plausible spots.
+  const extra = { ...obj(e.extra), ...obj(payload.extra), ...obj(order.extra) };
+  const ref = str(extra.referenceNumber);
+
+  return {
+    eventId: str(e.eventId),
+    eventType,
+    platformUuid: str(e.platformUuid) || str(order.platformUuid),
+    orderUuid: str(e.orderUuid) || str(order.orderUuid),
+    orderShortCode,
+    paymentStatus: str(order.paymentStatus).toLowerCase(),
+    orderStatus: str(order.status).toLowerCase(),
+    amount: Number.isFinite(totalPrice) ? totalPrice : null,
+    currency: str(order.currency).toUpperCase(),
+    bookingIds,
+    taxes,
+    referenceNumber: REFERENCE_PATTERN.test(ref) ? ref : null,
+    userId: str(extra.userId) || null,
+  };
 }
 
 /**
- * Normalises a webhook body into the fields we act on.
- *
- * TODO(strabl): the field names below are PLACEHOLDERS until Strabl sends the
- * payload spec (§2.2 Q3). This is the only place that needs to change.
- * Returns null when the body doesn't carry what we need.
+ * Only these event types can carry a successful payment ("order_updated: an
+ * order is marked paid or fulfilled"). The docs type paymentStatus as a free
+ * string and list no values, so the accepted set is deliberately broad and the
+ * route logs every status it ignores — add the real value here once seen.
  */
-export function parseStrablWebhook(event: unknown): StrablWebhookEvent | null {
-  if (!event || typeof event !== 'object') return null;
-  const e = event as Record<string, unknown>;
-  const extra = (e.extra && typeof e.extra === 'object' ? e.extra : {}) as Record<string, unknown>;
+const PAID_EVENT_TYPES = new Set<string>(['order_created', 'order_updated']);
+const PAID_STATUSES = new Set([
+  'paid',
+  'captured',
+  'success',
+  'succeeded',
+  'successful',
+  'completed',
+  'complete',
+  'approved',
+]);
 
-  const status = typeof e.status === 'string' ? e.status : '';
-  const orderShortCode = typeof e.orderShortCode === 'string' ? e.orderShortCode : '';
-  const amount = Number(e.amount);
-  const currency = typeof e.currency === 'string' ? e.currency : '';
-  const referenceNumber = typeof extra.referenceNumber === 'string' ? extra.referenceNumber : '';
-  const userId = typeof extra.userId === 'string' ? extra.userId : '';
-
-  if (!status || !orderShortCode || !Number.isFinite(amount) || !currency) return null;
-  if (!REFERENCE_PATTERN.test(referenceNumber) || !userId) return null;
-
-  return { status, orderShortCode, amount, currency, referenceNumber, userId };
+export function isPaidEvent(event: StrablWebhookEvent): boolean {
+  return PAID_EVENT_TYPES.has(event.eventType) && PAID_STATUSES.has(event.paymentStatus);
 }
 
 export type PaymentRecordStatus = 'PAID' | 'AMOUNT_MISMATCH' | 'UNMATCHED';
 
 export interface MarkPaidResult {
-  paymentId: string;
+  /** null for UNMATCHED — there is no user to attach a Payment row to. */
+  paymentId: string | null;
   status: PaymentRecordStatus;
   amount: number;
-  referenceNumber: string;
-  userId: string;
-  /** False when this orderShortCode was already recorded (webhook retry). */
+  referenceNumber: string | null;
+  userId: string | null;
+  /** False when this orderShortCode was already recorded (webhook retry / order_updated after order_created). */
   isNew: boolean;
 }
 
 /**
- * Records a Strabl payment and, only if the amount matches what the database
- * says is owed, marks the bookings PAID. Idempotent on orderShortCode.
+ * Records a successful Strabl payment and, only if the amount matches what the
+ * database says is owed, marks the bookings PAID. Idempotent on orderShortCode.
  *
- * The SDK builds the cart in the browser, so a mismatch means the cart was
- * tampered with (e.g. a price edited in DevTools). The money is recorded for
- * reconciliation, but the bookings are NOT confirmed.
+ * Bookings are found by the ids Strabl echoes back (externalVariantId), with
+ * cart.extra as a fallback and as a cross-check when both are present. The
+ * cart is built in the browser by the SDK, so an amount mismatch means it was
+ * tampered with: the money is recorded for reconciliation, bookings stay unpaid.
  */
 export async function markReferencePaid(
   event: StrablWebhookEvent,
   rawPayload: unknown
 ): Promise<MarkPaidResult> {
-  const amountSar = fromProviderAmount(event.amount);
+  const amountSar = event.amount === null ? 0 : fromProviderAmount(event.amount);
 
   return prisma.$transaction(async (tx) => {
-    // Webhooks are retried — a second delivery for the same order is a no-op.
+    // Webhooks are retried, and order_updated follows order_created for the
+    // same order — a second delivery for the same order is a no-op.
     const existing = await tx.payment.findUnique({
       where: { providerOrderId: event.orderShortCode },
     });
@@ -279,32 +382,53 @@ export async function markReferencePaid(
       };
     }
 
-    const bookings = await tx.booking.findMany({
-      where: {
+    const unmatched: MarkPaidResult = {
+      paymentId: null,
+      status: 'UNMATCHED',
+      amount: amountSar,
+      referenceNumber: event.referenceNumber,
+      userId: event.userId,
+      isNew: true,
+    };
+
+    let where: Prisma.BookingWhereInput | null = null;
+    if (event.bookingIds.length > 0) {
+      where = { id: { in: event.bookingIds }, paymentStatus: 'PENDING_PAYMENT' };
+    } else if (event.referenceNumber && event.userId) {
+      where = {
         userId: event.userId,
         referenceNumber: event.referenceNumber,
         paymentStatus: 'PENDING_PAYMENT',
-      },
-    });
-
-    let status: PaymentRecordStatus;
-    if (bookings.length === 0) {
-      // Money arrived for nothing we can find. Never drop that silently.
-      status = 'UNMATCHED';
-    } else {
-      // Same formula the cart was built with, so what Strabl was told to charge
-      // is exactly what we verify here.
-      const expected = amountWithVat(round2(bookings.reduce((sum, b) => sum + b.total, 0)));
-      const matches = event.currency === 'SAR' && Math.abs(amountSar - expected) < 0.01;
-      status = matches ? 'PAID' : 'AMOUNT_MISMATCH';
+      };
     }
+    const bookings = where ? await tx.booking.findMany({ where }) : [];
+    if (bookings.length === 0) return unmatched;
+
+    // One order pays for one reference of one user — anything else is not ours to confirm.
+    const referenceNumber = bookings[0].referenceNumber;
+    const userId = bookings[0].userId;
+    if (
+      !referenceNumber ||
+      bookings.some((b) => b.referenceNumber !== referenceNumber || b.userId !== userId) ||
+      (event.referenceNumber && event.referenceNumber !== referenceNumber) ||
+      (event.userId && event.userId !== userId)
+    ) {
+      return unmatched;
+    }
+
+    // Same formula the cart was built with, so what Strabl was told to charge
+    // is exactly what we verify here.
+    const expected = amountWithVat(round2(bookings.reduce((sum, b) => sum + b.total, 0)));
+    const matches =
+      event.currency === 'SAR' && event.amount !== null && Math.abs(amountSar - expected) < 0.01;
+    const status: PaymentRecordStatus = matches ? 'PAID' : 'AMOUNT_MISMATCH';
 
     const payment = await tx.payment.create({
       data: {
-        userId: event.userId,
-        referenceNumber: event.referenceNumber,
+        userId,
+        referenceNumber,
         amount: amountSar,
-        currency: event.currency,
+        currency: event.currency || 'SAR',
         method: 'strabl',
         provider: 'strabl',
         providerOrderId: event.orderShortCode,
@@ -320,13 +444,6 @@ export async function markReferencePaid(
       });
     }
 
-    return {
-      paymentId: payment.id,
-      status,
-      amount: amountSar,
-      referenceNumber: event.referenceNumber,
-      userId: event.userId,
-      isNew: true,
-    };
+    return { paymentId: payment.id, status, amount: amountSar, referenceNumber, userId, isNew: true };
   });
 }
