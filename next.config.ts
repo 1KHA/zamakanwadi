@@ -11,6 +11,14 @@ const strabl = {
   api: 'https://api.strabl.com https://sandbox.api.strabl.com',
   checkout: 'https://checkout.strabl.io https://sandbox.checkout.strabl.io',
   cdn: 'https://cdn.strabl.com https://strabl.io',
+  // Strabl's checkout hands the card entry / 3-D Secure step to Paymob by
+  // NAVIGATING its own iframe to https://uae.paymob.com/... (routes "3ds" and
+  // "perform-3ds/:redirectUuid" in the checkout app). A nested frame's
+  // navigation is checked against the embedding page's frame-src, so without
+  // this Chrome shows "This content is blocked. Contact the site owner".
+  // Wildcard because Paymob is regional (uae., ksa., accept. …) and the exact
+  // host comes from Strabl's API at runtime, not from the SDK.
+  gateway: 'https://*.paymob.com',
 };
 
 // Next.js injects inline bootstrap scripts, so 'unsafe-inline' is required
@@ -28,7 +36,7 @@ const csp = [
   // Required for the hero background video and the Strabl checkout dialog.
   // Without an explicit frame-src an iframe falls back to default-src 'self'
   // and is silently blocked.
-  `frame-src https://www.youtube-nocookie.com https://www.youtube.com ${strabl.checkout}`,
+  `frame-src https://www.youtube-nocookie.com https://www.youtube.com ${strabl.checkout} ${strabl.gateway}`,
   "frame-ancestors 'none'",
   "base-uri 'self'",
   "form-action 'self'",
