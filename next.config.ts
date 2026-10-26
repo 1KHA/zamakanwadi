@@ -18,7 +18,12 @@ const strabl = {
   // this Chrome shows "This content is blocked. Contact the site owner".
   // Wildcard because Paymob is regional (uae., ksa., accept. …) and the exact
   // host comes from Strabl's API at runtime, not from the SDK.
-  gateway: 'https://*.paymob.com',
+  //
+  // Paymob in turn runs 3-D Secure through Mastercard Gateway (MPGS), again by
+  // navigating the same frame: mtf.gateway.mastercard.com in test, and the
+  // regional ap-/eu-/na-gateway.mastercard.com hosts in production. The
+  // wildcard covers all of them.
+  gateway: 'https://*.paymob.com https://*.gateway.mastercard.com',
 };
 
 // Next.js injects inline bootstrap scripts, so 'unsafe-inline' is required
